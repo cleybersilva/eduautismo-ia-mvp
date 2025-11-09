@@ -1,5 +1,3 @@
-EduAutismo IA
-
 <div align="center">
 
 # 🧩 EduAutismo IA
