@@ -9,3 +9,4 @@ EOF
 
 chmod +x activate.sh
 echo "✅ Script activate.sh criado com sucesso!"
+echo "📄 Para ativar o ambiente virtual, execute: ./activate.sh"
