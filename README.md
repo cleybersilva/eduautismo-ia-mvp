@@ -38,7 +38,7 @@ Professores da rede pública enfrentam desafios significativos:
 ### 💡 Solução
 
 Uma plataforma que:
-- ✨ Gera atividades pedagógicas personalizadas usando **GPT-4**
+- ✨ Gera atividades pedagógicas personalizadas usando **GPT-5**
 - 📊 Realiza avaliações comportamentais baseadas em instrumentos validados (CARS, AQ, etc.)
 - 🤖 Classifica perfis comportamentais com **Machine Learning**
 - 📈 Acompanha evolução do aluno com dashboards e relatórios
@@ -600,26 +600,29 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 ---
 
-## 📞 Contato
+## 📞 Contato/WhatsApp
+
+(81) 98484-5021
+(83) 98832-9018
 
 ### Autor
 
 **Cleyber Ferreira**
 - 🎓 MBA em Inteligência Artificial e Big Data - USP
-- 📧 Email: cleyber@example.com
-- 💼 LinkedIn: [linkedin.com/in/cleyber](https://linkedin.com/in/cleyber)
-- 🐙 GitHub: [@cleyber](https://github.com/cleyber)
+- 📧 Email: cleyber.silva@usp.com.br
+- 💼 LinkedIn: [linkedin.com/in/cleybersilva](https://linkedin.com/in/cleybersilva)
+- 🐙 GitHub: [@cleybersilva](https://github.com/cleybersilva)
 
 ### Projeto
 
-- 🌐 Website: [eduautismo.example.com](https://eduautismo.example.com)
-- 📖 Documentação: [docs.eduautismo.example.com](https://docs.eduautismo.example.com)
-- 🐛 Issues: [github.com/your-org/eduautismo-ia/issues](https://github.com/your-org/eduautismo-ia/issues)
-- 💬 Discussões: [github.com/your-org/eduautismo-ia/discussions](https://github.com/your-org/eduautismo-ia/discussions)
+- 🌐 Website: [eduautismo-ia.com.br](https://eduautismo-ia.com.br)
+- 📖 Documentação: [docs.eduautismo-ia.com.br](https://docs.eduautismo-ia.com.br)
+- 🐛 Issues: [github.com/cleybersilva/eduautismo-ia/issues](https://github.com/cleybersilva/eduautismo-ia/issues)
+- 💬 Discussões: [github.com/cleybersilva/eduautismo-ia/discussions](https://github.com/cleybersilva/eduautismo-ia/discussions)
 
 ### Instituição
 
-**Veni Creator Christian University**
+**UNIVERSIDADE DE SÃO PAULO (USP)**
 - MBA em Inteligência Artificial e Big Data
 - São Paulo, Brasil
 
@@ -669,9 +672,9 @@ Agradecimentos especiais aos mantenedores de:
 
 Se você usar este projeto em sua pesquisa ou trabalho acadêmico, por favor cite:
 ```bibtex
-@mastersthesis{ferreira2025eduautismo,
+@mastersthesis{silva2025eduautismo,
   title={EduAutismo IA: Plataforma Inteligente de Apoio Pedagógico para Alunos com TEA},
-  author={Ferreira, Cleyber},
+  author={Silva, Cleyber},
   year={2025},
   school={Universidade de São Paulo},
   type={Trabalho de Conclusão de Curso (MBA)},
