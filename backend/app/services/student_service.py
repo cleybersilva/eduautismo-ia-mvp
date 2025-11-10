@@ -1,112 +1,320 @@
 """
-Student business logic service.
+Student Service - EduAutismo IA
 
-This module contains the business logic for student operations.
+Business logic for student management.
 """
 
+from datetime import date
 from typing import List, Optional
-from sqlalchemy.orm import Session
+from uuid import UUID
 
+from sqlalchemy import select, func
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from backend.app.core.exceptions import (
+    StudentNotFoundError,
+    PermissionDeniedError,
+    ValidationError as AppValidationError,
+)
 from backend.app.models.student import Student
 from backend.app.schemas.student import StudentCreate, StudentUpdate
+from backend.app.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class StudentService:
-    """
-    Service class for Student business logic.
-
-    This class handles all business logic operations for student.
-    """
+    """Service for student operations."""
 
     @staticmethod
-    def create(db: Session, student_data: StudentCreate) -> Student:
+    async def create_student(
+        db: AsyncSession,
+        student_data: StudentCreate,
+        teacher_id: UUID,
+    ) -> Student:
         """
-        Create a new student.
+        Create new student.
 
         Args:
             db: Database session
-            student_data: Student creation data
+            student_data: Student data
+            teacher_id: Teacher creating the student
 
         Returns:
-            Created student object
+            Created student
+
+        Raises:
+            AppValidationError: If data is invalid
         """
-        # TODO: Implement creation logic
-        db_obj = Student(**student_data.model_dump())
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
-        return db_obj
+        try:
+            # Calculate age from date of birth
+            today = date.today()
+            age = (
+                today.year
+                - student_data.date_of_birth.year
+                - (
+                    (today.month, today.day)
+                    < (student_data.date_of_birth.month, student_data.date_of_birth.day)
+                )
+            )
+
+            # Create student instance
+            student = Student(
+                name=student_data.name,
+                date_of_birth=student_data.date_of_birth,
+                age=age,
+                diagnosis=student_data.diagnosis,
+                tea_level=student_data.tea_level,
+                interests=student_data.interests,
+                learning_profile=student_data.learning_profile,
+                teacher_id=teacher_id,
+            )
+
+            db.add(student)
+            await db.commit()
+            await db.refresh(student)
+
+            logger.info(f"Student created: {student.id} by teacher {teacher_id}")
+
+            return student
+
+        except Exception as e:
+            await db.rollback()
+            logger.error(f"Error creating student: {e}")
+            raise
 
     @staticmethod
-    def get(db: Session, student_id: int) -> Optional[Student]:
+    async def get_student(
+        db: AsyncSession,
+        student_id: UUID,
+        teacher_id: Optional[UUID] = None,
+    ) -> Student:
         """
-        Get a student by ID.
+        Get student by ID.
 
         Args:
             db: Database session
             student_id: Student ID
+            teacher_id: Optional teacher ID for permission check
 
         Returns:
-            Student object or None if not found
+            Student
+
+        Raises:
+            StudentNotFoundError: If student not found
+            PermissionDeniedError: If teacher doesn't own student
         """
-        return db.query(Student).filter(Student.id == student_id).first()
+        result = await db.execute(select(Student).where(Student.id == student_id))
+        student = result.scalar_one_or_none()
+
+        if not student:
+            raise StudentNotFoundError(str(student_id))
+
+        # Check permission if teacher_id provided
+        if teacher_id and student.teacher_id != teacher_id:
+            raise PermissionDeniedError(
+                message="Você não tem permissão para acessar este aluno",
+                resource=f"student:{student_id}",
+            )
+
+        return student
 
     @staticmethod
-    def get_multi(db: Session, skip: int = 0, limit: int = 100) -> List[Student]:
+    async def list_students(
+        db: AsyncSession,
+        teacher_id: Optional[UUID] = None,
+        skip: int = 0,
+        limit: int = 20,
+        is_active: Optional[bool] = None,
+    ) -> tuple[List[Student], int]:
         """
-        Get multiple students.
+        List students with pagination.
 
         Args:
             db: Database session
-            skip: Number of records to skip
-            limit: Maximum number of records to return
+            teacher_id: Filter by teacher (None = all)
+            skip: Number to skip
+            limit: Max results
+            is_active: Filter by active status
 
         Returns:
-            List of student objects
+            Tuple of (students list, total count)
         """
-        return db.query(Student).offset(skip).limit(limit).all()
+        # Build query
+        query = select(Student)
+
+        if teacher_id:
+            query = query.where(Student.teacher_id == teacher_id)
+
+        if is_active is not None:
+            query = query.where(Student.is_active == is_active)
+
+        # Count total
+        count_query = select(func.count()).select_from(query.subquery())
+        total_result = await db.execute(count_query)
+        total = total_result.scalar_one()
+
+        # Get paginated results
+        query = query.offset(skip).limit(limit).order_by(Student.created_at.desc())
+        result = await db.execute(query)
+        students = result.scalars().all()
+
+        return list(students), total
 
     @staticmethod
-    def update(db: Session, student_id: int, student_data: StudentUpdate) -> Optional[Student]:
+    async def update_student(
+        db: AsyncSession,
+        student_id: UUID,
+        student_data: StudentUpdate,
+        teacher_id: Optional[UUID] = None,
+    ) -> Student:
         """
-        Update a student.
+        Update student.
 
         Args:
             db: Database session
             student_id: Student ID
             student_data: Update data
+            teacher_id: Optional teacher ID for permission check
 
         Returns:
-            Updated student object or None if not found
+            Updated student
+
+        Raises:
+            StudentNotFoundError: If student not found
+            PermissionDeniedError: If teacher doesn't own student
         """
-        db_obj = StudentService.get(db, student_id)
-        if not db_obj:
-            return None
+        # Get student (with permission check)
+        student = await StudentService.get_student(db, student_id, teacher_id)
 
+        # Update fields
         update_data = student_data.model_dump(exclude_unset=True)
-        for field, value in update_data.items():
-            setattr(db_obj, field, value)
 
-        db.commit()
-        db.refresh(db_obj)
-        return db_obj
+        # Recalculate age if date_of_birth changed
+        if "date_of_birth" in update_data:
+            today = date.today()
+            dob = update_data["date_of_birth"]
+            age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+            update_data["age"] = age
+
+        for field, value in update_data.items():
+            setattr(student, field, value)
+
+        await db.commit()
+        await db.refresh(student)
+
+        logger.info(f"Student updated: {student_id}")
+
+        return student
 
     @staticmethod
-    def delete(db: Session, student_id: int) -> bool:
+    async def delete_student(
+        db: AsyncSession,
+        student_id: UUID,
+        teacher_id: Optional[UUID] = None,
+    ) -> None:
         """
-        Delete a student.
+        Delete student (soft delete by setting is_active=False).
 
         Args:
             db: Database session
             student_id: Student ID
+            teacher_id: Optional teacher ID for permission check
+
+        Raises:
+            StudentNotFoundError: If student not found
+            PermissionDeniedError: If teacher doesn't own student
+        """
+        student = await StudentService.get_student(db, student_id, teacher_id)
+
+        student.is_active = False
+        await db.commit()
+
+        logger.info(f"Student deactivated: {student_id}")
+
+    @staticmethod
+    async def get_student_profile(
+        db: AsyncSession,
+        student_id: UUID,
+        teacher_id: Optional[UUID] = None,
+    ) -> dict:
+        """
+        Get student profile formatted for AI services.
+
+        Args:
+            db: Database session
+            student_id: Student ID
+            teacher_id: Optional teacher ID for permission check
 
         Returns:
-            True if deleted, False if not found
+            Student profile dict
         """
-        db_obj = StudentService.get(db, student_id)
-        if not db_obj:
-            return False
+        student = await StudentService.get_student(db, student_id, teacher_id)
+        return student.to_profile_dict()
 
-        db.delete(db_obj)
-        db.commit()
-        return True
+    @staticmethod
+    async def update_learning_profile(
+        db: AsyncSession,
+        student_id: UUID,
+        learning_profile: dict,
+        teacher_id: Optional[UUID] = None,
+    ) -> Student:
+        """
+        Update student's learning profile.
+
+        Args:
+            db: Database session
+            student_id: Student ID
+            learning_profile: New learning profile
+            teacher_id: Optional teacher ID for permission check
+
+        Returns:
+            Updated student
+        """
+        student = await StudentService.get_student(db, student_id, teacher_id)
+
+        student.learning_profile = learning_profile
+        await db.commit()
+        await db.refresh(student)
+
+        logger.info(f"Learning profile updated for student: {student_id}")
+
+        return student
+
+    @staticmethod
+    async def search_students(
+        db: AsyncSession,
+        query: str,
+        teacher_id: Optional[UUID] = None,
+        skip: int = 0,
+        limit: int = 20,
+    ) -> tuple[List[Student], int]:
+        """
+        Search students by name.
+
+        Args:
+            db: Database session
+            query: Search query
+            teacher_id: Filter by teacher
+            skip: Number to skip
+            limit: Max results
+
+        Returns:
+            Tuple of (students list, total count)
+        """
+        search_query = select(Student).where(Student.name.ilike(f"%{query}%"))
+
+        if teacher_id:
+            search_query = search_query.where(Student.teacher_id == teacher_id)
+
+        # Count
+        count_query = select(func.count()).select_from(search_query.subquery())
+        total_result = await db.execute(count_query)
+        total = total_result.scalar_one()
+
+        # Get results
+        search_query = search_query.offset(skip).limit(limit).order_by(Student.name)
+        result = await db.execute(search_query)
+        students = result.scalars().all()
+
+        return list(students), total

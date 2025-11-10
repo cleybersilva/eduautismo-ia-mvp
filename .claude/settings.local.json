@@ -10,7 +10,8 @@
       "Bash(./scripts/validate_structure.sh:*)",
       "Bash(tree:*)",
       "Bash(docker --version:*)",
-      "Bash(docker-compose:*)"
+      "Bash(docker-compose:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

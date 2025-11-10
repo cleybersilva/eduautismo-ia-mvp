@@ -1,0 +1,929 @@
+{
+  "info": {
+    "name": "EduAutismo IA API",
+    "description": "Coleção completa de endpoints da API EduAutismo IA - Plataforma Inteligente de Apoio Pedagógico para TEA",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "api_url",
+      "value": "{{base_url}}/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "test_email",
+      "value": "test@example.com",
+      "type": "string"
+    },
+    {
+      "key": "test_password",
+      "value": "SecurePass123!",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Root",
+      "item": [
+        {
+          "name": "Root Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            },
+            "description": "Endpoint raiz da API - Mensagem de boas-vindas"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "Basic Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_url}}/health",
+              "host": ["{{api_url}}"],
+              "path": ["health"]
+            },
+            "description": "Verificação básica de saúde da API"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has status field\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('status');",
+                  "    pm.expect(jsonData.status).to.eql('healthy');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Detailed Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_url}}/health/detailed",
+              "host": ["{{api_url}}"],
+              "path": ["health", "detailed"]
+            },
+            "description": "Verificação detalhada de saúde com informações de componentes (Database, Cache, OpenAI)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has components\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('components');",
+                  "    pm.expect(jsonData).to.have.property('version');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Readiness Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_url}}/health/ready",
+              "host": ["{{api_url}}"],
+              "path": ["health", "ready"]
+            },
+            "description": "Kubernetes readiness probe - Verifica se a aplicação está pronta para receber tráfego"
+          },
+          "response": []
+        },
+        {
+          "name": "Liveness Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_url}}/health/live",
+              "host": ["{{api_url}}"],
+              "path": ["health", "live"]
+            },
+            "description": "Kubernetes liveness probe - Verifica se a aplicação está viva"
+          },
+          "response": []
+        },
+        {
+          "name": "Startup Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_url}}/health/startup",
+              "host": ["{{api_url}}"],
+              "path": ["health", "startup"]
+            },
+            "description": "Kubernetes startup probe - Verifica se a aplicação inicializou corretamente"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register New User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\",\n  \"full_name\": \"Test User\",\n  \"role\": \"teacher\"\n}"
+            },
+            "url": {
+              "raw": "{{api_url}}/auth/register",
+              "host": ["{{api_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Registrar novo usuário no sistema. Roles disponíveis: teacher, admin"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has user data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('email');",
+                  "    pm.expect(jsonData).to.have.property('role');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "{{test_email}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{test_password}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{api_url}}/auth/login",
+              "host": ["{{api_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login com email e senha. Retorna access_token (30min) e refresh_token (7 dias)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has tokens\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('access_token');",
+                  "    pm.expect(jsonData).to.have.property('refresh_token');",
+                  "    pm.expect(jsonData).to.have.property('token_type');",
+                  "    ",
+                  "    // Save tokens to collection variables",
+                  "    pm.collectionVariables.set('access_token', jsonData.access_token);",
+                  "    pm.collectionVariables.set('refresh_token', jsonData.refresh_token);",
+                  "    ",
+                  "    console.log('✅ Tokens saved to collection variables');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{api_url}}/auth/me",
+              "host": ["{{api_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Obter informações do usuário autenticado atual"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has user data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('email');",
+                  "    pm.expect(jsonData).to.have.property('full_name');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{api_url}}/auth/refresh",
+              "host": ["{{api_url}}"],
+              "path": ["auth", "refresh"]
+            },
+            "description": "Renovar access_token usando refresh_token. Use quando o access_token expirar (30min)"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has new access token\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('access_token');",
+                  "    ",
+                  "    // Update access token",
+                  "    pm.collectionVariables.set('access_token', jsonData.access_token);",
+                  "    ",
+                  "    console.log('✅ Access token refreshed and updated');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{api_url}}/auth/logout",
+              "host": ["{{api_url}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Logout - Invalidar token atual"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Clear tokens",
+                  "pm.collectionVariables.set('access_token', '');",
+                  "pm.collectionVariables.set('refresh_token', '');",
+                  "",
+                  "console.log('✅ Tokens cleared');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Request Password Reset",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_email}}\"\n}"
+            },
+            "url": {
+              "raw": "{{api_url}}/auth/password-reset",
+              "host": ["{{api_url}}"],
+              "path": ["auth", "password-reset"]
+            },
+            "description": "Solicitar reset de senha. Um email será enviado com link/token"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has message\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Confirm Password Reset",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"reset-token-from-email\",\n  \"new_password\": \"NewSecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{api_url}}/auth/password-reset/confirm",
+              "host": ["{{api_url}}"],
+              "path": ["auth", "password-reset", "confirm"]
+            },
+            "description": "Confirmar reset de senha com token recebido por email"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Password reset successful\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "List Students",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{api_url}}/students/?skip=0&limit=10",
+              "host": ["{{api_url}}"],
+              "path": ["students", ""],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Listar todos os alunos (paginado)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Student by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{api_url}}/students/:student_id",
+              "host": ["{{api_url}}"],
+              "path": ["students", ":student_id"],
+              "variable": [
+                {
+                  "key": "student_id",
+                  "value": "uuid-here"
+                }
+              ]
+            },
+            "description": "Obter detalhes de um aluno específico"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"João Silva\",\n  \"age\": 8,\n  \"diagnosis\": \"TEA Nível 1\",\n  \"interests\": [\"dinossauros\", \"música\", \"pintura\"],\n  \"learning_profile\": {\n    \"strengths\": [\"visual\", \"memória\"],\n    \"challenges\": [\"comunicação verbal\", \"socialização\"],\n    \"preferences\": [\"atividades visuais\", \"rotina estruturada\"]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{api_url}}/students/",
+              "host": ["{{api_url}}"],
+              "path": ["students", ""]
+            },
+            "description": "Criar novo perfil de aluno"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Student",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"João Silva\",\n  \"age\": 9,\n  \"diagnosis\": \"TEA Nível 1\",\n  \"interests\": [\"dinossauros\", \"música\", \"pintura\", \"robótica\"]\n}"
+            },
+            "url": {
+              "raw": "{{api_url}}/students/:student_id",
+              "host": ["{{api_url}}"],
+              "path": ["students", ":student_id"],
+              "variable": [
+                {
+                  "key": "student_id",
+                  "value": "uuid-here"
+                }
+              ]
+            },
+            "description": "Atualizar perfil de aluno existente"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Student",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{api_url}}/students/:student_id",
+              "host": ["{{api_url}}"],
+              "path": ["students", ":student_id"],
+              "variable": [
+                {
+                  "key": "student_id",
+                  "value": "uuid-here"
+                }
+              ]
+            },
+            "description": "Deletar perfil de aluno"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Activities",
+      "item": [
+        {
+          "name": "Generate Activity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": \"uuid-here\",\n  \"activity_type\": \"cognitive\",\n  \"difficulty\": \"medium\",\n  \"duration_minutes\": 30,\n  \"theme\": \"dinossauros\"\n}"
+            },
+            "url": {
+              "raw": "{{api_url}}/activities/generate",
+              "host": ["{{api_url}}"],
+              "path": ["activities", "generate"]
+            },
+            "description": "Gerar atividade personalizada com IA para um aluno"
+          },
+          "response": []
+        },
+        {
+          "name": "List Activities",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{api_url}}/activities/?student_id=uuid-here&skip=0&limit=10",
+              "host": ["{{api_url}}"],
+              "path": ["activities", ""],
+              "query": [
+                {
+                  "key": "student_id",
+                  "value": "uuid-here"
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Listar atividades (filtrar por aluno opcional)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Activity by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{api_url}}/activities/:activity_id",
+              "host": ["{{api_url}}"],
+              "path": ["activities", ":activity_id"],
+              "variable": [
+                {
+                  "key": "activity_id",
+                  "value": "uuid-here"
+                }
+              ]
+            },
+            "description": "Obter detalhes de uma atividade específica"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Assessments",
+      "item": [
+        {
+          "name": "Create Assessment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activity_id\": \"uuid-here\",\n  \"student_id\": \"uuid-here\",\n  \"completion_status\": \"completed\",\n  \"engagement_level\": \"high\",\n  \"difficulty_rating\": \"appropriate\",\n  \"notes\": \"Aluno demonstrou ótimo engajamento e compreensão\",\n  \"duration_minutes\": 28\n}"
+            },
+            "url": {
+              "raw": "{{api_url}}/assessments/",
+              "host": ["{{api_url}}"],
+              "path": ["assessments", ""]
+            },
+            "description": "Criar avaliação de atividade realizada"
+          },
+          "response": []
+        },
+        {
+          "name": "List Assessments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{api_url}}/assessments/?student_id=uuid-here&skip=0&limit=10",
+              "host": ["{{api_url}}"],
+              "path": ["assessments", ""],
+              "query": [
+                {
+                  "key": "student_id",
+                  "value": "uuid-here"
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Listar avaliações (filtrar por aluno opcional)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Assessment by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{api_url}}/assessments/:assessment_id",
+              "host": ["{{api_url}}"],
+              "path": ["assessments", ":assessment_id"],
+              "variable": [
+                {
+                  "key": "assessment_id",
+                  "value": "uuid-here"
+                }
+              ]
+            },
+            "description": "Obter detalhes de uma avaliação específica"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Student Progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{api_url}}/assessments/progress/:student_id",
+              "host": ["{{api_url}}"],
+              "path": ["assessments", "progress", ":student_id"],
+              "variable": [
+                {
+                  "key": "student_id",
+                  "value": "uuid-here"
+                }
+              ]
+            },
+            "description": "Obter análise de progresso do aluno com insights de IA"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Documentation",
+      "item": [
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/docs",
+              "host": ["{{base_url}}"],
+              "path": ["docs"]
+            },
+            "description": "Interface Swagger interativa para testar endpoints"
+          },
+          "response": []
+        },
+        {
+          "name": "ReDoc",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/redoc",
+              "host": ["{{base_url}}"],
+              "path": ["redoc"]
+            },
+            "description": "Documentação alternativa em formato ReDoc"
+          },
+          "response": []
+        },
+        {
+          "name": "OpenAPI Schema",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/openapi.json",
+              "host": ["{{base_url}}"],
+              "path": ["openapi.json"]
+            },
+            "description": "Schema OpenAPI em formato JSON"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// This runs before every request",
+          "// You can add global pre-request logic here"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// This runs after every request",
+          "// You can add global test logic here"
+        ]
+      }
+    }
+  ]
+}

@@ -1,50 +1,130 @@
 """
-Activity Pydantic schemas for request/response validation.
+Activity Schemas - EduAutismo IA
 
-This module defines the Pydantic schemas for activity API endpoints.
+Request and response schemas for activity-related endpoints.
 """
 
-from pydantic import BaseModel, Field, ConfigDict
-from typing import Optional
-from datetime import datetime
+from typing import Any, Dict, List, Optional
+from uuid import UUID
+
+from pydantic import Field, field_validator
+
+from backend.app.schemas.common import BaseResponseSchema, BaseSchema
+from backend.app.utils.constants import (
+    ActivityType,
+    DifficultyLevel,
+    MIN_ACTIVITY_DURATION,
+    MAX_ACTIVITY_DURATION,
+)
 
 
-class ActivityBase(BaseModel):
-    """Base schema for Activity with shared attributes."""
+class ActivityGenerate(BaseSchema):
+    """Schema for generating activity with AI."""
 
-    # TODO: Add base fields here
-    pass
-
-
-class ActivityCreate(BaseModel):
-    """Schema for creating a new activity."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    # TODO: Add creation fields here
-    pass
-
-
-class ActivityUpdate(BaseModel):
-    """Schema for updating an existing activity."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    # TODO: Add update fields here
-    pass
+    student_id: UUID = Field(..., description="Student ID for personalization")
+    activity_type: ActivityType = Field(..., description="Type of activity")
+    difficulty: DifficultyLevel = Field(..., description="Difficulty level")
+    duration_minutes: int = Field(
+        ...,
+        ge=MIN_ACTIVITY_DURATION,
+        le=MAX_ACTIVITY_DURATION,
+        description="Duration in minutes"
+    )
+    theme: Optional[str] = Field(
+        default=None,
+        max_length=255,
+        description="Optional theme/topic",
+        examples=["dinossauros", "sistema solar", "cores"]
+    )
 
 
-class ActivityInDB(ActivityBase):
-    """Schema for activity as stored in database."""
+class ActivityCreate(BaseSchema):
+    """Schema for creating activity manually."""
 
-    model_config = ConfigDict(from_attributes=True)
+    student_id: UUID = Field(..., description="Student ID")
+    title: str = Field(..., min_length=3, max_length=500, description="Activity title")
+    description: str = Field(..., min_length=10, description="Activity description")
+    activity_type: ActivityType = Field(..., description="Activity type")
+    difficulty: DifficultyLevel = Field(..., description="Difficulty level")
+    duration_minutes: int = Field(..., ge=MIN_ACTIVITY_DURATION, le=MAX_ACTIVITY_DURATION)
+    objectives: List[str] = Field(..., min_length=1, description="Learning objectives")
+    materials: List[str] = Field(..., min_length=1, description="Required materials")
+    instructions: List[str] = Field(..., min_length=1, description="Step-by-step instructions")
+    adaptations: Optional[List[str]] = Field(default=None, description="Adaptations")
+    visual_supports: Optional[List[str]] = Field(default=None, description="Visual supports")
+    success_criteria: Optional[List[str]] = Field(default=None, description="Success criteria")
+    theme: Optional[str] = Field(default=None, max_length=255, description="Theme")
+    tags: Optional[List[str]] = Field(default=None, description="Tags")
 
-    id: int
-    created_at: datetime
-    updated_at: datetime
+    @field_validator("objectives", "materials", "instructions")
+    @classmethod
+    def validate_not_empty_list(cls, value: List[str]) -> List[str]:
+        """Validate lists are not empty."""
+        if not value or all(not item.strip() for item in value):
+            raise ValueError("Lista não pode estar vazia")
+        return [item.strip() for item in value if item.strip()]
 
 
-class ActivityResponse(ActivityInDB):
-    """Schema for activity API response."""
+class ActivityUpdate(BaseSchema):
+    """Schema for updating activity."""
 
-    model_config = ConfigDict(from_attributes=True)
+    title: Optional[str] = Field(default=None, min_length=3, max_length=500)
+    description: Optional[str] = Field(default=None, min_length=10)
+    activity_type: Optional[ActivityType] = Field(default=None)
+    difficulty: Optional[DifficultyLevel] = Field(default=None)
+    duration_minutes: Optional[int] = Field(default=None, ge=MIN_ACTIVITY_DURATION, le=MAX_ACTIVITY_DURATION)
+    objectives: Optional[List[str]] = Field(default=None)
+    materials: Optional[List[str]] = Field(default=None)
+    instructions: Optional[List[str]] = Field(default=None)
+    adaptations: Optional[List[str]] = Field(default=None)
+    visual_supports: Optional[List[str]] = Field(default=None)
+    success_criteria: Optional[List[str]] = Field(default=None)
+    theme: Optional[str] = Field(default=None, max_length=255)
+    tags: Optional[List[str]] = Field(default=None)
+    is_published: Optional[bool] = Field(default=None)
+
+
+class ActivityResponse(BaseResponseSchema):
+    """Schema for activity response."""
+
+    title: str
+    description: str
+    activity_type: ActivityType
+    difficulty: DifficultyLevel
+    duration_minutes: int
+    objectives: List[str]
+    materials: List[str]
+    instructions: List[str]
+    adaptations: Optional[List[str]] = None
+    visual_supports: Optional[List[str]] = None
+    success_criteria: Optional[List[str]] = None
+    theme: Optional[str] = None
+    tags: Optional[List[str]] = None
+    generated_by_ai: bool
+    generation_metadata: Optional[Dict[str, Any]] = None
+    is_published: bool
+    is_template: bool
+    student_id: UUID
+    created_by_id: Optional[UUID] = None
+
+
+class ActivityListResponse(BaseResponseSchema):
+    """Schema for activity in list."""
+
+    title: str
+    activity_type: ActivityType
+    difficulty: DifficultyLevel
+    duration_minutes: int
+    theme: Optional[str] = None
+    generated_by_ai: bool
+    student_id: UUID
+
+
+class ActivityFilterParams(BaseSchema):
+    """Query parameters for filtering activities."""
+
+    activity_type: Optional[ActivityType] = Field(default=None, description="Filter by type")
+    difficulty: Optional[DifficultyLevel] = Field(default=None, description="Filter by difficulty")
+    theme: Optional[str] = Field(default=None, description="Filter by theme")
+    generated_by_ai: Optional[bool] = Field(default=None, description="Filter AI-generated")
+    student_id: Optional[UUID] = Field(default=None, description="Filter by student")

@@ -1,50 +1,78 @@
 """
-Student Pydantic schemas for request/response validation.
+Student Schemas - EduAutismo IA
 
-This module defines the Pydantic schemas for student API endpoints.
+Request and response schemas for student-related endpoints.
 """
 
-from pydantic import BaseModel, Field, ConfigDict
-from typing import Optional
-from datetime import datetime
+from datetime import date
+from typing import Any, Dict, List, Optional
+from uuid import UUID
+
+from pydantic import Field, field_validator
+
+from backend.app.schemas.common import BaseResponseSchema, BaseSchema
+from backend.app.utils.constants import TEALevel, MIN_STUDENT_AGE, MAX_STUDENT_AGE, MAX_INTERESTS_COUNT
 
 
-class StudentBase(BaseModel):
-    """Base schema for Student with shared attributes."""
-
-    # TODO: Add base fields here
-    pass
-
-
-class StudentCreate(BaseModel):
+class StudentCreate(BaseSchema):
     """Schema for creating a new student."""
 
-    model_config = ConfigDict(from_attributes=True)
+    name: str = Field(..., min_length=2, max_length=255, description="Student's full name")
+    date_of_birth: date = Field(..., description="Student's date of birth")
+    diagnosis: str = Field(..., min_length=3, max_length=500, description="Diagnosis description")
+    tea_level: Optional[TEALevel] = Field(default=None, description="TEA support level")
+    interests: List[str] = Field(default=[], max_length=MAX_INTERESTS_COUNT, description="Interests")
+    learning_profile: Optional[Dict[str, Any]] = Field(default=None, description="Learning profile")
 
-    # TODO: Add creation fields here
-    pass
+    @field_validator("date_of_birth")
+    @classmethod
+    def validate_date_of_birth(cls, value: date) -> date:
+        """Validate date of birth."""
+        from datetime import date as date_type
+        today = date_type.today()
+        age = today.year - value.year - ((today.month, today.day) < (value.month, value.day))
+        
+        if age < MIN_STUDENT_AGE:
+            raise ValueError(f"Idade deve ser pelo menos {MIN_STUDENT_AGE} anos")
+        if age > MAX_STUDENT_AGE:
+            raise ValueError(f"Idade deve ser no máximo {MAX_STUDENT_AGE} anos")
+        if value > today:
+            raise ValueError("Data de nascimento não pode ser no futuro")
+        
+        return value
 
 
-class StudentUpdate(BaseModel):
-    """Schema for updating an existing student."""
+class StudentUpdate(BaseSchema):
+    """Schema for updating student information."""
 
-    model_config = ConfigDict(from_attributes=True)
-
-    # TODO: Add update fields here
-    pass
-
-
-class StudentInDB(StudentBase):
-    """Schema for student as stored in database."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    created_at: datetime
-    updated_at: datetime
+    name: Optional[str] = Field(default=None, min_length=2, max_length=255)
+    date_of_birth: Optional[date] = Field(default=None)
+    diagnosis: Optional[str] = Field(default=None, min_length=3, max_length=500)
+    tea_level: Optional[TEALevel] = Field(default=None)
+    interests: Optional[List[str]] = Field(default=None)
+    learning_profile: Optional[Dict[str, Any]] = Field(default=None)
+    is_active: Optional[bool] = Field(default=None)
 
 
-class StudentResponse(StudentInDB):
-    """Schema for student API response."""
+class StudentResponse(BaseResponseSchema):
+    """Schema for student response."""
 
-    model_config = ConfigDict(from_attributes=True)
+    name: str
+    date_of_birth: date
+    age: int
+    diagnosis: str
+    tea_level: Optional[TEALevel] = None
+    interests: List[str] = []
+    learning_profile: Optional[Dict[str, Any]] = None
+    is_active: bool
+    teacher_id: UUID
+
+
+class StudentListResponse(BaseResponseSchema):
+    """Schema for student in list."""
+
+    name: str
+    age: int
+    diagnosis: str
+    tea_level: Optional[TEALevel] = None
+    is_active: bool

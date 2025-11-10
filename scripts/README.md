@@ -54,6 +54,33 @@ python scripts/check_structure.py --create-missing --priority 2
 ./scripts/validate_structure.sh --fix --priority 2
 ```
 
+### test_routes.sh
+
+**Propósito:** Testar automaticamente todos os endpoints da API.
+
+**Recursos:**
+- ✅ Testes de conectividade
+- ✅ Testes de health checks (5 endpoints)
+- ✅ Testes de autenticação completa (registro, login, refresh, reset)
+- ✅ Testes de endpoints protegidos
+- ✅ Testes de documentação
+- ✅ Saída colorida e relatório detalhado
+- ✅ Contador de testes com taxa de sucesso
+
+**Início Rápido:**
+```bash
+# Tornar executável (primeira vez)
+chmod +x scripts/test_routes.sh
+
+# Executar testes
+./scripts/test_routes.sh
+
+# Testar servidor customizado
+./scripts/test_routes.sh http://seu-servidor:8000
+```
+
+**Documentação Completa:** Veja [docs/TESTING.md](../docs/TESTING.md)
+
 ## Organização de Diretórios
 
 ```
@@ -61,6 +88,7 @@ scripts/
 ├── README.md                    # Este arquivo
 ├── check_structure.py           # Script principal de validação
 ├── validate_structure.sh        # Script de fluxo completo
+├── test_routes.sh               # Script de teste de rotas da API
 │
 ├── setup/                       # Scripts de configuração e instalação
 │   ├── check-requirements.sh

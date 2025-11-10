@@ -1,78 +1,84 @@
-# Terraform Infrastructure
+# Infraestrutura Terraform
 
-Infrastructure as Code (IaC) for EduAutismo IA deployment on AWS.
+Infraestrutura como Código (IaC) para implantação do EduAutismo IA na AWS.
 
-## Overview
+## Visão Geral
 
-This directory contains Terraform configurations for provisioning and managing AWS infrastructure.
+Este diretório contém configurações do Terraform para provisionamento e gerenciamento da infraestrutura AWS.
 
-## Structure
+## Estrutura
 
 ```
 terraform/
-├── main.tf           # Main infrastructure configuration
-├── variables.tf      # Input variables
-├── outputs.tf        # Output values
-├── providers.tf      # Provider configurations
-├── backend.tf        # Remote state configuration
-├── modules/          # Reusable modules
-│   ├── networking/
-│   ├── database/
-│   ├── compute/
-│   └── storage/
-└── environments/     # Environment-specific configs
-    ├── dev/
-    ├── staging/
-    └── production/
+├── main.tf           # Configuração principal da infraestrutura
+├── variables.tf      # Variáveis de entrada
+├── outputs.tf        # Valores de saída
+├── providers.tf      # Configurações de provedores
+├── backend.tf        # Configuração de estado remoto
+├── modules/          # Módulos reutilizáveis
+│   ├── networking/   # Rede
+│   ├── database/     # Banco de dados
+│   ├── compute/      # Computação
+│   └── storage/      # Armazenamento
+└── environments/     # Configurações específicas de ambiente
+    ├── dev/         # Desenvolvimento
+    ├── staging/     # Homologação
+    └── production/  # Produção
 ```
 
-## Prerequisites
+## Pré-requisitos
 
 - Terraform >= 1.5.0
-- AWS CLI configured
-- AWS credentials with appropriate permissions
+- AWS CLI configurado
+- Credenciais AWS com permissões apropriadas
 
-## Usage
+## Uso
 
-### Initialize Terraform
+### Inicializar o Terraform
+
 ```bash
 cd terraform/
 terraform init
 ```
 
-### Create Workspace
+### Criar Workspace
+
 ```bash
 terraform workspace new development
 terraform workspace select development
 ```
 
-### Plan Changes
+### Planejar Mudanças
+
 ```bash
 terraform plan -out=tfplan
 ```
 
-### Apply Changes
+### Aplicar Mudanças
+
 ```bash
 terraform apply tfplan
 ```
 
-### Destroy Infrastructure
+### Destruir Infraestrutura
+
 ```bash
 terraform destroy
 ```
 
-## Key Resources
+## Recursos Principais
 
-- **VPC & Networking**: Subnets, NAT Gateway, Security Groups
-- **Compute**: ECS Fargate, ALB
-- **Database**: RDS PostgreSQL, DocumentDB
-- **Storage**: S3 buckets
-- **Monitoring**: CloudWatch, Datadog integration
-- **Security**: KMS, Secrets Manager
+- **VPC & Rede**: Subnets, NAT Gateway, Grupos de Segurança
+- **Computação**: ECS Fargate, ALB
+- **Banco de Dados**: RDS PostgreSQL, DocumentDB
+- **Armazenamento**: Buckets S3
+- **Monitoramento**: CloudWatch, integração com Datadog
+- **Segurança**: KMS, Secrets Manager
 
-## State Management
+## Gerenciamento de Estado
 
-Terraform state is stored remotely in S3 with DynamoDB for locking:
+O estado do Terraform é armazenado remotamente no S3 com DynamoDB para bloqueio:
+
 ```hcl
 backend "s3" {
   bucket         = "eduautismo-terraform-state"
@@ -83,11 +89,11 @@ backend "s3" {
 }
 ```
 
-## Cost Optimization
+## Otimização de Custos
 
-- Use Reserved Instances for RDS
-- Enable S3 Lifecycle policies
-- Right-size ECS tasks
-- Use NAT Gateway alternatives for dev environments
+- Usar Instâncias Reservadas para RDS
+- Habilitar políticas de ciclo de vida do S3
+- Dimensionar corretamente as tasks do ECS
+- Usar alternativas ao NAT Gateway para ambientes de desenvolvimento
 
-See [FinOps Guide](../docs/finops.md) for detailed cost optimization strategies.
+Consulte o [Guia FinOps](../docs/finops.md) para estratégias detalhadas de otimização de custos.
