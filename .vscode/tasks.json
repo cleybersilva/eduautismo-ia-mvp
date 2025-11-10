@@ -1,0 +1,61 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Iniciar Backend e Validar Docs",
+			"type": "shell",
+			"command": "bash",
+			"args": [
+				"-c",
+				"cd /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/backend && pkill -9 uvicorn 2>/dev/null || true && sleep 1 && nohup /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/.venv-backend/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 > ../logs/backend_manual.log 2>&1 & sleep 3 && tail -n 30 ../logs/backend_manual.log && echo '--- Testando localhost ---' && curl -s http://localhost:8000/docs | head -n 5 || echo 'Servidor não respondeu'; cd /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp && sleep 1 && .venv-docs/bin/python scripts/validate_docs.py docs/ 2>&1 | tail -n 50"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Instalar python-multipart e reiniciar",
+			"type": "shell",
+			"command": "bash",
+			"args": [
+				"-c",
+				"/mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/.venv-backend/bin/pip install 'python-multipart==0.0.6' && echo '✓ python-multipart instalado' && cd /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/backend && pkill -9 uvicorn 2>/dev/null || true && sleep 2 && /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/.venv-backend/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 > ../logs/backend_manual.log 2>&1 & sleep 3 && echo '✓ Uvicorn iniciado' && tail -n 20 ../logs/backend_manual.log"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Iniciar Backend Simples",
+			"type": "shell",
+			"command": "bash",
+			"args": [
+				"-c",
+				"cd /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/backend && pkill -9 uvicorn 2>/dev/null || true && sleep 2 && /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/.venv-backend/bin/uvicorn app.main_simple:app --host 0.0.0.0 --port 8000 > ../logs/backend_manual.log 2>&1 & sleep 3 && tail -n 10 ../logs/backend_manual.log && echo '' && echo '✓ Testando localhost:8000/health...' && curl -s http://localhost:8000/health | head -c 100"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Start Backend (Background)",
+			"type": "shell",
+			"command": "bash",
+			"args": [
+				"-c",
+				"cd /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/backend && pkill -9 uvicorn 2>/dev/null; sleep 2; /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/.venv-backend/bin/uvicorn app.main_simple:app --host 0.0.0.0 --port 8000 --no-access-log > ../logs/backend_simple.log 2>&1 &"
+			],
+			"isBackground": true,
+			"group": "build"
+		},
+		{
+			"label": "Final: Backend + Validate",
+			"type": "shell",
+			"command": "bash",
+			"args": [
+				"-c",
+				"cd /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/backend && { /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/.venv-backend/bin/uvicorn app.main_simple:app --host 0.0.0.0 --port 8000 --no-access-log > ../logs/backend_simple.log 2>&1 & }; sleep 4 && cd .. && curl -s http://localhost:8000/docs | head -c 200 && echo '' && .venv-docs/bin/python scripts/validate_docs.py docs/ 2>&1 | grep -A 100 'Relatório'"
+			],
+			"isBackground": false,
+			"group": "build"
+		}
+	]
+}

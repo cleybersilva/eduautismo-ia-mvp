@@ -1,0 +1,12 @@
+# Dependências para ferramentas de documentação
+requests==2.31.0
+markdown==3.5.1
+beautifulsoup4==4.12.2
+# Dependências Python para ferramentas de documentação
+requests==2.31.0
+markdown==3.5.1
+beautifulsoup4==4.12.2
+
+# Observação: `markdownlint-cli` é uma ferramenta Node.js (npm). Instale-a separadamente:
+#   npm install -g markdownlint-cli
+# Ou use o arquivo `docs/requirements-node.txt` (local) para instruções de instalação via npm.

@@ -1,0 +1,9 @@
+# Dependências/Instruções Node (ferramentas CLI de documentação)
+# markdownlint-cli é uma ferramenta npm; instale globalmente ou como dev-dependency
+# Para instalar globalmente:
+#   npm install -g markdownlint-cli
+# Ou para instalar localmente no projeto (dev dependency):
+#   npm install --save-dev markdownlint-cli
+
+# Versão recomendada (exemplo):
+# markdownlint-cli@0.37.0
