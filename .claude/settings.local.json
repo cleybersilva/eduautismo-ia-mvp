@@ -11,7 +11,14 @@
       "Bash(tree:*)",
       "Bash(docker --version:*)",
       "Bash(docker-compose:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(if [ -f .env ])",
+      "Bash(then echo \"✅ .env existe\")",
+      "Bash(else echo \"❌ .env NÃO existe - precisa ser criado\")",
+      "Bash(fi)",
+      "Bash(if [ -f backend/.env ])",
+      "Bash(then echo \"✅ backend/.env existe\")",
+      "Bash(else echo \"❌ backend/.env NÃO existe\")"
     ],
     "deny": [],
     "ask": []

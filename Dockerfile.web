@@ -30,7 +30,7 @@ WORKDIR /app
 FROM base as dependencies
 
 # Copy package files
-COPY frontend/package*.json ./
+COPY package*.json ./
 
 # Install dependencies
 RUN npm ci --prefer-offline --no-audit
@@ -41,14 +41,12 @@ RUN npm ci --prefer-offline --no-audit
 FROM dependencies as development
 
 # Copy application code
-COPY frontend/ .
+COPY . .
 
-# Create non-root user
-RUN addgroup -g 1000 appuser && \
-    adduser -D -u 1000 -G appuser appuser && \
-    chown -R appuser:appuser /app
+# Use existing node user (uid/gid 1000) and set ownership
+RUN chown -R node:node /app
 
-USER appuser
+USER node
 
 # Expose Vite dev server port
 EXPOSE 5173
@@ -62,7 +60,7 @@ CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
 FROM dependencies as builder
 
 # Copy application code
-COPY frontend/ .
+COPY . .
 
 # Build arguments for environment variables
 ARG VITE_API_URL=http://localhost:8000
@@ -139,9 +137,9 @@ EOF
 # Copy built assets from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Create non-root user for nginx
-RUN addgroup -g 1000 appuser && \
-    adduser -D -u 1000 -G appuser appuser && \
+# Create non-root user for nginx (avoid GID/UID conflicts)
+RUN addgroup -S appuser && \
+    adduser -S -G appuser appuser && \
     chown -R appuser:appuser /usr/share/nginx/html && \
     chown -R appuser:appuser /var/cache/nginx && \
     chown -R appuser:appuser /var/log/nginx && \

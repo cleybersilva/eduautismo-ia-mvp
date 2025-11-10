@@ -44,7 +44,7 @@ RUN pip install --upgrade pip setuptools wheel
 FROM base as dependencies
 
 # Copy requirements files
-COPY backend/requirements.txt backend/requirements-dev.txt ./
+COPY requirements.txt requirements-dev.txt ./
 
 # Install production dependencies
 RUN pip install --no-cache-dir -r requirements.txt
@@ -64,7 +64,7 @@ RUN pip install --no-cache-dir \
     watchdog
 
 # Copy application code
-COPY backend/ .
+COPY . .
 
 # Create non-root user for security
 RUN useradd -m -u 1000 appuser && \
@@ -88,7 +88,7 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload
 FROM dependencies as builder
 
 # Copy application code
-COPY backend/ .
+COPY . .
 
 # Run tests (optional - comment out if tests fail in build)
 # RUN pytest tests/ -v --tb=short || true
@@ -121,7 +121,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Python dependencies from dependencies stage
-COPY --from=dependencies /usr/local/lib/python${PYTHON_VERSION}/site-packages /usr/local/lib/python${PYTHON_VERSION}/site-packages
+COPY --from=dependencies /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=dependencies /usr/local/bin /usr/local/bin
 
 # Copy application code from builder

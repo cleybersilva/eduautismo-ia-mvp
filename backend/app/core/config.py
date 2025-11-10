@@ -51,7 +51,7 @@ class Settings(BaseSettings):
     CONFIDENCE_THRESHOLD: float = 0.75
     
     # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"\]
+    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"]
     
     # Logging
     LOG_LEVEL: str = "INFO"
