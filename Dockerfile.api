@@ -1,0 +1,171 @@
+# ============================================================================
+# EduAutismo IA - Backend API Dockerfile
+# Multi-stage build for optimized production and development images
+# ============================================================================
+
+# Build arguments
+ARG PYTHON_VERSION=3.11
+
+# ============================================================================
+# Stage 1: Base - Common dependencies for all stages
+# ============================================================================
+FROM python:${PYTHON_VERSION}-slim as base
+
+# Metadata
+LABEL maintainer="Cleyber Ferreira <cleyber@example.com>"
+LABEL description="EduAutismo IA - FastAPI Backend"
+LABEL version="1.0.0"
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    DEBIAN_FRONTEND=noninteractive
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    git \
+    libpq-dev \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip
+RUN pip install --upgrade pip setuptools wheel
+
+# ============================================================================
+# Stage 2: Dependencies - Install Python dependencies
+# ============================================================================
+FROM base as dependencies
+
+# Copy requirements files
+COPY backend/requirements.txt backend/requirements-dev.txt ./
+
+# Install production dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# ============================================================================
+# Stage 3: Development - For local development with hot-reload
+# ============================================================================
+FROM dependencies as development
+
+# Install development dependencies
+RUN pip install --no-cache-dir -r requirements-dev.txt
+
+# Install additional development tools
+RUN pip install --no-cache-dir \
+    ipython \
+    ipdb \
+    watchdog
+
+# Copy application code
+COPY backend/ .
+
+# Create non-root user for security
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app
+
+USER appuser
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Development command (with hot-reload)
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "info"]
+
+# ============================================================================
+# Stage 4: Builder - Prepare production artifacts
+# ============================================================================
+FROM dependencies as builder
+
+# Copy application code
+COPY backend/ .
+
+# Run tests (optional - comment out if tests fail in build)
+# RUN pytest tests/ -v --tb=short || true
+
+# Compile Python files for faster startup
+RUN python -m compileall -b app/
+
+# Remove source .py files, keep only .pyc (optional optimization)
+# RUN find app/ -name "*.py" -not -name "__init__.py" -delete
+
+# ============================================================================
+# Stage 5: Production - Optimized production image
+# ============================================================================
+FROM python:${PYTHON_VERSION}-slim as production
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    DEBIAN_FRONTEND=noninteractive \
+    ENV=production
+
+WORKDIR /app
+
+# Install only runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    libpq5 \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Python dependencies from dependencies stage
+COPY --from=dependencies /usr/local/lib/python${PYTHON_VERSION}/site-packages /usr/local/lib/python${PYTHON_VERSION}/site-packages
+COPY --from=dependencies /usr/local/bin /usr/local/bin
+
+# Copy application code from builder
+COPY --from=builder /app /app
+
+# Create non-root user
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app && \
+    mkdir -p /app/logs && \
+    chown -R appuser:appuser /app/logs
+
+USER appuser
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Production command (with Gunicorn for production)
+CMD ["gunicorn", "app.main:app", \
+     "--workers", "4", \
+     "--worker-class", "uvicorn.workers.UvicornWorker", \
+     "--bind", "0.0.0.0:8000", \
+     "--timeout", "120", \
+     "--keep-alive", "5", \
+     "--log-level", "info", \
+     "--access-logfile", "-", \
+     "--error-logfile", "-"]
+
+# ============================================================================
+# Usage Examples:
+# ============================================================================
+#
+# Development:
+#   docker build --target development -t eduautismo-api:dev -f Dockerfile.api .
+#   docker run -p 8000:8000 -v $(pwd)/backend:/app eduautismo-api:dev
+#
+# Production:
+#   docker build --target production -t eduautismo-api:prod -f Dockerfile.api .
+#   docker run -p 8000:8000 eduautismo-api:prod
+#
+# With docker-compose:
+#   docker-compose up api
+#
+# ============================================================================

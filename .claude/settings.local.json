@@ -5,7 +5,12 @@
       "Bash(python scripts/check_structure.py:*)",
       "Bash(mkdir:*)",
       "Bash(touch:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(chmod:*)",
+      "Bash(./scripts/validate_structure.sh:*)",
+      "Bash(tree:*)",
+      "Bash(docker --version:*)",
+      "Bash(docker-compose:*)"
     ],
     "deny": [],
     "ask": []
