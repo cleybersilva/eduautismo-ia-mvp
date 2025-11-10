@@ -1,283 +1,283 @@
-# 🚀 Quick Start Guide - EduAutismo IA
+# 🚀 Guia de Início Rápido - EduAutismo IA
 
-Get the application running in under 5 minutes!
+Coloque a aplicação em funcionamento em menos de 5 minutos!
 
-## Prerequisites
+## Pré-requisitos
 
-✅ Docker Desktop installed ([Download](https://www.docker.com/products/docker-desktop))
-✅ OpenAI API Key ([Get one here](https://platform.openai.com/api-keys))
-✅ 4GB+ RAM available
-✅ 10GB+ free disk space
+✅ Docker Desktop instalado ([Download](https://www.docker.com/products/docker-desktop))
+✅ Chave da API OpenAI ([Obtenha aqui](https://platform.openai.com/api-keys))
+✅ 4GB+ de RAM disponível
+✅ 10GB+ de espaço livre em disco
 
-## Step 1: Setup Environment (1 minute)
+## Passo 1: Configurar Ambiente (1 minuto)
 
 ```bash
-# Copy environment template
+# Copie o template de ambiente
 cp .env.example .env
 
-# Edit .env and add your OpenAI API key
-# Required: Change OPENAI_API_KEY=sk-your-key-here
-nano .env  # or use your preferred editor
+# Edite .env e adicione sua chave da API OpenAI
+# Obrigatório: Altere OPENAI_API_KEY=sk-sua-chave-aqui
+nano .env  # ou use seu editor preferido
 ```
 
-**IMPORTANT**: You MUST add your OpenAI API key in `.env` for the application to work!
+**IMPORTANTE**: Você DEVE adicionar sua chave da API OpenAI no `.env` para a aplicação funcionar!
 
-## Step 2: Start Services (2-3 minutes)
+## Passo 2: Iniciar Serviços (2-3 minutos)
 
 ```bash
-# Using Make (recommended)
+# Usando Make (recomendado)
 make dev
 
-# OR using docker-compose directly
+# OU usando docker-compose diretamente
 docker-compose up -d
 ```
 
-The first time will take 2-3 minutes to download images and build containers.
+A primeira vez levará 2-3 minutos para baixar imagens e construir containers.
 
-## Step 3: Verify Services (30 seconds)
+## Passo 3: Verificar Serviços (30 segundos)
 
 ```bash
-# Check if all services are healthy
+# Verifique se todos os serviços estão saudáveis
 make health
 
-# OR manually check
+# OU verifique manualmente
 docker-compose ps
 ```
 
-All services should show "healthy" status.
+Todos os serviços devem mostrar status "healthy".
 
-## Step 4: Access the Application
+## Passo 4: Acessar a Aplicação
 
-### 🎯 Main Services
+### 🎯 Serviços Principais
 
-| What | URL | Description |
-|------|-----|-------------|
-| **API Documentation** | http://localhost:8000/docs | Interactive Swagger UI |
-| **Frontend** | http://localhost:5173 | React application |
-| **Health Check** | http://localhost:8000/health | API status |
+| O Que | URL | Descrição |
+|-------|-----|-----------|
+| **Documentação da API** | http://localhost:8000/docs | Interface Swagger interativa |
+| **Frontend** | http://localhost:5173 | Aplicação React |
+| **Health Check** | http://localhost:8000/health | Status da API |
 
-### 🛠️ Admin Tools (Optional)
+### 🛠️ Ferramentas Admin (Opcional)
 
-Access database management UIs:
+Acesse interfaces de gerenciamento de banco de dados:
 
-| Tool | URL | Credentials |
-|------|-----|-------------|
-| **Adminer** (PostgreSQL) | http://localhost:8080 | System: PostgreSQL<br>Server: postgres<br>User: eduautismo<br>Password: (from .env) |
+| Ferramenta | URL | Credenciais |
+|------------|-----|-------------|
+| **Adminer** (PostgreSQL) | http://localhost:8080 | Sistema: PostgreSQL<br>Servidor: postgres<br>Usuário: eduautismo<br>Senha: (do .env) |
 | **Mongo Express** | http://localhost:8081 | admin / admin |
-| **Redis Commander** | http://localhost:8082 | No credentials needed |
+| **Redis Commander** | http://localhost:8082 | Sem credenciais necessárias |
 
-To enable admin tools:
+Para habilitar ferramentas admin:
 ```bash
 docker-compose --profile tools up -d
 ```
 
-## Step 5: Verify Everything Works
+## Passo 5: Verificar se Tudo Funciona
 
-### Test API
+### Testar API
 
 ```bash
-# Using curl
+# Usando curl
 curl http://localhost:8000/health
 
-# Expected response:
+# Resposta esperada:
 # {"status":"healthy"}
 ```
 
-### Test Database
+### Testar Banco de Dados
 
 ```bash
-# Run migrations
+# Execute migrations
 make db-migrate
 
-# OR
+# OU
 docker-compose exec api alembic upgrade head
 ```
 
-### Run Tests
+### Executar Testes
 
 ```bash
-# Run all tests
+# Execute todos os testes
 make test
 
-# OR
+# OU
 docker-compose exec api pytest -v
 ```
 
-## Common Commands
+## Comandos Comuns
 
 ```bash
-# View logs
-make logs              # All services
-make logs-api          # API only
-make logs-frontend     # Frontend only
+# Visualizar logs
+make logs              # Todos os serviços
+make logs-api          # Apenas API
+make logs-frontend     # Apenas Frontend
 
-# Stop services
+# Parar serviços
 make stop
 
-# Restart services
+# Reiniciar serviços
 make restart
 
-# Open API shell
+# Abrir shell da API
 make shell-api
 
-# Run database migrations
+# Executar migrations do banco de dados
 make db-migrate
 
-# Show all available commands
+# Mostrar todos os comandos disponíveis
 make help
 ```
 
-## Troubleshooting
+## Solução de Problemas
 
-### Services won't start?
+### Serviços não iniciam?
 
 ```bash
-# Check logs for errors
+# Verifique logs para erros
 docker-compose logs
 
-# Rebuild everything
+# Reconstrua tudo
 docker-compose down -v
 docker-compose up -d --build
 ```
 
-### Port already in use?
+### Porta já em uso?
 
-Edit `.env` and change the port:
+Edite `.env` e mude a porta:
 ```env
-API_PORT=8001  # Instead of 8000
-FRONTEND_PORT=5174  # Instead of 5173
+API_PORT=8001  # Em vez de 8000
+FRONTEND_PORT=5174  # Em vez de 5173
 ```
 
-### Can't connect to database?
+### Não consegue conectar ao banco de dados?
 
 ```bash
-# Check if postgres is running
+# Verifique se postgres está rodando
 docker-compose ps postgres
 
-# Restart postgres
+# Reinicie postgres
 docker-compose restart postgres
 
-# Wait a few seconds for it to be healthy
+# Aguarde alguns segundos para ficar saudável
 docker-compose ps
 ```
 
-### Out of memory?
+### Falta de memória?
 
-Increase Docker memory in Docker Desktop:
-- Settings → Resources → Memory
-- Set to at least 4GB
+Aumente a memória do Docker no Docker Desktop:
+- Configurações → Recursos → Memória
+- Defina para pelo menos 4GB
 
-## Next Steps
+## Próximos Passos
 
-### 1. Configure the Application
+### 1. Configurar a Aplicação
 
-Edit `backend/.env.example` for backend-specific settings:
+Edite `backend/.env.example` para configurações específicas do backend:
 ```bash
 cd backend
 cp .env.example .env
 nano .env
 ```
 
-### 2. Set Up Database
+### 2. Configurar Banco de Dados
 
 ```bash
-# Run migrations
+# Execute migrations
 make db-migrate
 
-# Seed with sample data (optional)
+# Popule com dados de exemplo (opcional)
 docker-compose exec api python scripts/seed_database.py
 ```
 
-### 3. Explore the API
+### 3. Explorar a API
 
-Visit http://localhost:8000/docs to explore all endpoints:
-- Student management
-- Activity generation
-- Assessments
-- Authentication
+Visite http://localhost:8000/docs para explorar todos os endpoints:
+- Gerenciamento de alunos
+- Geração de atividades
+- Avaliações
+- Autenticação
 
-### 4. Start Development
+### 4. Começar Desenvolvimento
 
 ```bash
-# Backend code is in backend/app/
-# Frontend code is in frontend/src/
+# Código do backend está em backend/app/
+# Código do frontend está em frontend/src/
 
-# Changes will auto-reload thanks to hot-reload!
+# Alterações serão recarregadas automaticamente graças ao hot-reload!
 ```
 
-## Development Workflow
+## Fluxo de Trabalho de Desenvolvimento
 
-### Making Changes
+### Fazendo Alterações
 
-1. **Backend**: Edit files in `backend/app/`
-   - Changes auto-reload (hot-reload enabled)
-   - Check logs: `make logs-api`
+1. **Backend**: Edite arquivos em `backend/app/`
+   - Alterações recarregam automaticamente (hot-reload habilitado)
+   - Verifique logs: `make logs-api`
 
-2. **Frontend**: Edit files in `frontend/src/`
-   - Changes auto-reload (Vite HMR enabled)
-   - Check logs: `make logs-frontend`
+2. **Frontend**: Edite arquivos em `frontend/src/`
+   - Alterações recarregam automaticamente (Vite HMR habilitado)
+   - Verifique logs: `make logs-frontend`
 
-### Adding Dependencies
+### Adicionando Dependências
 
 ```bash
 # Backend (Python)
-docker-compose exec api pip install package-name
-# Then update requirements.txt
+docker-compose exec api pip install nome-do-pacote
+# Então atualize requirements.txt
 docker-compose exec api pip freeze > backend/requirements.txt
 
 # Frontend (NPM)
-docker-compose exec frontend npm install package-name
+docker-compose exec frontend npm install nome-do-pacote
 ```
 
-### Running Commands
+### Executando Comandos
 
 ```bash
-# API shell
+# Shell da API
 make shell-api
-# Inside container:
+# Dentro do container:
 # - pytest
 # - alembic upgrade head
-# - python scripts/your_script.py
+# - python scripts/seu_script.py
 
-# Database shell
+# Shell do banco de dados
 make db-shell
-# Inside postgres:
-# - \dt (list tables)
+# Dentro do postgres:
+# - \dt (listar tabelas)
 # - SELECT * FROM students;
 ```
 
-## Production Deployment
+## Deploy em Produção
 
-For production deployment guide, see:
-- [Docker Guide](docs/DOCKER.md)
-- [Deployment Guide](docs/deployment.md) (if available)
+Para guia de deploy em produção, veja:
+- [Guia Docker](docs/DOCKER.md)
+- [Guia de Deploy](docs/deployment.md) (se disponível)
 
-Or use:
+Ou use:
 ```bash
-# Build production images
+# Construa imagens de produção
 make build-prod
 
-# Start production stack
+# Inicie stack de produção
 make prod
 ```
 
-## Need Help?
+## Precisa de Ajuda?
 
-- 📖 [Full Docker Guide](docs/DOCKER.md)
-- 📊 [Structure Validation](docs/structure-validation.md)
-- 📝 [Main README](README.md)
-- 🤖 [Claude Guide](CLAUDE.md)
+- 📖 [Guia Completo Docker](docs/DOCKER.md)
+- 📊 [Validação de Estrutura](docs/structure-validation.md)
+- 📝 [README Principal](README.md)
+- 🤖 [Guia Claude](CLAUDE.md)
 
-## Useful Links
+## Links Úteis
 
-- **API Docs**: http://localhost:8000/docs
+- **Docs da API**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 - **OpenAPI JSON**: http://localhost:8000/openapi.json
 
 ---
 
-**Time to get started**: ~5 minutes
-**Prerequisites**: Docker + OpenAI API Key
-**Status**: ✅ Ready for development
+**Tempo para começar**: ~5 minutos
+**Pré-requisitos**: Docker + Chave da API OpenAI
+**Status**: ✅ Pronto para desenvolvimento
 
-Happy coding! 🎉
+Bom código! 🎉

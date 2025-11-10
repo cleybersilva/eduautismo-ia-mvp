@@ -1,24 +1,24 @@
-# Docker Setup Guide - EduAutismo IA
+# Guia de Configuração Docker - EduAutismo IA
 
-## Overview
+## Visão Geral
 
-This project uses Docker and Docker Compose to provide a consistent development and production environment. The setup includes:
+Este projeto usa Docker e Docker Compose para fornecer um ambiente de desenvolvimento e produção consistente. A configuração inclui:
 
-- **FastAPI Backend** (Python 3.11)
-- **React Frontend** (Node 20 + Vite)
-- **PostgreSQL** (Database)
+- **Backend FastAPI** (Python 3.11)
+- **Frontend React** (Node 20 + Vite)
+- **PostgreSQL** (Banco de Dados)
 - **MongoDB** (Logs & Analytics)
-- **Redis** (Cache & Sessions)
-- **Admin Tools** (Adminer, Mongo Express, Redis Commander)
+- **Redis** (Cache & Sessões)
+- **Ferramentas Admin** (Adminer, Mongo Express, Redis Commander)
 
-## Prerequisites
+## Pré-requisitos
 
-- Docker Desktop 20.10+ or Docker Engine 20.10+
+- Docker Desktop 20.10+ ou Docker Engine 20.10+
 - Docker Compose 2.0+
-- At least 4GB RAM available for Docker
-- At least 10GB free disk space
+- Pelo menos 4GB de RAM disponível para Docker
+- Pelo menos 10GB de espaço livre em disco
 
-### Installation
+### Instalação
 
 **macOS:**
 ```bash
@@ -33,70 +33,70 @@ sudo usermod -aG docker $USER
 ```
 
 **Windows:**
-Download from [Docker Desktop](https://www.docker.com/products/docker-desktop)
+Baixe de [Docker Desktop](https://www.docker.com/products/docker-desktop)
 
-## Quick Start
+## Início Rápido
 
-### 1. Initial Setup
+### 1. Configuração Inicial
 
 ```bash
-# Clone the repository (if not already done)
+# Clone o repositório (se ainda não foi feito)
 cd eduautismo-ia-mvp
 
-# Copy environment file
+# Copie o arquivo de ambiente
 cp .env.example .env
 
-# Edit .env and add your OpenAI API key (REQUIRED)
-nano .env  # or use your preferred editor
+# Edite .env e adicione sua chave da API OpenAI (OBRIGATÓRIO)
+nano .env  # ou use seu editor preferido
 ```
 
-**IMPORTANT**: Add your OpenAI API key to `.env`:
+**IMPORTANTE**: Adicione sua chave da API OpenAI no `.env`:
 ```env
-OPENAI_API_KEY=sk-your-actual-api-key-here
+OPENAI_API_KEY=sk-sua-chave-api-aqui
 ```
 
-### 2. Start All Services
+### 2. Iniciar Todos os Serviços
 
 ```bash
-# Start everything (first time will download images)
+# Inicie tudo (primeira vez irá baixar as imagens)
 docker-compose up -d
 
-# View logs
+# Visualize os logs
 docker-compose logs -f
 
-# Check status
+# Verifique o status
 docker-compose ps
 ```
 
-### 3. Access the Application
+### 3. Acesse a Aplicação
 
-Once all services are healthy (this may take 1-2 minutes):
+Quando todos os serviços estiverem saudáveis (pode levar 1-2 minutos):
 
-| Service | URL | Credentials |
+| Serviço | URL | Credenciais |
 |---------|-----|-------------|
-| **API Documentation** | http://localhost:8000/docs | - |
+| **Documentação da API** | http://localhost:8000/docs | - |
 | **Frontend** | http://localhost:5173 | - |
-| **Adminer (DB UI)** | http://localhost:8080 | System: PostgreSQL<br>Server: postgres<br>User: eduautismo<br>Password: (from .env) |
+| **Adminer (UI do BD)** | http://localhost:8080 | Sistema: PostgreSQL<br>Servidor: postgres<br>Usuário: eduautismo<br>Senha: (do .env) |
 | **Mongo Express** | http://localhost:8081 | admin / admin |
 | **Redis Commander** | http://localhost:8082 | - |
 
-### 4. Stop Services
+### 4. Parar Serviços
 
 ```bash
-# Stop all services
+# Parar todos os serviços
 docker-compose down
 
-# Stop and remove volumes (deletes all data!)
+# Parar e remover volumes (deleta todos os dados!)
 docker-compose down -v
 ```
 
-## Architecture
+## Arquitetura
 
-### Services
+### Serviços
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      Docker Network                         │
+│                      Rede Docker                            │
 │                   (eduautismo-network)                      │
 │                                                             │
 │  ┌──────────┐   ┌──────────┐   ┌──────────┐               │
@@ -106,7 +106,7 @@ docker-compose down -v
 │       │              │              │                       │
 │       │         ┌────┴──────────────┴────┐                 │
 │       │         │                        │                 │
-│       └─────────┤   FastAPI Backend      │                 │
+│       └─────────┤   Backend FastAPI      │                 │
 │                 │       :8000            │                 │
 │                 └───────────┬────────────┘                 │
 │                             │                              │
@@ -119,110 +119,110 @@ docker-compose down -v
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Multi-Stage Builds
+### Builds Multi-Estágio
 
-Both Dockerfiles use multi-stage builds for optimization:
+Ambos os Dockerfiles usam builds multi-estágio para otimização:
 
 **Dockerfile.api** (Backend):
-1. `base` - System dependencies
-2. `dependencies` - Python packages
-3. `development` - Dev tools + hot-reload
-4. `builder` - Build artifacts
-5. `production` - Optimized production image
+1. `base` - Dependências do sistema
+2. `dependencies` - Pacotes Python
+3. `development` - Ferramentas dev + hot-reload
+4. `builder` - Artefatos de build
+5. `production` - Imagem de produção otimizada
 
 **Dockerfile.web** (Frontend):
-1. `base` - Node.js setup
-2. `dependencies` - NPM packages
-3. `development` - Dev server with hot-reload
-4. `builder` - Build production assets
-5. `production` - Nginx serving static files
+1. `base` - Configuração Node.js
+2. `dependencies` - Pacotes NPM
+3. `development` - Servidor dev com hot-reload
+4. `builder` - Build de assets de produção
+5. `production` - Nginx servindo arquivos estáticos
 
-## Development Workflow
+## Fluxo de Trabalho de Desenvolvimento
 
-### Running in Development Mode
+### Executando em Modo Desenvolvimento
 
 ```bash
-# Start with hot-reload
+# Inicie com hot-reload
 docker-compose up -d
 
-# View real-time logs
+# Visualize logs em tempo real
 docker-compose logs -f api
 docker-compose logs -f frontend
 
-# Make code changes - they will auto-reload!
-# Backend: Edit files in backend/
-# Frontend: Edit files in frontend/
+# Faça alterações no código - elas serão recarregadas automaticamente!
+# Backend: Edite arquivos em backend/
+# Frontend: Edite arquivos em frontend/
 ```
 
-### Running Commands Inside Containers
+### Executando Comandos Dentro dos Containers
 
 ```bash
-# Backend shell
+# Shell do backend
 docker-compose exec api bash
 
-# Run migrations
+# Execute migrations
 docker-compose exec api alembic upgrade head
 
-# Run tests
+# Execute testes
 docker-compose exec api pytest
 
-# Frontend shell
+# Shell do frontend
 docker-compose exec frontend sh
 
-# Install new NPM package
-docker-compose exec frontend npm install package-name
+# Instale novo pacote NPM
+docker-compose exec frontend npm install nome-do-pacote
 ```
 
-### Database Operations
+### Operações de Banco de Dados
 
 ```bash
-# Connect to PostgreSQL
+# Conecte ao PostgreSQL
 docker-compose exec postgres psql -U eduautismo -d eduautismo_dev
 
-# Backup database
+# Backup do banco de dados
 docker-compose exec postgres pg_dump -U eduautismo eduautismo_dev > backup.sql
 
-# Restore database
+# Restaure o banco de dados
 docker-compose exec -T postgres psql -U eduautismo eduautismo_dev < backup.sql
 
-# Reset database (WARNING: deletes all data)
+# Resete o banco de dados (AVISO: deleta todos os dados)
 docker-compose down -v
 docker-compose up -d postgres
 docker-compose exec api alembic upgrade head
 ```
 
-### Debugging
+### Depuração
 
 ```bash
-# View service logs
+# Visualize logs do serviço
 docker-compose logs -f api
 docker-compose logs -f frontend
 docker-compose logs -f postgres
 
-# Check service health
+# Verifique saúde do serviço
 docker-compose ps
 
-# Inspect container
+# Inspecione container
 docker-compose exec api env
 docker inspect eduautismo-api
 
-# Check resource usage
+# Verifique uso de recursos
 docker stats
 ```
 
-## Production Deployment
+## Deploy em Produção
 
-### Building Production Images
+### Construindo Imagens de Produção
 
 ```bash
-# Build production API image
+# Construa imagem de produção da API
 docker build \
   --target production \
   --build-arg PYTHON_VERSION=3.11 \
   -t eduautismo-api:1.0.0 \
   -f Dockerfile.api .
 
-# Build production Frontend image
+# Construa imagem de produção do Frontend
 docker build \
   --target production \
   --build-arg NODE_VERSION=20 \
@@ -230,291 +230,291 @@ docker build \
   -t eduautismo-web:1.0.0 \
   -f Dockerfile.web .
 
-# Tag for registry
-docker tag eduautismo-api:1.0.0 your-registry.com/eduautismo-api:1.0.0
-docker tag eduautismo-web:1.0.0 your-registry.com/eduautismo-web:1.0.0
+# Tag para registry
+docker tag eduautismo-api:1.0.0 seu-registry.com/eduautismo-api:1.0.0
+docker tag eduautismo-web:1.0.0 seu-registry.com/eduautismo-web:1.0.0
 
-# Push to registry
-docker push your-registry.com/eduautismo-api:1.0.0
-docker push your-registry.com/eduautismo-web:1.0.0
+# Push para registry
+docker push seu-registry.com/eduautismo-api:1.0.0
+docker push seu-registry.com/eduautismo-web:1.0.0
 ```
 
-### Production docker-compose
+### docker-compose de Produção
 
-For production, create `docker-compose.prod.yml`:
+Para produção, crie `docker-compose.prod.yml`:
 
 ```yaml
 version: '3.8'
 
 services:
   api:
-    image: your-registry.com/eduautismo-api:1.0.0
+    image: seu-registry.com/eduautismo-api:1.0.0
     environment:
       ENV: production
       DEBUG: false
-      # ... other production env vars
+      # ... outras variáveis de ambiente de produção
     restart: always
 
   frontend:
-    image: your-registry.com/eduautismo-web:1.0.0
+    image: seu-registry.com/eduautismo-web:1.0.0
     ports:
       - "80:80"
     restart: always
 ```
 
-Run with:
+Execute com:
 ```bash
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
-## Admin Tools
+## Ferramentas Admin
 
-### Adminer (Database UI)
+### Adminer (UI do Banco de Dados)
 
-Access at http://localhost:8080
+Acesse em http://localhost:8080
 
-Features:
-- Browse database tables
-- Execute SQL queries
-- Import/Export data
-- View table relationships
+Recursos:
+- Navegar tabelas do banco de dados
+- Executar consultas SQL
+- Importar/Exportar dados
+- Visualizar relacionamentos de tabelas
 
-### Mongo Express (MongoDB UI)
+### Mongo Express (UI do MongoDB)
 
-Access at http://localhost:8081
+Acesse em http://localhost:8081
 
-Features:
-- Browse collections
-- Execute queries
-- View documents
-- Database statistics
+Recursos:
+- Navegar coleções
+- Executar consultas
+- Visualizar documentos
+- Estatísticas do banco de dados
 
 ### Redis Commander
 
-Access at http://localhost:8082
+Acesse em http://localhost:8082
 
-Features:
-- View keys
-- Execute Redis commands
-- Monitor performance
-- Manage data
+Recursos:
+- Visualizar chaves
+- Executar comandos Redis
+- Monitorar performance
+- Gerenciar dados
 
-**Note**: Admin tools are only enabled with profile `tools`:
+**Nota**: Ferramentas admin são habilitadas apenas com o perfil `tools`:
 ```bash
 docker-compose --profile tools up -d
 ```
 
-## Environment Variables
+## Variáveis de Ambiente
 
-### Required Variables
-
-```env
-OPENAI_API_KEY=sk-...          # REQUIRED: OpenAI API key
-POSTGRES_PASSWORD=...           # Database password
-SECRET_KEY=...                  # Application secret (min 32 chars)
-JWT_SECRET_KEY=...              # JWT signing key (min 32 chars)
-```
-
-### Optional Variables
+### Variáveis Obrigatórias
 
 ```env
-ENV=development                 # Environment: development/staging/production
-DEBUG=true                      # Enable debug mode
-LOG_LEVEL=INFO                  # Logging level
-AWS_ACCESS_KEY_ID=...          # AWS credentials (optional)
-SENTRY_DSN=...                 # Sentry monitoring (optional)
+OPENAI_API_KEY=sk-...          # OBRIGATÓRIO: Chave da API OpenAI
+POSTGRES_PASSWORD=...           # Senha do banco de dados
+SECRET_KEY=...                  # Segredo da aplicação (mín 32 caracteres)
+JWT_SECRET_KEY=...              # Chave de assinatura JWT (mín 32 caracteres)
 ```
 
-See `.env.example` for complete list.
+### Variáveis Opcionais
 
-## Troubleshooting
+```env
+ENV=development                 # Ambiente: development/staging/production
+DEBUG=true                      # Habilitar modo debug
+LOG_LEVEL=INFO                  # Nível de logging
+AWS_ACCESS_KEY_ID=...          # Credenciais AWS (opcional)
+SENTRY_DSN=...                 # Monitoramento Sentry (opcional)
+```
 
-### Services Won't Start
+Veja `.env.example` para lista completa.
+
+## Solução de Problemas
+
+### Serviços Não Iniciam
 
 ```bash
-# Check logs
+# Verifique logs
 docker-compose logs
 
-# Rebuild images
+# Reconstrua imagens
 docker-compose build --no-cache
 
-# Remove volumes and restart
+# Remova volumes e reinicie
 docker-compose down -v
 docker-compose up -d
 ```
 
-### Port Already in Use
+### Porta Já em Uso
 
 ```bash
-# Find process using port
-lsof -i :8000  # or :5173, :5432, etc.
+# Encontre processo usando a porta
+lsof -i :8000  # ou :5173, :5432, etc.
 
-# Kill the process or change port in .env
+# Mate o processo ou mude a porta no .env
 API_PORT=8001
 ```
 
-### Database Connection Issues
+### Problemas de Conexão com Banco de Dados
 
 ```bash
-# Check if postgres is healthy
+# Verifique se postgres está saudável
 docker-compose ps postgres
 
-# Check connectivity
+# Verifique conectividade
 docker-compose exec api pg_isready -h postgres -U eduautismo
 
-# Reset database
+# Resete banco de dados
 docker-compose down -v postgres
 docker-compose up -d postgres
 ```
 
-### Out of Memory
+### Falta de Memória
 
 ```bash
-# Increase Docker memory limit in Docker Desktop settings
-# Recommended: 4GB minimum, 8GB ideal
+# Aumente o limite de memória do Docker nas configurações do Docker Desktop
+# Recomendado: 4GB mínimo, 8GB ideal
 
-# Or reduce services
-docker-compose up -d api postgres  # Only essential services
+# Ou reduza serviços
+docker-compose up -d api postgres  # Apenas serviços essenciais
 ```
 
-### Slow Build Times
+### Builds Lentos
 
 ```bash
-# Use BuildKit (faster)
+# Use BuildKit (mais rápido)
 DOCKER_BUILDKIT=1 docker-compose build
 
-# Build in parallel
+# Build em paralelo
 docker-compose build --parallel
 
-# Use cache from registry
+# Use cache do registry
 docker-compose build --build-arg BUILDKIT_INLINE_CACHE=1
 ```
 
-### Frontend Not Hot-Reloading
+### Frontend Não Recarrega Automaticamente
 
 ```bash
-# Check volume mounts
+# Verifique montagens de volume
 docker-compose exec frontend ls -la /app
 
-# Restart with clean state
+# Reinicie com estado limpo
 docker-compose restart frontend
 ```
 
-## Performance Optimization
+## Otimização de Performance
 
-### Reduce Image Size
+### Reduzir Tamanho da Imagem
 
 ```bash
-# Use multi-stage builds (already implemented)
-# Remove unnecessary files in .dockerignore
+# Use builds multi-estágio (já implementado)
+# Remova arquivos desnecessários no .dockerignore
 
-# Check image sizes
+# Verifique tamanhos das imagens
 docker images | grep eduautismo
 
-# Analyze image layers
+# Analise camadas da imagem
 docker history eduautismo-api:latest
 ```
 
-### Faster Builds
+### Builds Mais Rápidos
 
 ```bash
 # Use BuildKit
 export DOCKER_BUILDKIT=1
 
-# Cache dependencies separately
-# (already implemented in Dockerfiles)
+# Cache de dependências separadamente
+# (já implementado nos Dockerfiles)
 
-# Use docker-compose build cache
+# Use cache de build do docker-compose
 docker-compose build --build-arg BUILDKIT_INLINE_CACHE=1
 ```
 
-### Network Performance
+### Performance de Rede
 
 ```bash
-# Use host network for local dev (Linux only)
+# Use rede host para dev local (apenas Linux)
 network_mode: "host"
 
-# Or optimize bridge network
+# Ou otimize rede bridge
 docker network inspect eduautismo-network
 ```
 
-## Best Practices
+## Melhores Práticas
 
-### Security
+### Segurança
 
-1. **Never commit `.env`** - Always use `.env.example`
-2. **Change default passwords** - Use strong passwords in production
-3. **Run as non-root** - Already implemented in Dockerfiles
-4. **Scan images** - Use `docker scan eduautismo-api:latest`
-5. **Keep images updated** - Regularly rebuild with latest base images
+1. **Nunca commite `.env`** - Sempre use `.env.example`
+2. **Mude senhas padrão** - Use senhas fortes em produção
+3. **Execute como não-root** - Já implementado nos Dockerfiles
+4. **Escaneie imagens** - Use `docker scan eduautismo-api:latest`
+5. **Mantenha imagens atualizadas** - Reconstrua regularmente com imagens base mais recentes
 
-### Development
+### Desenvolvimento
 
-1. **Use volumes** - For hot-reload during development
-2. **Health checks** - Monitor service health
-3. **Resource limits** - Set memory/CPU limits in production
-4. **Logging** - Use structured logging
-5. **Backups** - Regular database backups
+1. **Use volumes** - Para hot-reload durante desenvolvimento
+2. **Health checks** - Monitore saúde do serviço
+3. **Limites de recursos** - Defina limites de memória/CPU em produção
+4. **Logging** - Use logging estruturado
+5. **Backups** - Backups regulares do banco de dados
 
-### Production
+### Produção
 
-1. **Use secrets** - Docker secrets or external secret management
-2. **Enable monitoring** - Sentry, Datadog, or similar
-3. **Load balancing** - Use multiple replicas
-4. **Auto-restart** - `restart: always` policy
-5. **Regular updates** - Keep dependencies updated
+1. **Use secrets** - Docker secrets ou gerenciamento externo de secrets
+2. **Habilite monitoramento** - Sentry, Datadog ou similar
+3. **Load balancing** - Use múltiplas réplicas
+4. **Auto-restart** - Política `restart: always`
+5. **Atualizações regulares** - Mantenha dependências atualizadas
 
-## Common Commands Reference
+## Referência de Comandos Comuns
 
 ```bash
-# Start services
+# Iniciar serviços
 docker-compose up -d
 
-# Stop services
+# Parar serviços
 docker-compose down
 
-# View logs
-docker-compose logs -f [service]
+# Visualizar logs
+docker-compose logs -f [serviço]
 
-# Rebuild services
+# Reconstruir serviços
 docker-compose build
 
-# Restart service
-docker-compose restart [service]
+# Reiniciar serviço
+docker-compose restart [serviço]
 
-# Execute command
-docker-compose exec [service] [command]
+# Executar comando
+docker-compose exec [serviço] [comando]
 
-# View resource usage
+# Visualizar uso de recursos
 docker stats
 
-# Clean up
+# Limpar
 docker system prune -a
 
-# View networks
+# Visualizar redes
 docker network ls
 
-# View volumes
+# Visualizar volumes
 docker volume ls
 ```
 
-## Additional Resources
+## Recursos Adicionais
 
-- [Docker Documentation](https://docs.docker.com/)
-- [Docker Compose Documentation](https://docs.docker.com/compose/)
+- [Documentação Docker](https://docs.docker.com/)
+- [Documentação Docker Compose](https://docs.docker.com/compose/)
 - [FastAPI Docker](https://fastapi.tiangolo.com/deployment/docker/)
 - [Vite Docker](https://vitejs.dev/guide/static-deploy.html)
 
-## Support
+## Suporte
 
-For Docker-related issues:
-1. Check logs: `docker-compose logs`
-2. Review this documentation
-3. Check [troubleshooting section](#troubleshooting)
-4. Open an issue on GitHub
+Para problemas relacionados ao Docker:
+1. Verifique logs: `docker-compose logs`
+2. Revise esta documentação
+3. Verifique [seção de solução de problemas](#solução-de-problemas)
+4. Abra uma issue no GitHub
 
 ---
 
-**Last Updated**: 2025-01-09
-**Docker Version**: 24.0+
-**Docker Compose Version**: 2.0+
+**Última Atualização**: 2025-01-09
+**Versão Docker**: 24.0+
+**Versão Docker Compose**: 2.0+

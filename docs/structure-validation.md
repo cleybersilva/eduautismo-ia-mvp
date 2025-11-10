@@ -1,185 +1,185 @@
-# Structure Validation Guide
+# Guia de Validação de Estrutura
 
-## Overview
+## Visão Geral
 
-The EduAutismo IA project includes a comprehensive structure validation system that ensures your project maintains the correct directory and file organization. This system can automatically create missing files with templates, making it easier to maintain consistency across the codebase.
+O projeto EduAutismo IA inclui um sistema abrangente de validação de estrutura que garante que seu projeto mantenha a organização correta de diretórios e arquivos. Este sistema pode criar automaticamente arquivos ausentes com templates, facilitando a manutenção da consistência em toda a base de código.
 
-## Quick Start
+## Início Rápido
 
 ```bash
-# 1. Validate structure and generate report
+# 1. Valide a estrutura e gere relatório
 python scripts/check_structure.py --report-only
 
-# 2. Create all missing Priority 1 (Critical) files
+# 2. Crie todos os arquivos ausentes de Prioridade 1 (Críticos)
 python scripts/check_structure.py --create-missing --priority 1
 
-# 3. Create all missing Priority 1 & 2 files
+# 3. Crie todos os arquivos ausentes de Prioridade 1 e 2
 python scripts/check_structure.py --create-missing --priority 2
 
-# 4. Run complete validation workflow
+# 4. Execute o fluxo completo de validação
 ./scripts/validate_structure.sh
 ```
 
-## Priority System
+## Sistema de Prioridades
 
-Files are classified into three priority levels:
+Os arquivos são classificados em três níveis de prioridade:
 
-### Priority 1: Critical (Must Have)
-These are essential files without which the project cannot function:
-- `__init__.py` files for all Python packages
-- Package initialization files
-- Core module markers
+### Prioridade 1: Crítico (Deve Ter)
+Estes são arquivos essenciais sem os quais o projeto não pode funcionar:
+- Arquivos `__init__.py` para todos os pacotes Python
+- Arquivos de inicialização de pacotes
+- Marcadores de módulos principais
 
-**Example:**
+**Exemplo:**
 ```bash
 python scripts/check_structure.py --create-missing --priority 1
 ```
 
-### Priority 2: Important (Should Have)
-These files provide core functionality and are necessary for a complete application:
-- Database models (Student, Activity, Assessment)
-- Pydantic schemas for validation
-- Business logic services
-- API route handlers
-- Test configuration (conftest.py)
-- Authentication dependencies
+### Prioridade 2: Importante (Deveria Ter)
+Estes arquivos fornecem funcionalidade principal e são necessários para uma aplicação completa:
+- Modelos de banco de dados (Student, Activity, Assessment)
+- Schemas Pydantic para validação
+- Serviços de lógica de negócio
+- Handlers de rotas da API
+- Configuração de testes (conftest.py)
+- Dependências de autenticação
 
-**Example:**
+**Exemplo:**
 ```bash
 python scripts/check_structure.py --create-missing --priority 2
 ```
 
-### Priority 3: Optional (Nice to Have)
-Configuration and quality-of-life files:
-- `pytest.ini` - Test configuration
-- `.coveragerc` - Code coverage settings
-- Additional utilities
+### Prioridade 3: Opcional (Bom Ter)
+Arquivos de configuração e qualidade de vida:
+- `pytest.ini` - Configuração de testes
+- `.coveragerc` - Configurações de cobertura de código
+- Utilitários adicionais
 
-**Example:**
+**Exemplo:**
 ```bash
 python scripts/check_structure.py --create-missing --priority 3
 ```
 
-## Tools
+## Ferramentas
 
 ### 1. check_structure.py
 
-The main validation script with file generation capabilities.
+O script principal de validação com capacidades de geração de arquivos.
 
-#### Usage
+#### Uso
 
 ```bash
-python scripts/check_structure.py [OPTIONS]
+python scripts/check_structure.py [OPÇÕES]
 ```
 
-#### Options
+#### Opções
 
-- `--verbose`, `-v` - Show detailed information about all checks
-- `--create-missing` - Create missing files with templates
-- `--priority N` - Maximum priority level to create (1-3)
-- `--report-only` - Only report, don't create anything
-- `--project-root PATH` - Path to project root (default: current directory)
+- `--verbose`, `-v` - Mostrar informações detalhadas sobre todas as verificações
+- `--create-missing` - Criar arquivos ausentes com templates
+- `--priority N` - Nível máximo de prioridade para criar (1-3)
+- `--report-only` - Apenas reportar, não criar nada
+- `--project-root PATH` - Caminho para raiz do projeto (padrão: diretório atual)
 
-#### Examples
+#### Exemplos
 
 ```bash
-# Just validate and report
+# Apenas validar e reportar
 python scripts/check_structure.py --report-only
 
-# Create only critical files
+# Criar apenas arquivos críticos
 python scripts/check_structure.py --create-missing --priority 1
 
-# Create critical + important files with verbose output
+# Criar arquivos críticos + importantes com saída verbosa
 python scripts/check_structure.py --create-missing --priority 2 --verbose
 
-# Full validation with optional files
+# Validação completa com arquivos opcionais
 python scripts/check_structure.py --create-missing --priority 3
 ```
 
-#### Output
+#### Saída
 
-The script provides:
-- Directory completion percentage
-- File completion percentage by priority
-- Overall project completion percentage
-- Detailed list of missing items
-- Status indicator (Excellent/Good/Fair/Poor)
+O script fornece:
+- Porcentagem de conclusão de diretórios
+- Porcentagem de conclusão de arquivos por prioridade
+- Porcentagem geral de conclusão do projeto
+- Lista detalhada de itens ausentes
+- Indicador de status (Excelente/Bom/Razoável/Ruim)
 
-**Example Output:**
+**Exemplo de Saída:**
 ```
-EduAutismo IA - Project Structure Validator
-Project root: /path/to/project
-Date: 2025-11-09 22:30:00
+EduAutismo IA - Validador de Estrutura do Projeto
+Raiz do projeto: /caminho/para/projeto
+Data: 2025-11-09 22:30:00
 
 ======================================================================
-Project Structure Validation Summary
+Resumo da Validação da Estrutura do Projeto
 ======================================================================
 
-Directories:
-  Present: 38/38 (100.0%)
+Diretórios:
+  Presentes: 38/38 (100.0%)
 
-Files:
-  Present: 29/31 (93.5%)
-  Missing: 2/31
+Arquivos:
+  Presentes: 29/31 (93.5%)
+  Ausentes: 2/31
 
-  Missing by Priority:
-    Priority 3 (Optional): 2 files
+  Ausentes por Prioridade:
+    Prioridade 3 (Opcional): 2 arquivos
 
-Overall Completion: 97.1%
+Conclusão Geral: 97.1%
 
-Status: ✓ Excellent - Project structure is complete
+Status: ✓ Excelente - Estrutura do projeto está completa
 ======================================================================
 ```
 
 ### 2. validate_structure.sh
 
-Complete validation workflow with multiple checks.
+Fluxo completo de validação com múltiplas verificações.
 
-#### Usage
+#### Uso
 
 ```bash
-./scripts/validate_structure.sh [OPTIONS]
+./scripts/validate_structure.sh [OPÇÕES]
 ```
 
-#### Options
+#### Opções
 
-- `--fix` - Automatically create missing files (Priority 1 by default)
-- `--priority N` - Set priority level for creation (1-3)
-- `--help`, `-h` - Show help message
+- `--fix` - Criar automaticamente arquivos ausentes (Prioridade 1 por padrão)
+- `--priority N` - Definir nível de prioridade para criação (1-3)
+- `--help`, `-h` - Mostrar mensagem de ajuda
 
-#### Features
+#### Recursos
 
-1. **Python Version Check** - Verifies Python 3 is installed
-2. **Structure Validation** - Runs check_structure.py
-3. **Package Structure Verification** - Checks for `__init__.py` files
-4. **Critical Files Check** - Validates essential project files
-5. **Syntax Validation** - Checks Python files for syntax errors
-6. **Git Status** - Shows uncommitted changes if in a git repo
+1. **Verificação de Versão Python** - Verifica se Python 3 está instalado
+2. **Validação de Estrutura** - Executa check_structure.py
+3. **Verificação de Estrutura de Pacotes** - Verifica arquivos `__init__.py`
+4. **Verificação de Arquivos Críticos** - Valida arquivos essenciais do projeto
+5. **Validação de Sintaxe** - Verifica arquivos Python para erros de sintaxe
+6. **Status do Git** - Mostra alterações não commitadas se estiver em um repositório git
 
-#### Examples
+#### Exemplos
 
 ```bash
-# Just validate (no changes)
+# Apenas validar (sem alterações)
 ./scripts/validate_structure.sh
 
-# Create critical files automatically
+# Criar arquivos críticos automaticamente
 ./scripts/validate_structure.sh --fix
 
-# Create critical + important files
+# Criar arquivos críticos + importantes
 ./scripts/validate_structure.sh --fix --priority 2
 ```
 
-## File Templates
+## Templates de Arquivos
 
-When creating missing files, the system uses intelligent templates based on file type:
+Ao criar arquivos ausentes, o sistema usa templates inteligentes baseados no tipo de arquivo:
 
-### Models (SQLAlchemy)
+### Modelos (SQLAlchemy)
 
 ```python
 """
-Student model for EduAutismo IA.
+Modelo Student para EduAutismo IA.
 
-This module defines the database model for student.
+Este módulo define o modelo de banco de dados para student.
 """
 
 from sqlalchemy import Column, Integer, String, DateTime, JSON, ForeignKey
@@ -190,7 +190,7 @@ from backend.app.core.database import Base
 
 
 class Student(Base):
-    """Student database model."""
+    """Modelo de banco de dados Student."""
 
     __tablename__ = "students"
 
@@ -198,14 +198,14 @@ class Student(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    # TODO: Add model-specific fields here
+    # TODO: Adicione campos específicos do modelo aqui
 ```
 
 ### Schemas (Pydantic)
 
 ```python
 """
-Student Pydantic schemas for request/response validation.
+Schemas Pydantic de Student para validação de request/response.
 """
 
 from pydantic import BaseModel, Field, ConfigDict
@@ -214,28 +214,28 @@ from datetime import datetime
 
 
 class StudentBase(BaseModel):
-    """Base schema for Student with shared attributes."""
-    # TODO: Add base fields here
+    """Schema base para Student com atributos compartilhados."""
+    # TODO: Adicione campos base aqui
     pass
 
 
 class StudentCreate(BaseModel):
-    """Schema for creating a new student."""
+    """Schema para criar um novo student."""
     model_config = ConfigDict(from_attributes=True)
-    # TODO: Add creation fields here
+    # TODO: Adicione campos de criação aqui
     pass
 
 
 class StudentResponse(StudentInDB):
-    """Schema for student API response."""
+    """Schema para resposta da API de student."""
     model_config = ConfigDict(from_attributes=True)
 ```
 
-### Services (Business Logic)
+### Serviços (Lógica de Negócio)
 
 ```python
 """
-Student business logic service.
+Serviço de lógica de negócio de Student.
 """
 
 from typing import List, Optional
@@ -246,11 +246,11 @@ from backend.app.schemas.student import StudentCreate, StudentUpdate
 
 
 class StudentService:
-    """Service class for Student business logic."""
+    """Classe de serviço para lógica de negócio de Student."""
 
     @staticmethod
     def create(db: Session, student_data: StudentCreate) -> Student:
-        """Create a new student."""
+        """Criar um novo student."""
         db_obj = Student(**student_data.model_dump())
         db.add(db_obj)
         db.commit()
@@ -259,17 +259,17 @@ class StudentService:
 
     @staticmethod
     def get(db: Session, student_id: int) -> Optional[Student]:
-        """Get a student by ID."""
+        """Obter um student por ID."""
         return db.query(Student).filter(Student.id == student_id).first()
 
-    # ... more methods
+    # ... mais métodos
 ```
 
-### Routes (FastAPI)
+### Rotas (FastAPI)
 
 ```python
 """
-Student API routes.
+Rotas da API de Student.
 """
 
 from typing import List
@@ -292,7 +292,7 @@ def create_student(
     student_data: StudentCreate,
     db: Session = Depends(get_db)
 ) -> StudentResponse:
-    """Create a new student."""
+    """Criar um novo student."""
     return StudentService.create(db, student_data)
 
 
@@ -301,25 +301,25 @@ def get_student(
     student_id: int,
     db: Session = Depends(get_db)
 ) -> StudentResponse:
-    """Get a student by ID."""
+    """Obter um student por ID."""
     student = StudentService.get(db, student_id)
     if not student:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Student not found"
+            detail="Student não encontrado"
         )
     return student
 
-# ... more endpoints
+# ... mais endpoints
 ```
 
-### Tests
+### Testes
 
 ```python
 """
-Unit tests for student_service.
+Testes unitários para student_service.
 
-This module contains unit tests for the student_service module.
+Este módulo contém testes unitários para o módulo student_service.
 """
 
 import pytest
@@ -327,153 +327,153 @@ from fastapi.testclient import TestClient
 
 
 class TestStudentServiceUnit:
-    """Test class for student_service unit tests."""
+    """Classe de teste para testes unitários de student_service."""
 
     def test_student_service_placeholder(self):
         """
-        Placeholder test for student_service.
+        Teste placeholder para student_service.
 
-        TODO: Implement actual unit tests
+        TODO: Implementar testes unitários reais
         """
-        # TODO: Add test implementation
-        assert True  # Placeholder assertion
+        # TODO: Adicionar implementação do teste
+        assert True  # Asserção placeholder
 ```
 
-## Step-by-Step Validation Process
+## Processo de Validação Passo a Passo
 
-### Step 1: Check Current Structure
+### Passo 1: Verificar Estrutura Atual
 
-First, understand the current state of your project:
+Primeiro, entenda o estado atual do seu projeto:
 
 ```bash
-# See directory tree
+# Veja árvore de diretórios
 tree -L 3 -I '__pycache__|*.pyc|venv|.git|node_modules'
 
-# Or use find
+# Ou use find
 find . -type f -name "*.py" | grep -E "(backend/app/|tests/)" | sort
 
-# Run basic validation
+# Execute validação básica
 python scripts/check_structure.py --report-only
 ```
 
-### Step 2: Analyze the Report
+### Passo 2: Analisar o Relatório
 
-Look at the output to understand:
-- How many directories are present/missing
-- How many files are present/missing by priority
-- Overall completion percentage
-- Specific missing items
+Observe a saída para entender:
+- Quantos diretórios estão presentes/ausentes
+- Quantos arquivos estão presentes/ausentes por prioridade
+- Porcentagem geral de conclusão
+- Itens específicos ausentes
 
-### Step 3: Create Missing Files
+### Passo 3: Criar Arquivos Ausentes
 
-Based on the report, create files incrementally:
+Baseado no relatório, crie arquivos incrementalmente:
 
 ```bash
-# Start with critical files
+# Comece com arquivos críticos
 python scripts/check_structure.py --create-missing --priority 1
 
-# Verify creation
+# Verifique criação
 python scripts/check_structure.py --report-only
 
-# Add important files
+# Adicione arquivos importantes
 python scripts/check_structure.py --create-missing --priority 2
 
-# Verify again
+# Verifique novamente
 python scripts/check_structure.py --report-only
 ```
 
-### Step 4: Verify Package Structure
+### Passo 4: Verificar Estrutura de Pacotes
 
-Ensure all Python packages have `__init__.py`:
+Garanta que todos os pacotes Python tenham `__init__.py`:
 
 ```bash
-# Check all __init__.py files
+# Verifique todos os arquivos __init__.py
 find backend/app -name "__init__.py" -type f
 
-# Should output all package init files
+# Deve mostrar todos os arquivos init de pacotes
 ```
 
-### Step 5: Validate Python Syntax
+### Passo 5: Validar Sintaxe Python
 
-Check for syntax errors in created files:
+Verifique erros de sintaxe nos arquivos criados:
 
 ```bash
-# Check specific file
+# Verifique arquivo específico
 python -m py_compile backend/app/models/student.py
 
-# Or use flake8
+# Ou use flake8
 flake8 backend/app/ --count --select=E9,F63,F7,F82 --show-source --statistics
 ```
 
-### Step 6: Review and Customize
+### Passo 6: Revisar e Personalizar
 
-All created files contain TODO comments. Replace them with actual implementation:
+Todos os arquivos criados contêm comentários TODO. Substitua-os com implementação real:
 
-1. **Models**: Add SQLAlchemy columns
-2. **Schemas**: Add Pydantic fields
-3. **Services**: Add business logic
-4. **Routes**: Add endpoints
-5. **Tests**: Add test cases
+1. **Modelos**: Adicione colunas SQLAlchemy
+2. **Schemas**: Adicione campos Pydantic
+3. **Serviços**: Adicione lógica de negócio
+4. **Rotas**: Adicione endpoints
+5. **Testes**: Adicione casos de teste
 
-## Common Workflows
+## Fluxos de Trabalho Comuns
 
-### New Project Setup
+### Configuração de Novo Projeto
 
 ```bash
-# 1. Create full structure
+# 1. Crie estrutura completa
 python scripts/check_structure.py --create-missing --priority 2
 
-# 2. Verify
+# 2. Verifique
 ./scripts/validate_structure.sh
 
-# 3. Install dependencies
+# 3. Instale dependências
 cd backend && pip install -r requirements.txt
 cd ../frontend && npm install
 ```
 
-### Fixing Incomplete Structure
+### Corrigindo Estrutura Incompleta
 
 ```bash
-# 1. Check what's missing
+# 1. Verifique o que está faltando
 python scripts/check_structure.py --report-only
 
-# 2. Create missing files
+# 2. Crie arquivos ausentes
 python scripts/check_structure.py --create-missing --priority 2
 
-# 3. Run full validation
+# 3. Execute validação completa
 ./scripts/validate_structure.sh
 ```
 
-### Adding New Features
+### Adicionando Novos Recursos
 
-When adding a new resource (e.g., "Teacher"):
+Ao adicionar um novo recurso (ex: "Teacher"):
 
 ```bash
-# Current templates support: student, activity, assessment
-# For new resources, create files manually following the same pattern
+# Templates atuais suportam: student, activity, assessment
+# Para novos recursos, crie arquivos manualmente seguindo o mesmo padrão
 
-# Or modify check_structure.py to add new templates
+# Ou modifique check_structure.py para adicionar novos templates
 ```
 
-## Integration with Development Workflow
+## Integração com Fluxo de Desenvolvimento
 
-### Pre-commit Hook
+### Hook Pre-commit
 
-Add to `.git/hooks/pre-commit`:
+Adicione em `.git/hooks/pre-commit`:
 
 ```bash
 #!/bin/bash
-# Validate structure before commit
+# Valide estrutura antes do commit
 python scripts/check_structure.py --report-only
 exit $?
 ```
 
-### CI/CD Integration
+### Integração CI/CD
 
-Add to GitHub Actions (`.github/workflows/validate.yml`):
+Adicione ao GitHub Actions (`.github/workflows/validate.yml`):
 
 ```yaml
-name: Validate Structure
+name: Validar Estrutura
 
 on: [push, pull_request]
 
@@ -482,97 +482,97 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python
+      - name: Configurar Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.11'
-      - name: Validate structure
+      - name: Validar estrutura
         run: python scripts/check_structure.py --report-only
 ```
 
-### Make Task
+### Tarefa Make
 
-Add to `Makefile`:
+Adicione ao `Makefile`:
 
 ```makefile
 .PHONY: validate
 validate:
-	@echo "Validating project structure..."
+	@echo "Validando estrutura do projeto..."
 	@python scripts/check_structure.py --report-only
 
 .PHONY: fix-structure
 fix-structure:
-	@echo "Creating missing files..."
+	@echo "Criando arquivos ausentes..."
 	@python scripts/check_structure.py --create-missing --priority 2
 ```
 
-## Troubleshooting
+## Solução de Problemas
 
-### Issue: Script not found
+### Problema: Script não encontrado
 
 ```bash
-# Make sure you're in project root
+# Certifique-se de estar na raiz do projeto
 pwd
-# Should show: /path/to/eduautismo-ia-mvp
+# Deve mostrar: /caminho/para/eduautismo-ia-mvp
 
-# Make script executable
+# Torne o script executável
 chmod +x scripts/check_structure.py
 chmod +x scripts/validate_structure.sh
 ```
 
-### Issue: Permission denied
+### Problema: Permissão negada
 
 ```bash
-# Run with python explicitly
+# Execute com python explicitamente
 python3 scripts/check_structure.py
 
-# Or fix permissions
+# Ou corrija permissões
 chmod +x scripts/*.py scripts/*.sh
 ```
 
-### Issue: Import errors in created files
+### Problema: Erros de importação em arquivos criados
 
-The generated files may have import errors initially because:
-1. Dependencies might not be installed
-2. Referenced files might not exist yet
+Os arquivos gerados podem ter erros de importação inicialmente porque:
+1. Dependências podem não estar instaladas
+2. Arquivos referenciados podem ainda não existir
 
-**Solutions:**
+**Soluções:**
 ```bash
-# Install dependencies
+# Instale dependências
 cd backend
 pip install -r requirements.txt
 
-# Create missing dependencies
+# Crie dependências ausentes
 python ../scripts/check_structure.py --create-missing --priority 2
 
-# Update imports in main.py or config.py as needed
+# Atualize imports em main.py ou config.py conforme necessário
 ```
 
-### Issue: Syntax errors after creation
+### Problema: Erros de sintaxe após criação
 
-If files have syntax errors:
+Se arquivos tiverem erros de sintaxe:
 ```bash
-# Check specific file
+# Verifique arquivo específico
 python -m py_compile backend/app/models/student.py
 
-# Fix the file manually
-# The template provides a working structure, syntax errors likely come from manual edits
+# Corrija o arquivo manualmente
+# O template fornece uma estrutura funcional, erros de sintaxe provavelmente vêm de edições manuais
 ```
 
-## Best Practices
+## Melhores Práticas
 
-1. **Start with Priority 1**: Always create critical files first
-2. **Review TODOs**: Check all TODO comments in generated files
-3. **Customize Templates**: Modify templates in `check_structure.py` to match your needs
-4. **Regular Validation**: Run validation before commits
-5. **Version Control**: Commit generated files immediately with clear messages
-6. **Incremental Updates**: Add Priority 2 and 3 files as needed, not all at once
-7. **Test Early**: Run tests after creating test files to ensure structure is correct
+1. **Comece com Prioridade 1**: Sempre crie arquivos críticos primeiro
+2. **Revise TODOs**: Verifique todos os comentários TODO em arquivos gerados
+3. **Personalize Templates**: Modifique templates em `check_structure.py` para atender suas necessidades
+4. **Validação Regular**: Execute validação antes de commits
+5. **Controle de Versão**: Commite arquivos gerados imediatamente com mensagens claras
+6. **Atualizações Incrementais**: Adicione arquivos de Prioridade 2 e 3 conforme necessário, não todos de uma vez
+7. **Teste Cedo**: Execute testes após criar arquivos de teste para garantir que a estrutura está correta
 
-## File Reference
+## Referência de Arquivos
 
-### Created by Priority 1
-- All `__init__.py` files in:
+### Criados por Prioridade 1
+- Todos os arquivos `__init__.py` em:
   - `backend/app/`
   - `backend/app/api/`
   - `backend/app/core/`
@@ -587,98 +587,98 @@ python -m py_compile backend/app/models/student.py
   - `backend/tests/integration/`
   - `backend/tests/fixtures/`
 
-### Created by Priority 2
-- **Models**: `student.py`, `activity.py`, `assessment.py`
+### Criados por Prioridade 2
+- **Modelos**: `student.py`, `activity.py`, `assessment.py`
 - **Schemas**: `student.py`, `activity.py`, `assessment.py`
-- **Services**: `student_service.py`, `activity_service.py`, `assessment_service.py`
-- **Routes**: `students.py`, `activities.py`, `assessments.py`
-- **Tests**: `conftest.py`, `test_student_service.py`, `test_students_api.py`
-- **Dependencies**: `auth.py`
+- **Serviços**: `student_service.py`, `activity_service.py`, `assessment_service.py`
+- **Rotas**: `students.py`, `activities.py`, `assessments.py`
+- **Testes**: `conftest.py`, `test_student_service.py`, `test_students_api.py`
+- **Dependências**: `auth.py`
 
-### Created by Priority 3
+### Criados por Prioridade 3
 - `backend/pytest.ini`
 - `backend/.coveragerc`
 
-## Advanced Usage
+## Uso Avançado
 
-### Custom Templates
+### Templates Personalizados
 
-To add custom templates, edit `scripts/check_structure.py`:
+Para adicionar templates personalizados, edite `scripts/check_structure.py`:
 
 ```python
-# In FileTemplates class, add new method
+# Na classe FileTemplates, adicione novo método
 @staticmethod
 def get_custom_template(name: str) -> str:
-    return f'''"""Custom template for {name}."""
-    # Your template here
+    return f'''"""Template personalizado para {name}."""
+    # Seu template aqui
     '''
 
-# In _define_expected_files(), add file definition
+# Em _define_expected_files(), adicione definição de arquivo
 FileDefinition(
-    'path/to/file.py',
-    2,  # Priority
-    templates.get_custom_template('MyClass'),
-    'Description of the file'
+    'caminho/para/arquivo.py',
+    2,  # Prioridade
+    templates.get_custom_template('MinhaClasse'),
+    'Descrição do arquivo'
 ),
 ```
 
-### Extending Validation
+### Estendendo Validação
 
-To add new validation checks:
+Para adicionar novas verificações de validação:
 
 ```python
-# In ProjectStructureValidator class
+# Na classe ProjectStructureValidator
 def validate_custom_rule(self):
-    """Add custom validation logic."""
-    # Your validation code here
+    """Adicione lógica de validação personalizada."""
+    # Seu código de validação aqui
     pass
 ```
 
-## Exit Codes
+## Códigos de Saída
 
-The scripts use exit codes to indicate status:
+Os scripts usam códigos de saída para indicar status:
 
-- `0`: Success (≥ 95% completion)
-- `1`: Warning (≥ 70% completion)
-- `2`: Error (< 70% completion)
+- `0`: Sucesso (≥ 95% conclusão)
+- `1`: Aviso (≥ 70% conclusão)
+- `2`: Erro (< 70% conclusão)
 
-Use these in CI/CD:
+Use estes em CI/CD:
 ```bash
 python scripts/check_structure.py --report-only
 if [ $? -eq 2 ]; then
-    echo "Critical structure issues!"
+    echo "Problemas críticos de estrutura!"
     exit 1
 fi
 ```
 
-## Next Steps
+## Próximos Passos
 
-After validating your structure:
+Após validar sua estrutura:
 
-1. **Configure Environment**
+1. **Configure Ambiente**
    ```bash
    cp backend/.env.example backend/.env
-   # Edit backend/.env with your settings
+   # Edite backend/.env com suas configurações
    ```
 
-2. **Set Up Database**
+2. **Configure Banco de Dados**
    ```bash
    cd backend
    alembic upgrade head
    ```
 
-3. **Install Dependencies**
+3. **Instale Dependências**
    ```bash
    cd backend && pip install -r requirements.txt
    cd frontend && npm install
    ```
 
-4. **Run Tests**
+4. **Execute Testes**
    ```bash
    pytest backend/tests/
    ```
 
-5. **Start Development Servers**
+5. **Inicie Servidores de Desenvolvimento**
    ```bash
    # Backend
    uvicorn backend.app.main:app --reload
@@ -687,10 +687,10 @@ After validating your structure:
    cd frontend && npm run dev
    ```
 
-## Support
+## Suporte
 
-For issues or questions:
-- Check this documentation
-- Review generated file templates
-- Check `CLAUDE.md` for project-specific guidance
-- Review `README.md` for general project info
+Para problemas ou questões:
+- Verifique esta documentação
+- Revise templates de arquivos gerados
+- Verifique `CLAUDE.md` para orientação específica do projeto
+- Revise `README.md` para informações gerais do projeto

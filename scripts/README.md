@@ -1,202 +1,202 @@
-# Scripts Directory
+# Diretório de Scripts
 
-This directory contains utility scripts for the EduAutismo IA project.
+Este diretório contém scripts utilitários para o projeto EduAutismo IA.
 
-## Structure Validation Scripts
+## Scripts de Validação de Estrutura
 
 ### check_structure.py
 
-**Purpose:** Validate project structure and create missing files with templates.
+**Propósito:** Validar estrutura do projeto e criar arquivos ausentes com templates.
 
-**Features:**
-- ✅ Validates directory structure
-- ✅ Validates file existence
-- ✅ Priority-based file creation (1=Critical, 2=Important, 3=Optional)
-- ✅ Intelligent file templates (Models, Schemas, Services, Routes, Tests)
-- ✅ Detailed reporting with color-coded output
-- ✅ Automatic TODO insertion for customization
+**Recursos:**
+- ✅ Valida estrutura de diretórios
+- ✅ Valida existência de arquivos
+- ✅ Criação de arquivos baseada em prioridade (1=Crítico, 2=Importante, 3=Opcional)
+- ✅ Templates inteligentes de arquivos (Models, Schemas, Services, Routes, Tests)
+- ✅ Relatórios detalhados com saída colorida
+- ✅ Inserção automática de TODO para customização
 
-**Quick Start:**
+**Início Rápido:**
 ```bash
-# Validate only
+# Apenas validar
 python scripts/check_structure.py --report-only
 
-# Create critical files
+# Criar arquivos críticos
 python scripts/check_structure.py --create-missing --priority 1
 
-# Create critical + important files
+# Criar arquivos críticos + importantes
 python scripts/check_structure.py --create-missing --priority 2
 ```
 
-**Full Documentation:** See [docs/structure-validation.md](../docs/structure-validation.md)
+**Documentação Completa:** Veja [docs/structure-validation.md](../docs/structure-validation.md)
 
 ### validate_structure.sh
 
-**Purpose:** Complete validation workflow with multiple checks.
+**Propósito:** Fluxo completo de validação com múltiplas verificações.
 
-**Features:**
-- ✅ Python version check
-- ✅ Structure validation
-- ✅ Package structure verification
-- ✅ Critical files check
-- ✅ Python syntax validation
-- ✅ Git status report
+**Recursos:**
+- ✅ Verificação de versão Python
+- ✅ Validação de estrutura
+- ✅ Verificação de estrutura de pacotes
+- ✅ Verificação de arquivos críticos
+- ✅ Validação de sintaxe Python
+- ✅ Relatório de status do Git
 
-**Quick Start:**
+**Início Rápido:**
 ```bash
-# Validate everything
+# Validar tudo
 ./scripts/validate_structure.sh
 
-# Auto-fix with Priority 1 files
+# Auto-corrigir com arquivos de Prioridade 1
 ./scripts/validate_structure.sh --fix
 
-# Auto-fix with Priority 1 & 2 files
+# Auto-corrigir com arquivos de Prioridade 1 e 2
 ./scripts/validate_structure.sh --fix --priority 2
 ```
 
-## Directory Organization
+## Organização de Diretórios
 
 ```
 scripts/
-├── README.md                    # This file
-├── check_structure.py           # Main validation script
-├── validate_structure.sh        # Complete workflow script
+├── README.md                    # Este arquivo
+├── check_structure.py           # Script principal de validação
+├── validate_structure.sh        # Script de fluxo completo
 │
-├── setup/                       # Setup and installation scripts
+├── setup/                       # Scripts de configuração e instalação
 │   ├── check-requirements.sh
 │   ├── install.sh
 │   ├── quick-start.sh
 │   └── test-all.sh
 │
-├── deployment/                  # Deployment scripts
+├── deployment/                  # Scripts de deploy
 │   ├── deploy-dev.sh
 │   └── stop-dev.sh
 │
-├── backup/                      # Backup utilities
+├── backup/                      # Utilitários de backup
 │
-├── database/                    # Database management scripts
+├── database/                    # Scripts de gerenciamento de banco de dados
 │
-└── ml/                          # ML model training and management
+└── ml/                          # Treinamento e gerenciamento de modelos ML
 
 ```
 
-## Other Scripts
+## Outros Scripts
 
-### Setup Scripts (setup/)
+### Scripts de Configuração (setup/)
 
 **check-requirements.sh**
-- Checks if all required tools are installed
-- Validates Python, Node.js, Docker versions
+- Verifica se todas as ferramentas necessárias estão instaladas
+- Valida versões de Python, Node.js, Docker
 
 **install.sh**
-- Complete installation script
-- Sets up backend and frontend environments
+- Script completo de instalação
+- Configura ambientes backend e frontend
 
 **quick-start.sh**
-- Quick project startup
-- Runs database migrations and starts services
+- Inicialização rápida do projeto
+- Executa migrations do banco de dados e inicia serviços
 
 **test-all.sh**
-- Runs all test suites
-- Backend and frontend tests
+- Executa todas as suítes de teste
+- Testes de backend e frontend
 
-### Deployment Scripts (deployment/)
+### Scripts de Deploy (deployment/)
 
 **deploy-dev.sh**
-- Deploys to development environment
-- Handles Docker containers and services
+- Deploy para ambiente de desenvolvimento
+- Gerencia containers e serviços Docker
 
 **stop-dev.sh**
-- Stops development services
-- Cleans up containers
+- Para serviços de desenvolvimento
+- Limpa containers
 
-## Usage Examples
+## Exemplos de Uso
 
-### Complete New Project Setup
+### Configuração Completa de Novo Projeto
 
 ```bash
-# 1. Create project structure
+# 1. Criar estrutura do projeto
 python scripts/check_structure.py --create-missing --priority 2
 
-# 2. Validate everything
+# 2. Validar tudo
 ./scripts/validate_structure.sh
 
-# 3. Install dependencies
+# 3. Instalar dependências
 cd backend && pip install -r requirements.txt
 cd ../frontend && npm install
 
-# 4. Run tests
+# 4. Executar testes
 pytest backend/tests/
 ```
 
-### Daily Development Workflow
+### Fluxo de Trabalho Diário de Desenvolvimento
 
 ```bash
-# Before starting work
+# Antes de começar a trabalhar
 ./scripts/validate_structure.sh
 
-# Before committing
+# Antes de commitar
 python scripts/check_structure.py --report-only
 git status
 git add .
-git commit -m "Your message"
+git commit -m "Sua mensagem"
 ```
 
-### CI/CD Integration
+### Integração CI/CD
 
 ```yaml
 # .github/workflows/validate.yml
-- name: Validate Structure
+- name: Validar Estrutura
   run: python scripts/check_structure.py --report-only
 ```
 
-## Script Permissions
+## Permissões de Scripts
 
-Make scripts executable:
+Torne os scripts executáveis:
 
 ```bash
 chmod +x scripts/*.sh
 chmod +x scripts/**/*.sh
 ```
 
-## Adding New Scripts
+## Adicionando Novos Scripts
 
-When adding new scripts:
+Ao adicionar novos scripts:
 
-1. Choose the appropriate subdirectory
-2. Follow naming conventions (lowercase, hyphens)
-3. Add shebang line (`#!/bin/bash` or `#!/usr/bin/env python3`)
-4. Document in this README
-5. Make executable with `chmod +x`
-6. Add error handling (`set -e` for bash scripts)
+1. Escolha o subdiretório apropriado
+2. Siga convenções de nomenclatura (minúsculas, hífens)
+3. Adicione linha shebang (`#!/bin/bash` ou `#!/usr/bin/env python3`)
+4. Documente neste README
+5. Torne executável com `chmod +x`
+6. Adicione tratamento de erros (`set -e` para scripts bash)
 
-### Template for Bash Scripts
+### Template para Scripts Bash
 
 ```bash
 #!/bin/bash
 #
-# Script Name - Brief Description
+# Nome do Script - Breve Descrição
 #
-# Usage:
-#   ./script-name.sh [options]
+# Uso:
+#   ./nome-do-script.sh [opções]
 #
-# Options:
-#   --help    Show this help message
+# Opções:
+#   --help    Mostrar esta mensagem de ajuda
 
-set -e  # Exit on error
+set -e  # Sair em caso de erro
 
-# Script content here
+# Conteúdo do script aqui
 ```
 
-### Template for Python Scripts
+### Template para Scripts Python
 
 ```python
 #!/usr/bin/env python3
 """
-Script Name - Brief Description
+Nome do Script - Breve Descrição
 
-Usage:
-    python script_name.py [options]
+Uso:
+    python nome_do_script.py [opções]
 """
 
 import argparse
@@ -204,113 +204,113 @@ import sys
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Description')
-    # Add arguments
+    parser = argparse.ArgumentParser(description='Descrição')
+    # Adicionar argumentos
     args = parser.parse_args()
 
-    # Script logic here
+    # Lógica do script aqui
 
 
 if __name__ == '__main__':
     main()
 ```
 
-## Troubleshooting
+## Solução de Problemas
 
-### Permission Issues
+### Problemas de Permissão
 
 ```bash
-# Fix all scripts at once
+# Corrigir todos os scripts de uma vez
 find scripts/ -type f -name "*.sh" -exec chmod +x {} \;
 find scripts/ -type f -name "*.py" -exec chmod +x {} \;
 ```
 
-### Python Import Issues
+### Problemas de Importação Python
 
 ```bash
-# Set PYTHONPATH to project root
+# Definir PYTHONPATH para raiz do projeto
 export PYTHONPATH="${PYTHONPATH}:${PWD}"
 
-# Or run from project root
-cd /path/to/eduautismo-ia-mvp
+# Ou executar da raiz do projeto
+cd /caminho/para/eduautismo-ia-mvp
 python scripts/check_structure.py
 ```
 
-### Script Not Found
+### Script Não Encontrado
 
 ```bash
-# Always run from project root
-pwd  # Should be: /path/to/eduautismo-ia-mvp
+# Sempre execute da raiz do projeto
+pwd  # Deve ser: /caminho/para/eduautismo-ia-mvp
 
-# Use full path or ./
+# Use caminho completo ou ./
 python scripts/check_structure.py  # ✅
 python check_structure.py          # ❌
 ```
 
-## Dependencies
+## Dependências
 
-Most scripts require:
-- **Python 3.11+** for Python scripts
-- **Bash 4.0+** for shell scripts
-- **Git** for version control operations
-- **Docker** (optional, for deployment scripts)
+A maioria dos scripts requer:
+- **Python 3.11+** para scripts Python
+- **Bash 4.0+** para scripts shell
+- **Git** para operações de controle de versão
+- **Docker** (opcional, para scripts de deploy)
 
-## Exit Codes
+## Códigos de Saída
 
-Scripts use standard exit codes:
-- `0` - Success
-- `1` - Warning or minor issues
-- `2` - Error or major issues
+Scripts usam códigos de saída padrão:
+- `0` - Sucesso
+- `1` - Aviso ou problemas menores
+- `2` - Erro ou problemas maiores
 
-Use in CI/CD:
+Use em CI/CD:
 ```bash
 ./scripts/validate_structure.sh
 if [ $? -ne 0 ]; then
-    echo "Validation failed"
+    echo "Validação falhou"
     exit 1
 fi
 ```
 
-## Best Practices
+## Melhores Práticas
 
-1. **Always run from project root**
-2. **Check exit codes in automation**
-3. **Review script output before acting on suggestions**
-4. **Use `--help` flag when available**
-5. **Test scripts in development before using in production**
-6. **Keep scripts focused and single-purpose**
-7. **Document all options and usage**
+1. **Sempre execute da raiz do projeto**
+2. **Verifique códigos de saída em automação**
+3. **Revise saída do script antes de agir nas sugestões**
+4. **Use flag `--help` quando disponível**
+5. **Teste scripts em desenvolvimento antes de usar em produção**
+6. **Mantenha scripts focados e com propósito único**
+7. **Documente todas as opções e uso**
 
-## Contributing
+## Contribuindo
 
-When contributing new scripts:
-1. Follow existing patterns and conventions
-2. Add comprehensive documentation
-3. Include usage examples
-4. Add error handling
-5. Test thoroughly
-6. Update this README
+Ao contribuir com novos scripts:
+1. Siga padrões e convenções existentes
+2. Adicione documentação abrangente
+3. Inclua exemplos de uso
+4. Adicione tratamento de erros
+5. Teste completamente
+6. Atualize este README
 
-## Support
+## Suporte
 
-For issues with scripts:
-1. Check script output for error messages
-2. Review this documentation
-3. Check [docs/structure-validation.md](../docs/structure-validation.md) for validation scripts
-4. Review [docs/troubleshooting.md](../docs/troubleshooting.md) if available
-5. Open an issue on GitHub
+Para problemas com scripts:
+1. Verifique saída do script para mensagens de erro
+2. Revise esta documentação
+3. Verifique [docs/structure-validation.md](../docs/structure-validation.md) para scripts de validação
+4. Revise [docs/troubleshooting.md](../docs/troubleshooting.md) se disponível
+5. Abra uma issue no GitHub
 
-## Future Scripts
+## Scripts Futuros
 
-Planned additions:
-- [ ] Database seeding script
-- [ ] ML model training automation
-- [ ] Performance benchmarking
-- [ ] Security scanning
-- [ ] Automated testing with coverage
-- [ ] Production deployment scripts
-- [ ] Backup and restore utilities
+Adições planejadas:
+- [ ] Script de seed do banco de dados
+- [ ] Automação de treinamento de modelos ML
+- [ ] Benchmarking de performance
+- [ ] Scanning de segurança
+- [ ] Testes automatizados com cobertura
+- [ ] Scripts de deploy em produção
+- [ ] Utilitários de backup e restore
 
-## License
+## Licença
 
-All scripts are part of the EduAutismo IA project and follow the same MIT License.
+Todos os scripts são parte do projeto EduAutismo IA e seguem a mesma Licença MIT.
