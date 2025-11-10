@@ -602,12 +602,11 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 ## 📞 Contato/WhatsApp
 
-(81) 98484-5021
-(83) 98832-9018
+(81) 98484-5021 / (83) 98832-9018
 
 ### Autor
 
-**Cleyber Ferreira**
+**Cleyber Silva**
 - 🎓 MBA em Inteligência Artificial e Big Data - USP
 - 📧 Email: cleyber.silva@usp.com.br
 - 💼 LinkedIn: [linkedin.com/in/cleybersilva](https://linkedin.com/in/cleybersilva)
