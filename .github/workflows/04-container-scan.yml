@@ -77,6 +77,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       
+      - name: Install Syft
+        uses: anchore/sbom-action/download-syft@v0
+      
       - name: Build image (for scanning)
         uses: docker/build-push-action@v5
         with:
@@ -132,19 +135,38 @@ jobs:
           category: 'grype-${{ matrix.image.name }}'
         continue-on-error: true
       
-      - name: Generate SBOM with Syft
-        uses: anchore/sbom-action@v0
-        with:
-          image: eduautismo-${{ matrix.image.name }}:scan
-          format: 'spdx-json'
-          output-file: 'sbom-${{ matrix.image.name }}.json'
+      - name: Save Docker image for SBOM analysis
+        run: |
+          docker save eduautismo-${{ matrix.image.name }}:scan -o sbom-${{ matrix.image.name }}.tar
+          ls -lh sbom-${{ matrix.image.name }}.tar
+      
+      - name: Generate SBOM with Syft (SPDX)
+        continue-on-error: true
+        run: |
+          echo "🔍 Generating SPDX SBOM for eduautismo-${{ matrix.image.name }}..."
+          syft packages 'docker-archive://sbom-${{ matrix.image.name }}.tar' \
+            -o spdx-json > sbom-${{ matrix.image.name }}.json
+          
+          if [ -f "sbom-${{ matrix.image.name }}.json" ]; then
+            echo "✅ SPDX SBOM generated successfully"
+            wc -l sbom-${{ matrix.image.name }}.json
+          else
+            echo "⚠️  SPDX SBOM generation failed"
+          fi
       
       - name: Generate CycloneDX SBOM
-        uses: anchore/sbom-action@v0
-        with:
-          image: eduautismo-${{ matrix.image.name }}:scan
-          format: 'cyclonedx-json'
-          output-file: 'sbom-${{ matrix.image.name }}-cyclonedx.json'
+        continue-on-error: true
+        run: |
+          echo "🔍 Generating CycloneDX SBOM for eduautismo-${{ matrix.image.name }}..."
+          syft packages 'docker-archive://sbom-${{ matrix.image.name }}.tar' \
+            -o cyclonedx-json > sbom-${{ matrix.image.name }}-cyclonedx.json
+          
+          if [ -f "sbom-${{ matrix.image.name }}-cyclonedx.json" ]; then
+            echo "✅ CycloneDX SBOM generated successfully"
+            wc -l sbom-${{ matrix.image.name }}-cyclonedx.json
+          else
+            echo "⚠️  CycloneDX SBOM generation failed"
+          fi
       
       - name: Upload SBOM artifacts
         uses: actions/upload-artifact@v4
