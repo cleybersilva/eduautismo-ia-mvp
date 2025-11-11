@@ -1,0 +1,106 @@
+name: "🎯 Pipeline Orchestrator - Sequencial"
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  pull-requests: write
+
+jobs:
+  # ============================================================================
+  # STAGE 1: VALIDAÇÃO E TESTES (Backend)
+  # ============================================================================
+  
+  backend-tests:
+    name: "Stage 1️⃣ - Backend Tests & Lint"
+    uses: ./.github/workflows/02-backend-tests.yml
+    permissions:
+      contents: read
+      pull-requests: write
+  
+  # ============================================================================
+  # STAGE 2: TESTES FRONTEND
+  # ============================================================================
+  
+  frontend-tests:
+    name: "Stage 2️⃣ - Frontend Tests"
+    needs: backend-tests
+    if: success() && github.event_name != 'pull_request'
+    uses: ./.github/workflows/03-frontend-tests.yml
+    permissions:
+      contents: read
+  
+  # ============================================================================
+  # STAGE 3: SEGURANÇA (Paralelo)
+  # ============================================================================
+  
+  security-scan:
+    name: "Stage 3️⃣ - Security Scan"
+    needs: backend-tests
+    if: success()
+    uses: ./.github/workflows/01-security-scan.yml
+    permissions:
+      contents: read
+      security-events: write
+  
+  # ============================================================================
+  # STAGE 4: BUILD & PUSH (Imagens Container)
+  # ============================================================================
+  
+  build-and-push:
+    name: "Stage 4️⃣ - Build & Push"
+    needs: [backend-tests, security-scan]
+    if: success() && github.event_name == 'push'
+    uses: ./.github/workflows/05-build-and-push.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+  
+  # ============================================================================
+  # STAGE 5: CONTAINER SCANNING (Após build)
+  # ============================================================================
+  
+  container-scan:
+    name: "Stage 5️⃣ - Container Scan & SBOM"
+    needs: build-and-push
+    if: success() && github.event_name == 'push'
+    uses: ./.github/workflows/04-container-scan.yml
+    permissions:
+      contents: read
+      security-events: write
+  
+  # ============================================================================
+  # FINAL: STATUS E NOTIFICAÇÕES
+  # ============================================================================
+  
+  pipeline-status:
+    name: "✅ Pipeline Status"
+    needs: [backend-tests, security-scan, build-and-push, container-scan]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Pipeline Status Report
+        run: |
+          echo "╔════════════════════════════════════════════════════╗"
+          echo "║        🎯 Pipeline Orchestrator - Status            ║"
+          echo "╚════════════════════════════════════════════════════╝"
+          echo ""
+          echo "✅ Stage 1️⃣  Backend Tests & Lint:        ${{ needs.backend-tests.result }}"
+          echo "✅ Stage 2️⃣  Frontend Tests:              ${{ needs.frontend-tests.result || 'skipped' }}"
+          echo "✅ Stage 3️⃣  Security Scan:               ${{ needs.security-scan.result }}"
+          echo "✅ Stage 4️⃣  Build & Push:                ${{ needs.build-and-push.result || 'skipped' }}"
+          echo "✅ Stage 5️⃣  Container Scan & SBOM:       ${{ needs.container-scan.result || 'skipped' }}"
+          echo ""
+          echo "═══════════════════════════════════════════════════"
+      
+      - name: Determine Pipeline Status
+        if: failure()
+        run: exit 1
