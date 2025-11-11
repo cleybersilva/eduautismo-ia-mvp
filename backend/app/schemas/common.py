@@ -8,12 +8,12 @@ from datetime import datetime
 from typing import Any, Dict, Generic, List, Optional, TypeVar
 from uuid import UUID
 
-from pydantic import BaseModel, Field, ConfigDict
-
+from pydantic import BaseModel, ConfigDict, Field
 
 # ============================================================================
 # Base Schemas
 # ============================================================================
+
 
 class BaseSchema(BaseModel):
     """Base schema with common configuration."""
@@ -47,6 +47,7 @@ class BaseResponseSchema(UUIDSchema, TimestampSchema):
 # ============================================================================
 # Pagination
 # ============================================================================
+
 
 class PaginationParams(BaseSchema):
     """Query parameters for pagination."""
@@ -112,6 +113,7 @@ class PaginatedResponse(BaseSchema, Generic[T]):
 # API Responses
 # ============================================================================
 
+
 class MessageResponse(BaseSchema):
     """Simple message response."""
 
@@ -159,6 +161,7 @@ class ValidationErrorResponse(ErrorResponse):
 # ============================================================================
 # Health Check
 # ============================================================================
+
 
 class ComponentHealth(BaseSchema):
     """Health status of a component."""
@@ -214,6 +217,7 @@ class DetailedHealthCheckResponse(HealthCheckResponse):
 # Authentication
 # ============================================================================
 
+
 class Token(BaseSchema):
     """JWT token response."""
 
@@ -246,6 +250,7 @@ class TokenResponse(BaseSchema):
 # File Upload
 # ============================================================================
 
+
 class FileUploadResponse(BaseSchema):
     """File upload response."""
 
@@ -258,6 +263,7 @@ class FileUploadResponse(BaseSchema):
 # ============================================================================
 # Filters
 # ============================================================================
+
 
 class DateRangeFilter(BaseSchema):
     """Date range filter."""
@@ -287,6 +293,7 @@ class SearchFilter(BaseSchema):
 # Bulk Operations
 # ============================================================================
 
+
 class BulkDeleteRequest(BaseSchema):
     """Bulk delete request."""
 
@@ -315,6 +322,7 @@ class BulkDeleteResponse(BaseSchema):
 # ============================================================================
 # Statistics
 # ============================================================================
+
 
 class CountResponse(BaseSchema):
     """Simple count response."""

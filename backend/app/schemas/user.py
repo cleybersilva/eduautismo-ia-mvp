@@ -8,19 +8,15 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from pydantic import EmailStr, Field, field_validator
-
 from app.schemas.common import BaseResponseSchema, BaseSchema
-from app.utils.constants import (
-    UserRole,
-    MIN_PASSWORD_LENGTH,
-    MAX_PASSWORD_LENGTH,
-)
-
+from app.utils.constants import (MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH,
+                                 UserRole)
+from pydantic import EmailStr, Field, field_validator
 
 # ============================================================================
 # Request Schemas
 # ============================================================================
+
 
 class UserRegister(BaseSchema):
     """Schema for user registration."""
@@ -257,6 +253,7 @@ class PasswordChange(BaseSchema):
 # Response Schemas
 # ============================================================================
 
+
 class UserResponse(BaseResponseSchema):
     """Schema for user response (public information)."""
 
@@ -306,6 +303,7 @@ class UserListResponse(UserResponse):
 # ============================================================================
 # Admin Schemas
 # ============================================================================
+
 
 class UserAdminUpdate(UserUpdate):
     """Schema for admin user updates (includes role and status)."""

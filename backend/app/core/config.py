@@ -1,10 +1,13 @@
 """
 Configurações da aplicação
 """
-from pydantic_settings import BaseSettings
-from pydantic import field_validator
-from typing import List, Union
+
 import os
+from typing import List, Union
+
+from pydantic import field_validator
+from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
     """Configurações da aplicação"""
@@ -54,11 +57,11 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: Union[List[str], str] = ["http://localhost:3000", "http://localhost:5173"]
 
-    @field_validator('CORS_ORIGINS', mode='before')
+    @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def parse_cors_origins(cls, v):
         if isinstance(v, str):
-            return [origin.strip() for origin in v.split(',')]
+            return [origin.strip() for origin in v.split(",")]
         return v
 
     # Logging
@@ -69,5 +72,6 @@ class Settings(BaseSettings):
         env_file = ".env"
         case_sensitive = True
         extra = "ignore"  # Ignore extra fields from .env
+
 
 settings = Settings()

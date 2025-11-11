@@ -8,17 +8,13 @@ from datetime import date
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import select, func
-from sqlalchemy.orm import Session
-
-from app.core.exceptions import (
-    StudentNotFoundError,
-    PermissionDeniedError,
-    ValidationError as AppValidationError,
-)
+from app.core.exceptions import PermissionDeniedError, StudentNotFoundError
+from app.core.exceptions import ValidationError as AppValidationError
 from app.models.student import Student
 from app.schemas.student import StudentCreate, StudentUpdate
 from app.utils.logger import get_logger
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)
 
@@ -52,10 +48,7 @@ class StudentService:
             age = (
                 today.year
                 - student_data.date_of_birth.year
-                - (
-                    (today.month, today.day)
-                    < (student_data.date_of_birth.month, student_data.date_of_birth.day)
-                )
+                - ((today.month, today.day) < (student_data.date_of_birth.month, student_data.date_of_birth.day))
             )
 
             # Create student instance

@@ -7,15 +7,10 @@ Request and response schemas for assessment-related endpoints.
 from typing import Any, Dict, Optional
 from uuid import UUID
 
-from pydantic import Field, field_validator
-
 from app.schemas.common import BaseResponseSchema, BaseSchema
-from app.utils.constants import (
-    CompletionStatus,
-    EngagementLevel,
-    DifficultyRating,
-    MAX_NOTES_LENGTH,
-)
+from app.utils.constants import (MAX_NOTES_LENGTH, CompletionStatus,
+                                 DifficultyRating, EngagementLevel)
+from pydantic import Field, field_validator
 
 
 class AssessmentCreate(BaseSchema):
@@ -26,58 +21,23 @@ class AssessmentCreate(BaseSchema):
     completion_status: CompletionStatus = Field(..., description="Completion status")
     engagement_level: EngagementLevel = Field(..., description="Engagement level")
     difficulty_rating: DifficultyRating = Field(..., description="Difficulty rating")
-    actual_duration_minutes: Optional[int] = Field(
-        default=None,
-        ge=0,
-        description="Actual duration in minutes"
-    )
-    notes: Optional[str] = Field(
-        default=None,
-        max_length=MAX_NOTES_LENGTH,
-        description="Teacher's notes"
-    )
+    actual_duration_minutes: Optional[int] = Field(default=None, ge=0, description="Actual duration in minutes")
+    notes: Optional[str] = Field(default=None, max_length=MAX_NOTES_LENGTH, description="Teacher's notes")
     strengths_observed: Optional[str] = Field(
-        default=None,
-        max_length=MAX_NOTES_LENGTH,
-        description="Observed strengths"
+        default=None, max_length=MAX_NOTES_LENGTH, description="Observed strengths"
     )
     challenges_observed: Optional[str] = Field(
-        default=None,
-        max_length=MAX_NOTES_LENGTH,
-        description="Observed challenges"
+        default=None, max_length=MAX_NOTES_LENGTH, description="Observed challenges"
     )
-    recommendations: Optional[str] = Field(
-        default=None,
-        max_length=MAX_NOTES_LENGTH,
-        description="Recommendations"
-    )
-    skills_demonstrated: Optional[Dict[str, Any]] = Field(
-        default=None,
-        description="Skills demonstrated (JSON)"
-    )
-    behavioral_notes: Optional[Dict[str, Any]] = Field(
-        default=None,
-        description="Behavioral observations (JSON)"
-    )
-    independence_level: Optional[str] = Field(
-        default=None,
-        max_length=50,
-        description="Independence level"
-    )
-    assistance_needed: Optional[str] = Field(
-        default=None,
-        max_length=255,
-        description="Assistance needed"
-    )
+    recommendations: Optional[str] = Field(default=None, max_length=MAX_NOTES_LENGTH, description="Recommendations")
+    skills_demonstrated: Optional[Dict[str, Any]] = Field(default=None, description="Skills demonstrated (JSON)")
+    behavioral_notes: Optional[Dict[str, Any]] = Field(default=None, description="Behavioral observations (JSON)")
+    independence_level: Optional[str] = Field(default=None, max_length=50, description="Independence level")
+    assistance_needed: Optional[str] = Field(default=None, max_length=255, description="Assistance needed")
     modifications_made: Optional[str] = Field(
-        default=None,
-        max_length=MAX_NOTES_LENGTH,
-        description="Modifications made"
+        default=None, max_length=MAX_NOTES_LENGTH, description="Modifications made"
     )
-    objectives_met: Optional[Dict[str, bool]] = Field(
-        default=None,
-        description="Objectives met (JSON)"
-    )
+    objectives_met: Optional[Dict[str, bool]] = Field(default=None, description="Objectives met (JSON)")
 
     @field_validator("notes", "strengths_observed", "challenges_observed", "recommendations", "modifications_made")
     @classmethod
@@ -157,7 +117,7 @@ class ProgressAnalysisRequest(BaseSchema):
     time_period: Optional[str] = Field(
         default=None,
         description="Time period (e.g., 'last month', 'last 3 months')",
-        examples=["last month", "last 3 months", "last year"]
+        examples=["last month", "last 3 months", "last year"],
     )
 
 

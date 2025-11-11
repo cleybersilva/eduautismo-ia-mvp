@@ -6,12 +6,13 @@ All custom exceptions provide consistent error handling and messaging.
 """
 
 from typing import Any, Dict, Optional
-from fastapi import HTTPException, status
 
+from fastapi import HTTPException, status
 
 # ============================================================================
 # Base Custom Exception
 # ============================================================================
+
 
 class EduAutismoException(Exception):
     """Base exception for all custom exceptions in the application."""
@@ -41,6 +42,7 @@ class EduAutismoException(Exception):
 # ============================================================================
 # Authentication & Authorization Exceptions
 # ============================================================================
+
 
 class AuthenticationError(EduAutismoException):
     """Base authentication error."""
@@ -112,6 +114,7 @@ class PermissionDeniedError(EduAutismoException):
 # Resource Not Found Exceptions
 # ============================================================================
 
+
 class ResourceNotFoundError(EduAutismoException):
     """Base exception for resource not found errors."""
 
@@ -162,6 +165,7 @@ class AssessmentNotFoundError(ResourceNotFoundError):
 # ============================================================================
 # Validation Exceptions
 # ============================================================================
+
 
 class ValidationError(EduAutismoException):
     """Base validation error."""
@@ -232,6 +236,7 @@ class InvalidDurationError(ValidationError):
 # Business Logic Exceptions
 # ============================================================================
 
+
 class EmailAlreadyExistsError(EduAutismoException):
     """Email is already registered."""
 
@@ -279,6 +284,7 @@ class ResourceLimitExceededError(EduAutismoException):
 # ============================================================================
 # External Service Exceptions
 # ============================================================================
+
 
 class ExternalServiceError(EduAutismoException):
     """Base exception for external service errors."""
@@ -351,6 +357,7 @@ class EmailServiceError(ExternalServiceError):
 # File Upload Exceptions
 # ============================================================================
 
+
 class FileUploadError(EduAutismoException):
     """Base file upload error."""
 
@@ -390,6 +397,7 @@ class InvalidFileTypeError(FileUploadError):
 # Rate Limiting Exceptions
 # ============================================================================
 
+
 class RateLimitExceededError(EduAutismoException):
     """Rate limit exceeded."""
 
@@ -408,6 +416,7 @@ class RateLimitExceededError(EduAutismoException):
 # ============================================================================
 # Data Integrity Exceptions
 # ============================================================================
+
 
 class DataIntegrityError(EduAutismoException):
     """Data integrity violation."""
@@ -438,6 +447,7 @@ class ForeignKeyViolationError(DataIntegrityError):
 # Configuration Exceptions
 # ============================================================================
 
+
 class ConfigurationError(EduAutismoException):
     """Configuration error."""
 
@@ -466,6 +476,7 @@ class MissingConfigurationError(ConfigurationError):
 # ============================================================================
 # Helper Functions
 # ============================================================================
+
 
 def handle_exception(exception: Exception) -> HTTPException:
     """

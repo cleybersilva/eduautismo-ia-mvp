@@ -7,13 +7,14 @@ Centralized constants used throughout the application.
 from enum import Enum
 from typing import List
 
-
 # ============================================================================
 # User Roles
 # ============================================================================
 
+
 class UserRole(str, Enum):
     """User roles in the system."""
+
     ADMIN = "admin"
     TEACHER = "teacher"
     PARENT = "parent"  # Future implementation
@@ -24,8 +25,10 @@ class UserRole(str, Enum):
 # Activity Types
 # ============================================================================
 
+
 class ActivityType(str, Enum):
     """Types of educational activities."""
+
     COGNITIVE = "cognitive"
     SOCIAL = "social"
     MOTOR = "motor"
@@ -39,8 +42,10 @@ class ActivityType(str, Enum):
 # Difficulty Levels
 # ============================================================================
 
+
 class DifficultyLevel(str, Enum):
     """Difficulty levels for activities."""
+
     VERY_EASY = "very_easy"
     EASY = "easy"
     MEDIUM = "medium"
@@ -52,8 +57,10 @@ class DifficultyLevel(str, Enum):
 # Assessment Ratings
 # ============================================================================
 
+
 class EngagementLevel(str, Enum):
     """Student engagement level during activity."""
+
     NONE = "none"
     LOW = "low"
     MEDIUM = "medium"
@@ -63,6 +70,7 @@ class EngagementLevel(str, Enum):
 
 class CompletionStatus(str, Enum):
     """Activity completion status."""
+
     NOT_STARTED = "not_started"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
@@ -72,6 +80,7 @@ class CompletionStatus(str, Enum):
 
 class DifficultyRating(str, Enum):
     """How appropriate was the activity difficulty."""
+
     TOO_EASY = "too_easy"
     SLIGHTLY_EASY = "slightly_easy"
     APPROPRIATE = "appropriate"
@@ -83,8 +92,10 @@ class DifficultyRating(str, Enum):
 # TEA (Autism Spectrum Disorder) Levels
 # ============================================================================
 
+
 class TEALevel(str, Enum):
     """TEA support levels based on DSM-5."""
+
     LEVEL_1 = "level_1"  # Requiring support
     LEVEL_2 = "level_2"  # Requiring substantial support
     LEVEL_3 = "level_3"  # Requiring very substantial support
@@ -94,8 +105,10 @@ class TEALevel(str, Enum):
 # Learning Domains
 # ============================================================================
 
+
 class LearningDomain(str, Enum):
     """Learning domains for skill assessment."""
+
     VISUAL = "visual"
     AUDITORY = "auditory"
     KINESTHETIC = "kinesthetic"
@@ -109,8 +122,10 @@ class LearningDomain(str, Enum):
 # OpenAI Configuration
 # ============================================================================
 
+
 class OpenAIModel(str, Enum):
     """Available OpenAI models."""
+
     GPT_4 = "gpt-4"
     GPT_4_TURBO = "gpt-4-turbo-preview"
     GPT_35_TURBO = "gpt-3.5-turbo"
@@ -129,7 +144,7 @@ MAX_TOKENS_RECOMMENDATION = 1000
 # Temperature settings
 TEMPERATURE_CREATIVE = 0.9  # For creative content generation
 TEMPERATURE_BALANCED = 0.7  # For general responses
-TEMPERATURE_PRECISE = 0.3   # For factual/analytical content
+TEMPERATURE_PRECISE = 0.3  # For factual/analytical content
 
 
 # ============================================================================
@@ -190,10 +205,10 @@ ALLOWED_DOCUMENT_EXTENSIONS = ["pdf", "doc", "docx", "txt"]
 # Cache TTL (Time To Live) in seconds
 # ============================================================================
 
-CACHE_TTL_SHORT = 300       # 5 minutes
-CACHE_TTL_MEDIUM = 1800     # 30 minutes
-CACHE_TTL_LONG = 3600       # 1 hour
-CACHE_TTL_VERY_LONG = 86400 # 24 hours
+CACHE_TTL_SHORT = 300  # 5 minutes
+CACHE_TTL_MEDIUM = 1800  # 30 minutes
+CACHE_TTL_LONG = 3600  # 1 hour
+CACHE_TTL_VERY_LONG = 86400  # 24 hours
 
 
 # ============================================================================
@@ -306,8 +321,10 @@ Suas recomendações devem ser específicas, práticas e baseadas em evidências
 # API Response Formats
 # ============================================================================
 
+
 class ResponseStatus(str, Enum):
     """Standard API response statuses."""
+
     SUCCESS = "success"
     ERROR = "error"
     WARNING = "warning"
@@ -364,6 +381,7 @@ DEFAULT_TIMEZONE = "America/Sao_Paulo"
 # ============================================================================
 # Helper Functions
 # ============================================================================
+
 
 def get_activity_types() -> List[str]:
     """Get list of all activity types."""

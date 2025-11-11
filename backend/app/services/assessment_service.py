@@ -7,20 +7,16 @@ Business logic for assessment management and progress analysis.
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy.orm import Session
-from sqlalchemy import select
-
-from app.core.exceptions import (
-    AssessmentNotFoundError,
-    ActivityNotFoundError,
-    StudentNotFoundError,
-    PermissionDeniedError,
-)
-from app.models.assessment import Assessment
+from app.core.exceptions import (ActivityNotFoundError,
+                                 AssessmentNotFoundError,
+                                 PermissionDeniedError, StudentNotFoundError)
 from app.models.activity import Activity
+from app.models.assessment import Assessment
 from app.models.student import Student
 from app.schemas.assessment import AssessmentCreate, AssessmentUpdate
 from app.utils.logger import get_logger
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)
 
@@ -64,9 +60,7 @@ class AssessmentService:
 
         # Check permission
         if student.teacher_id != teacher_id:
-            raise PermissionDeniedError(
-                message="Você não tem permissão para avaliar este aluno"
-            )
+            raise PermissionDeniedError(message="Você não tem permissão para avaliar este aluno")
 
         # Create assessment
         assessment = Assessment(
@@ -112,9 +106,7 @@ class AssessmentService:
         if teacher_id:
             student = db.query(Student).filter(Student.id == assessment.student_id).first()
             if student and student.teacher_id != teacher_id:
-                raise PermissionDeniedError(
-                    message="Você não tem permissão para ver esta avaliação"
-                )
+                raise PermissionDeniedError(message="Você não tem permissão para ver esta avaliação")
 
         return assessment
 
@@ -192,9 +184,7 @@ class AssessmentService:
         # Check permission
         student = db.query(Student).filter(Student.id == assessment.student_id).first()
         if student and student.teacher_id != teacher_id:
-            raise PermissionDeniedError(
-                message="Você não tem permissão para atualizar esta avaliação"
-            )
+            raise PermissionDeniedError(message="Você não tem permissão para atualizar esta avaliação")
 
         # Update fields
         update_data = assessment_data.model_dump(exclude_unset=True)
@@ -237,9 +227,7 @@ class AssessmentService:
         # Check permission
         student = db.query(Student).filter(Student.id == assessment.student_id).first()
         if student and student.teacher_id != teacher_id:
-            raise PermissionDeniedError(
-                message="Você não tem permissão para deletar esta avaliação"
-            )
+            raise PermissionDeniedError(message="Você não tem permissão para deletar esta avaliação")
 
         db.delete(assessment)
         db.commit()

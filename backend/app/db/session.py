@@ -6,19 +6,22 @@ Synchronous database session management with SQLAlchemy.
 
 from typing import Generator
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.pool import NullPool
-
 from app.core.config import settings
 from app.utils.logger import get_logger
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import NullPool
 
 logger = get_logger(__name__)
 
 
 # Create engine
 engine = create_engine(
-    settings.DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://") if not settings.DATABASE_URL.startswith("postgresql+psycopg2") else settings.DATABASE_URL,
+    (
+        settings.DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://")
+        if not settings.DATABASE_URL.startswith("postgresql+psycopg2")
+        else settings.DATABASE_URL
+    ),
     echo=settings.DEBUG,  # Log SQL queries in debug mode
     pool_pre_ping=True,  # Verify connections before using
     poolclass=NullPool if settings.ENVIRONMENT == "test" else None,  # Disable pooling for tests
@@ -66,9 +69,8 @@ def init_db() -> None:
     Use Alembic migrations for production.
     """
     from app.db.base import Base
-
     # Import all models to ensure they're registered
-    from app.models import user, student, activity, assessment  # noqa
+    from app.models import activity, assessment, student, user  # noqa
 
     # Create all tables
     Base.metadata.create_all(bind=engine)

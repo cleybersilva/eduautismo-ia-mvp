@@ -7,17 +7,18 @@ Represents students with autism spectrum disorder (TEA).
 from datetime import date
 from typing import TYPE_CHECKING, Any, Dict, List
 
-from sqlalchemy import Date, ForeignKey, Integer, String, Text, Enum as SQLEnum, Boolean
+from app.db.base import BaseModel
+from app.utils.constants import TEALevel
+from sqlalchemy import Boolean, Date
+from sqlalchemy import Enum as SQLEnum
+from sqlalchemy import ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.base import BaseModel
-from app.utils.constants import TEALevel
-
 if TYPE_CHECKING:
-    from app.models.user import User
     from app.models.activity import Activity
     from app.models.assessment import Assessment
+    from app.models.user import User
 
 
 class Student(BaseModel):
@@ -33,9 +34,13 @@ class Student(BaseModel):
     interests: Mapped[List[str]] = mapped_column(ARRAY(String), default=[], nullable=False)
     learning_profile: Mapped[Dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    
+
     teacher_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    
+
     teacher: Mapped["User"] = relationship("User", back_populates="students", lazy="selectin")
-    activities: Mapped[List["Activity"]] = relationship("Activity", back_populates="student", cascade="all, delete-orphan", lazy="selectin")
-    assessments: Mapped[List["Assessment"]] = relationship("Assessment", back_populates="student", cascade="all, delete-orphan", lazy="selectin")
+    activities: Mapped[List["Activity"]] = relationship(
+        "Activity", back_populates="student", cascade="all, delete-orphan", lazy="selectin"
+    )
+    assessments: Mapped[List["Assessment"]] = relationship(
+        "Assessment", back_populates="student", cascade="all, delete-orphan", lazy="selectin"
+    )

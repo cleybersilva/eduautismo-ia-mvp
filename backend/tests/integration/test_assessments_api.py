@@ -26,8 +26,8 @@ class TestAssessmentsAPI:
                 "challenges_observed": "Precisa de apoio em algumas etapas",
                 "recommendations": "Continuar com atividades similares",
                 "independence_level": "Independente com supervisão",
-                "assistance_needed": "Apoio verbal ocasional"
-            }
+                "assistance_needed": "Apoio verbal ocasional",
+            },
         )
 
         assert response.status_code == 201
@@ -50,8 +50,8 @@ class TestAssessmentsAPI:
                 "student_id": str(test_activity.student_id),
                 "completion_status": "completed",
                 "engagement_level": "high",
-                "difficulty_rating": "appropriate"
-            }
+                "difficulty_rating": "appropriate",
+            },
         )
 
         # FastAPI's HTTPBearer returns 403 when no auth header is provided
@@ -60,6 +60,7 @@ class TestAssessmentsAPI:
     def test_create_assessment_invalid_activity(self, client, auth_headers, test_activity):
         """Test creating assessment with invalid activity ID."""
         import uuid
+
         fake_id = str(uuid.uuid4())
 
         response = client.post(
@@ -70,8 +71,8 @@ class TestAssessmentsAPI:
                 "student_id": str(test_activity.student_id),
                 "completion_status": "completed",
                 "engagement_level": "high",
-                "difficulty_rating": "appropriate"
-            }
+                "difficulty_rating": "appropriate",
+            },
         )
 
         assert response.status_code in [404, 400]
@@ -86,8 +87,8 @@ class TestAssessmentsAPI:
                 "student_id": str(test_activity.student_id),
                 "completion_status": "completed",
                 "engagement_level": "medium",
-                "difficulty_rating": "appropriate"
-            }
+                "difficulty_rating": "appropriate",
+            },
         )
 
         assert response.status_code == 201
@@ -106,16 +107,13 @@ class TestAssessmentsAPI:
                 "student_id": str(test_activity.student_id),
                 "completion_status": "completed",
                 "engagement_level": "high",
-                "difficulty_rating": "appropriate"
-            }
+                "difficulty_rating": "appropriate",
+            },
         )
         assessment_id = create_response.json()["id"]
 
         # Now get it
-        response = client.get(
-            f"/api/v1/assessments/{assessment_id}",
-            headers=auth_headers
-        )
+        response = client.get(f"/api/v1/assessments/{assessment_id}", headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -125,12 +123,10 @@ class TestAssessmentsAPI:
     def test_get_assessment_not_found(self, client, auth_headers):
         """Test getting non-existent assessment."""
         import uuid
+
         fake_id = str(uuid.uuid4())
 
-        response = client.get(
-            f"/api/v1/assessments/{fake_id}",
-            headers=auth_headers
-        )
+        response = client.get(f"/api/v1/assessments/{fake_id}", headers=auth_headers)
 
         assert response.status_code == 404
 
@@ -147,15 +143,12 @@ class TestAssessmentsAPI:
                     "completion_status": "completed",
                     "engagement_level": "high",
                     "difficulty_rating": "appropriate",
-                    "notes": f"Assessment {i+1}"
-                }
+                    "notes": f"Assessment {i+1}",
+                },
             )
 
         # List assessments
-        response = client.get(
-            f"/api/v1/assessments/student/{test_activity.student_id}",
-            headers=auth_headers
-        )
+        response = client.get(f"/api/v1/assessments/student/{test_activity.student_id}", headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -173,8 +166,8 @@ class TestAssessmentsAPI:
                 "student_id": str(test_activity.student_id),
                 "completion_status": "in_progress",
                 "engagement_level": "medium",
-                "difficulty_rating": "appropriate"
-            }
+                "difficulty_rating": "appropriate",
+            },
         )
         assessment_id = create_response.json()["id"]
 
@@ -185,8 +178,8 @@ class TestAssessmentsAPI:
             json={
                 "completion_status": "completed",
                 "engagement_level": "high",
-                "notes": "Atualização: Atividade concluída com sucesso"
-            }
+                "notes": "Atualização: Atividade concluída com sucesso",
+            },
         )
 
         assert response.status_code == 200
@@ -206,22 +199,14 @@ class TestAssessmentsAPI:
                 "completion_status": "completed",
                 "engagement_level": "very_high",
                 "difficulty_rating": "appropriate",
-                "skills_demonstrated": {
-                    "fine_motor": True,
-                    "problem_solving": True,
-                    "communication": False
-                },
+                "skills_demonstrated": {"fine_motor": True, "problem_solving": True, "communication": False},
                 "behavioral_notes": {
                     "self_regulation": "good",
                     "social_interaction": "needs_improvement",
-                    "attention_span": "excellent"
+                    "attention_span": "excellent",
                 },
-                "objectives_met": {
-                    "objective_1": True,
-                    "objective_2": True,
-                    "objective_3": False
-                }
-            }
+                "objectives_met": {"objective_1": True, "objective_2": True, "objective_3": False},
+            },
         )
 
         assert response.status_code == 201
@@ -240,8 +225,8 @@ class TestAssessmentsAPI:
                 "student_id": str(test_activity.student_id),
                 "completion_status": "invalid_status",
                 "engagement_level": "high",
-                "difficulty_rating": "appropriate"
-            }
+                "difficulty_rating": "appropriate",
+            },
         )
 
         assert response.status_code == 422
@@ -257,8 +242,8 @@ class TestAssessmentsAPI:
                 "completion_status": "completed",
                 "engagement_level": "high",
                 "difficulty_rating": "appropriate",
-                "actual_duration_minutes": -10
-            }
+                "actual_duration_minutes": -10,
+            },
         )
 
         assert response.status_code == 422

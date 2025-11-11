@@ -5,23 +5,23 @@ This is the main entry point for the EduAutismo IA API.
 It configures the FastAPI application with middleware, exception handlers, and routes.
 """
 
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
-from contextlib import asynccontextmanager
 import time
+from contextlib import asynccontextmanager
 
+from app.api import api_router
 # Import configuration and dependencies
 from app.core.config import settings
 from app.core.database import engine
 from app.db.base import Base  # Use the Base where models are registered
-from app.api import api_router
-
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
 
 # ============================================================================
 # Lifecycle Management
 # ============================================================================
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -44,7 +44,7 @@ async def lifespan(app: FastAPI):
 
     # Import all models to ensure they're registered with Base
     try:
-        from app.models import student, user, activity, assessment  # noqa
+        from app.models import activity, assessment, student, user  # noqa
     except Exception as e:
         print(f"⚠️  Could not import models: {e}")
 
@@ -111,15 +111,13 @@ app.add_middleware(
 )
 
 # GZIP Compression Middleware
-app.add_middleware(
-    GZipMiddleware,
-    minimum_size=1000  # Only compress responses larger than 1KB
-)
+app.add_middleware(GZipMiddleware, minimum_size=1000)  # Only compress responses larger than 1KB
 
 
 # ============================================================================
 # Custom Middleware
 # ============================================================================
+
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
@@ -163,6 +161,7 @@ async def log_requests(request: Request, call_next):
 # Exception Handlers
 # ============================================================================
 
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     """
@@ -171,17 +170,14 @@ async def global_exception_handler(request: Request, exc: Exception):
     print(f"❌ Unhandled error: {exc}")
     return JSONResponse(
         status_code=500,
-        content={
-            "detail": "Internal server error",
-            "type": "internal_server_error",
-            "path": str(request.url.path)
-        }
+        content={"detail": "Internal server error", "type": "internal_server_error", "path": str(request.url.path)},
     )
 
 
 # ============================================================================
 # Root Endpoints
 # ============================================================================
+
 
 @app.get("/", tags=["root"])
 async def root():
@@ -200,8 +196,8 @@ async def root():
             "redoc": "/redoc",
             "openapi": "/openapi.json",
             "health": "/health",
-            "api_v1": "/api/v1"
-        }
+            "api_v1": "/api/v1",
+        },
     }
 
 
@@ -210,10 +206,7 @@ async def root():
 # ============================================================================
 
 # Include all API v1 routes
-app.include_router(
-    api_router,
-    prefix="/api/v1"
-)
+app.include_router(api_router, prefix="/api/v1")
 
 
 # ============================================================================
@@ -223,10 +216,4 @@ app.include_router(
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_level="info"
-    )
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, log_level="info")

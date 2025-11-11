@@ -19,8 +19,8 @@ class TestActivitiesAPI:
                 "activity_type": "cognitive",
                 "difficulty": "easy",
                 "duration_minutes": 30,
-                "theme": "números e cores"
-            }
+                "theme": "números e cores",
+            },
         )
 
         assert response.status_code == 201
@@ -46,8 +46,8 @@ class TestActivitiesAPI:
                 "student_id": str(test_student.id),
                 "activity_type": "academic",
                 "difficulty": "medium",
-                "duration_minutes": 45
-            }
+                "duration_minutes": 45,
+            },
         )
 
         assert response.status_code == 403
@@ -55,17 +55,13 @@ class TestActivitiesAPI:
     def test_generate_activity_nonexistent_student(self, client, auth_headers):
         """Test generating activity for non-existent student."""
         import uuid
+
         fake_id = str(uuid.uuid4())
 
         response = client.post(
             "/api/v1/activities/generate",
             headers=auth_headers,
-            json={
-                "student_id": fake_id,
-                "activity_type": "social",
-                "difficulty": "easy",
-                "duration_minutes": 30
-            }
+            json={"student_id": fake_id, "activity_type": "social", "difficulty": "easy", "duration_minutes": 30},
         )
 
         assert response.status_code == 404
@@ -79,8 +75,8 @@ class TestActivitiesAPI:
                 "student_id": str(test_student.id),
                 "activity_type": "motor",
                 "difficulty": "medium",
-                "duration_minutes": 200  # Over maximum
-            }
+                "duration_minutes": 200,  # Over maximum
+            },
         )
 
         assert response.status_code == 422
@@ -97,8 +93,8 @@ class TestActivitiesAPI:
                     "student_id": str(test_student.id),
                     "activity_type": activity_type,
                     "difficulty": "easy",
-                    "duration_minutes": 30
-                }
+                    "duration_minutes": 30,
+                },
             )
 
             assert response.status_code == 201

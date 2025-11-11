@@ -6,34 +6,25 @@ This module defines the FastAPI routes for activity operations.
 
 from typing import List
 from uuid import UUID
+
+from app.api.dependencies.auth import get_current_user
+from app.core.database import get_db
+from app.models.activity import Activity
+from app.models.student import Student
+from app.schemas.activity import (ActivityCreate, ActivityGenerate,
+                                  ActivityResponse, ActivityUpdate)
+from app.utils.logger import get_logger
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.database import get_db
-from app.api.dependencies.auth import get_current_user
-from app.schemas.activity import (
-    ActivityCreate,
-    ActivityUpdate,
-    ActivityResponse,
-    ActivityGenerate
-)
-from app.models.activity import Activity
-from app.models.student import Student
-from app.utils.logger import get_logger
-
 logger = get_logger(__name__)
 
-router = APIRouter(
-    prefix="/activities",
-    tags=["activities"]
-)
+router = APIRouter(prefix="/activities", tags=["activities"])
 
 
 @router.post("/generate", response_model=ActivityResponse, status_code=status.HTTP_201_CREATED)
 def generate_activity(
-    activity_data: ActivityGenerate,
-    current_user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    activity_data: ActivityGenerate, current_user: dict = Depends(get_current_user), db: Session = Depends(get_db)
 ) -> ActivityResponse:
     """
     Generate personalized activity using AI.
@@ -55,16 +46,12 @@ def generate_activity(
     student = db.query(Student).filter(Student.id == activity_data.student_id).first()
 
     if not student:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Aluno não encontrado"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Aluno não encontrado")
 
     # Check permission
     if student.teacher_id != teacher_id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Você não tem permissão para criar atividades para este aluno"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Você não tem permissão para criar atividades para este aluno"
         )
 
     # Generate activity content (simplified version without OpenAI)
@@ -78,7 +65,7 @@ def generate_activity(
         "sensory": "Sensorial",
         "communication": "Comunicação",
         "daily_living": "Vida Diária",
-        "academic": "Acadêmica"
+        "academic": "Acadêmica",
     }
 
     difficulty_names = {
@@ -86,7 +73,7 @@ def generate_activity(
         "easy": "Fácil",
         "medium": "Médio",
         "hard": "Difícil",
-        "very_hard": "Muito Difícil"
+        "very_hard": "Muito Difícil",
     }
 
     type_name = activity_type_names.get(activity_data.activity_type, activity_data.activity_type)
@@ -98,44 +85,40 @@ def generate_activity(
         student_id=activity_data.student_id,
         title=f"Atividade {type_name}{theme_text}",
         description=f"Atividade {type_name.lower()} personalizada para {student.name}, com nível de dificuldade {difficulty_name.lower()}. "
-                   f"Esta atividade foi criada considerando o perfil de aprendizagem do aluno: {student.diagnosis}.",
+        f"Esta atividade foi criada considerando o perfil de aprendizagem do aluno: {student.diagnosis}.",
         activity_type=activity_data.activity_type,
         difficulty=activity_data.difficulty,
         duration_minutes=activity_data.duration_minutes,
         objectives=[
             f"Desenvolver habilidades {type_name.lower()}s adequadas ao nível do aluno",
             "Promover engajamento através de atividades adaptadas",
-            "Respeitar o perfil sensorial e ritmo de aprendizagem"
+            "Respeitar o perfil sensorial e ritmo de aprendizagem",
         ],
-        materials=[
-            "Material visual de apoio",
-            "Recursos adaptados para TEA",
-            "Ambiente estruturado e previsível"
-        ],
+        materials=["Material visual de apoio", "Recursos adaptados para TEA", "Ambiente estruturado e previsível"],
         instructions=[
             f"1. Prepare o ambiente garantindo que esteja calmo e organizado",
             f"2. Apresente a atividade de forma clara e visual",
             f"3. Divida a tarefa em pequenos passos",
             f"4. Ofereça suporte quando necessário",
             f"5. Reforce positivamente cada conquista",
-            f"6. Permita pausas sensoriais se o aluno demonstrar necessidade"
+            f"6. Permita pausas sensoriais se o aluno demonstrar necessidade",
         ],
         adaptations=[
             "Use apoios visuais (imagens, pictogramas)",
             "Mantenha instruções curtas e diretas",
             "Permita tempo extra para processamento",
-            "Reduza estímulos sensoriais desnecessários"
+            "Reduza estímulos sensoriais desnecessários",
         ],
         visual_supports=[
             "Sequência visual dos passos",
             "Timer visual para duração",
-            "Imagens de apoio relacionadas ao tema"
+            "Imagens de apoio relacionadas ao tema",
         ],
         success_criteria=[
             "Aluno consegue iniciar a atividade com suporte mínimo",
             "Demonstra compreensão das instruções",
             "Completa pelo menos 70% da atividade proposta",
-            "Mantém engajamento durante a maior parte do tempo"
+            "Mantém engajamento durante a maior parte do tempo",
         ],
         theme=activity_data.theme,
         tags=[activity_data.activity_type, activity_data.difficulty],
@@ -146,20 +129,20 @@ def generate_activity(
                 "age": student.age,
                 "diagnosis": student.diagnosis,
                 "tea_level": student.tea_level,
-                "interests": student.interests
+                "interests": student.interests,
             },
             "generation_params": {
                 "activity_type": activity_data.activity_type,
                 "difficulty": activity_data.difficulty,
                 "duration_minutes": activity_data.duration_minutes,
-                "theme": activity_data.theme
+                "theme": activity_data.theme,
             },
             "model": "template-based",
-            "note": "Generated using simplified template (OpenAI integration pending)"
+            "note": "Generated using simplified template (OpenAI integration pending)",
         },
         is_published=True,
         is_template=False,
-        created_by_id=teacher_id
+        created_by_id=teacher_id,
     )
 
     db.add(activity)
@@ -173,9 +156,7 @@ def generate_activity(
 
 @router.post("/", response_model=ActivityResponse, status_code=status.HTTP_201_CREATED)
 def create_activity(
-    activity_data: ActivityCreate,
-    current_user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    activity_data: ActivityCreate, current_user: dict = Depends(get_current_user), db: Session = Depends(get_db)
 ) -> ActivityResponse:
     """
     Create a new activity manually.
@@ -194,15 +175,11 @@ def create_activity(
     student = db.query(Student).filter(Student.id == activity_data.student_id).first()
 
     if not student:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Aluno não encontrado"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aluno não encontrado")
 
     if student.teacher_id != teacher_id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Você não tem permissão para criar atividades para este aluno"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Você não tem permissão para criar atividades para este aluno"
         )
 
     # Create activity
@@ -211,7 +188,7 @@ def create_activity(
         generated_by_ai=False,
         is_published=True,
         is_template=False,
-        created_by_id=teacher_id
+        created_by_id=teacher_id,
     )
 
     db.add(activity)
@@ -222,10 +199,7 @@ def create_activity(
 
 
 @router.get("/{activity_id}", response_model=ActivityResponse)
-def get_activity(
-    activity_id: int,
-    db: Session = Depends(get_db)
-) -> ActivityResponse:
+def get_activity(activity_id: int, db: Session = Depends(get_db)) -> ActivityResponse:
     """
     Get a activity by ID.
 
@@ -241,19 +215,12 @@ def get_activity(
     """
     activity = ActivityService.get(db, activity_id)
     if not activity:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Activity not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Activity not found")
     return activity
 
 
 @router.get("/", response_model=List[ActivityResponse])
-def list_activitys(
-    skip: int = 0,
-    limit: int = 100,
-    db: Session = Depends(get_db)
-) -> List[ActivityResponse]:
+def list_activitys(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)) -> List[ActivityResponse]:
     """
     List activitys with pagination.
 
@@ -269,11 +236,7 @@ def list_activitys(
 
 
 @router.put("/{activity_id}", response_model=ActivityResponse)
-def update_activity(
-    activity_id: int,
-    activity_data: ActivityUpdate,
-    db: Session = Depends(get_db)
-) -> ActivityResponse:
+def update_activity(activity_id: int, activity_data: ActivityUpdate, db: Session = Depends(get_db)) -> ActivityResponse:
     """
     Update a activity.
 
@@ -290,18 +253,12 @@ def update_activity(
     """
     activity = ActivityService.update(db, activity_id, activity_data)
     if not activity:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Activity not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Activity not found")
     return activity
 
 
 @router.delete("/{activity_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_activity(
-    activity_id: int,
-    db: Session = Depends(get_db)
-) -> None:
+def delete_activity(activity_id: int, db: Session = Depends(get_db)) -> None:
     """
     Delete a activity.
 
@@ -314,7 +271,4 @@ def delete_activity(
     """
     success = ActivityService.delete(db, activity_id)
     if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Activity not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Activity not found")

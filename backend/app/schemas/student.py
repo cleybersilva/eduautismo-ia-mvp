@@ -8,10 +8,10 @@ from datetime import date
 from typing import Any, Dict, List, Optional
 from uuid import UUID
 
-from pydantic import Field, field_validator
-
 from app.schemas.common import BaseResponseSchema, BaseSchema
-from app.utils.constants import TEALevel, MIN_STUDENT_AGE, MAX_STUDENT_AGE, MAX_INTERESTS_COUNT
+from app.utils.constants import (MAX_INTERESTS_COUNT, MAX_STUDENT_AGE,
+                                 MIN_STUDENT_AGE, TEALevel)
+from pydantic import Field, field_validator
 
 
 class StudentCreate(BaseSchema):
@@ -29,16 +29,17 @@ class StudentCreate(BaseSchema):
     def validate_date_of_birth(cls, value: date) -> date:
         """Validate date of birth."""
         from datetime import date as date_type
+
         today = date_type.today()
         age = today.year - value.year - ((today.month, today.day) < (value.month, value.day))
-        
+
         if age < MIN_STUDENT_AGE:
             raise ValueError(f"Idade deve ser pelo menos {MIN_STUDENT_AGE} anos")
         if age > MAX_STUDENT_AGE:
             raise ValueError(f"Idade deve ser no máximo {MAX_STUDENT_AGE} anos")
         if value > today:
             raise ValueError("Data de nascimento não pode ser no futuro")
-        
+
         return value
 
 

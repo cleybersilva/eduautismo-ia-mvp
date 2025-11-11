@@ -13,7 +13,6 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import Mapped, mapped_column
 
-
 # Create declarative base
 Base = declarative_base()
 
@@ -60,18 +59,16 @@ class BaseModel(Base, UUIDMixin, TimestampMixin):
         """Generate __tablename__ automatically from class name."""
         # Convert CamelCase to snake_case and pluralize
         import re
-        name = re.sub(r'(?<!^)(?=[A-Z])', '_', cls.__name__).lower()
+
+        name = re.sub(r"(?<!^)(?=[A-Z])", "_", cls.__name__).lower()
         # Simple pluralization (add 's' if doesn't end with 's')
-        if not name.endswith('s'):
-            name += 's'
+        if not name.endswith("s"):
+            name += "s"
         return name
 
     def to_dict(self) -> dict[str, Any]:
         """Convert model instance to dictionary."""
-        return {
-            column.name: getattr(self, column.name)
-            for column in self.__table__.columns
-        }
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
     def __repr__(self) -> str:
         """String representation of model."""

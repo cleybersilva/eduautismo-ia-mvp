@@ -9,13 +9,13 @@ Provides structured logging with support for:
 - Rotating file handlers
 """
 
+import json
 import logging
 import sys
-from pathlib import Path
-from typing import Any, Dict, Optional
-import json
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 from app.core.config import settings
 
@@ -57,11 +57,11 @@ class ColoredFormatter(logging.Formatter):
 
     # Color codes
     COLORS = {
-        "DEBUG": "\033[36m",      # Cyan
-        "INFO": "\033[32m",       # Green
-        "WARNING": "\033[33m",    # Yellow
-        "ERROR": "\033[31m",      # Red
-        "CRITICAL": "\033[35m",   # Magenta
+        "DEBUG": "\033[36m",  # Cyan
+        "INFO": "\033[32m",  # Green
+        "WARNING": "\033[33m",  # Yellow
+        "ERROR": "\033[31m",  # Red
+        "CRITICAL": "\033[35m",  # Magenta
     }
     RESET = "\033[0m"
 

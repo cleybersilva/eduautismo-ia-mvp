@@ -7,21 +7,17 @@ Business logic for activity management and AI generation.
 from typing import List, Optional
 from uuid import UUID
 
-from sqlalchemy import select, func
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.core.exceptions import (
-    ActivityNotFoundError,
-    StudentNotFoundError,
-    PermissionDeniedError,
-    OpenAIError,
-)
+from app.core.exceptions import (ActivityNotFoundError, OpenAIError,
+                                 PermissionDeniedError, StudentNotFoundError)
 from app.models.activity import Activity
 from app.models.student import Student
-from app.schemas.activity import ActivityCreate, ActivityUpdate, ActivityGenerate
+from app.schemas.activity import (ActivityCreate, ActivityGenerate,
+                                  ActivityUpdate)
 from app.services.nlp_service import get_nlp_service
 from app.utils.constants import ActivityType, DifficultyLevel
 from app.utils.logger import get_logger
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = get_logger(__name__)
 
@@ -52,9 +48,7 @@ class ActivityService:
             OpenAIError: If AI generation fails
         """
         # Get student
-        result = await db.execute(
-            select(Student).where(Student.id == activity_data.student_id)
-        )
+        result = await db.execute(select(Student).where(Student.id == activity_data.student_id))
         student = result.scalar_one_or_none()
 
         if not student:
@@ -62,9 +56,7 @@ class ActivityService:
 
         # Check permission
         if student.teacher_id != teacher_id:
-            raise PermissionDeniedError(
-                message="Você não tem permissão para criar atividades para este aluno"
-            )
+            raise PermissionDeniedError(message="Você não tem permissão para criar atividades para este aluno")
 
         # Get student profile for AI
         student_profile = student.to_profile_dict()
@@ -107,9 +99,7 @@ class ActivityService:
             await db.commit()
             await db.refresh(activity)
 
-            logger.info(
-                f"Activity generated with AI: {activity.id} for student {student.id}"
-            )
+            logger.info(f"Activity generated with AI: {activity.id} for student {student.id}")
 
             return activity
 
@@ -143,18 +133,14 @@ class ActivityService:
             PermissionDeniedError: If teacher doesn't own student
         """
         # Get student and check permission
-        result = await db.execute(
-            select(Student).where(Student.id == activity_data.student_id)
-        )
+        result = await db.execute(select(Student).where(Student.id == activity_data.student_id))
         student = result.scalar_one_or_none()
 
         if not student:
             raise StudentNotFoundError(str(activity_data.student_id))
 
         if student.teacher_id != teacher_id:
-            raise PermissionDeniedError(
-                message="Você não tem permissão para criar atividades para este aluno"
-            )
+            raise PermissionDeniedError(message="Você não tem permissão para criar atividades para este aluno")
 
         # Create activity
         activity = Activity(
@@ -201,15 +187,11 @@ class ActivityService:
         # Check permission if teacher_id provided
         if teacher_id:
             # Get student to check teacher
-            student_result = await db.execute(
-                select(Student).where(Student.id == activity.student_id)
-            )
+            student_result = await db.execute(select(Student).where(Student.id == activity.student_id))
             student = student_result.scalar_one_or_none()
 
             if student and student.teacher_id != teacher_id:
-                raise PermissionDeniedError(
-                    message="Você não tem permissão para acessar esta atividade"
-                )
+                raise PermissionDeniedError(message="Você não tem permissão para acessar esta atividade")
 
         return activity
 

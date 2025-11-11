@@ -20,11 +20,8 @@ class TestStudentsAPI:
                 "diagnosis": "Transtorno do Espectro Autista - Nível 2",
                 "tea_level": "level_2",
                 "interests": ["música", "arte"],
-                "learning_profile": {
-                    "visual_learner": True,
-                    "auditory_sensitivity": "high"
-                }
-            }
+                "learning_profile": {"visual_learner": True, "auditory_sensitivity": "high"},
+            },
         )
 
         assert response.status_code == 201
@@ -43,8 +40,8 @@ class TestStudentsAPI:
                 "name": "Test Student",
                 "date_of_birth": "2015-01-01",
                 "diagnosis": "TEA Nível 1",
-                "tea_level": "level_1"
-            }
+                "tea_level": "level_1",
+            },
         )
 
         assert response.status_code == 403
@@ -58,8 +55,8 @@ class TestStudentsAPI:
                 "name": "Invalid Student",
                 "date_of_birth": "2025-01-01",  # Future date
                 "diagnosis": "TEA",
-                "tea_level": "level_1"
-            }
+                "tea_level": "level_1",
+            },
         )
 
         assert response.status_code == 422
@@ -73,8 +70,8 @@ class TestStudentsAPI:
                 "name": "Too Young",
                 "date_of_birth": "2024-06-01",  # Less than 2 years old (1.5 years)
                 "diagnosis": "TEA",
-                "tea_level": "level_1"
-            }
+                "tea_level": "level_1",
+            },
         )
 
         # Should return 422 (Validation Error) because age < MIN_STUDENT_AGE (2 years)

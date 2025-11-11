@@ -5,19 +5,16 @@ This module provides health check endpoints for monitoring service status,
 database connectivity, and external dependencies.
 """
 
-from fastapi import APIRouter, Depends, status
-from sqlalchemy.orm import Session
-from sqlalchemy import text
-from typing import Dict, Any
-from datetime import datetime
 import asyncio
+from datetime import datetime
+from typing import Any, Dict
 
 from app.core.database import get_db
+from fastapi import APIRouter, Depends, status
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
-router = APIRouter(
-    prefix="/health",
-    tags=["health"]
-)
+router = APIRouter(prefix="/health", tags=["health"])
 
 
 @router.get("", status_code=status.HTTP_200_OK)
@@ -36,10 +33,7 @@ async def health_check() -> Dict[str, str]:
         GET /health
         Response: {"status": "healthy"}
     """
-    return {
-        "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat()
-    }
+    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
 
 
 @router.get("/detailed", status_code=status.HTTP_200_OK)
@@ -74,10 +68,7 @@ async def detailed_health_check(db: Session = Depends(get_db)) -> Dict[str, Any]
     overall_status = "healthy"
 
     # Check API
-    components["api"] = {
-        "status": "up",
-        "version": "1.0.0"
-    }
+    components["api"] = {"status": "up", "version": "1.0.0"}
 
     # Check Database
     try:
@@ -85,41 +76,21 @@ async def detailed_health_check(db: Session = Depends(get_db)) -> Dict[str, Any]
         db.execute(text("SELECT 1"))
         latency = (asyncio.get_event_loop().time() - start_time) * 1000
 
-        components["database"] = {
-            "status": "up",
-            "type": "postgresql",
-            "latency_ms": round(latency, 2)
-        }
+        components["database"] = {"status": "up", "type": "postgresql", "latency_ms": round(latency, 2)}
     except Exception as e:
-        components["database"] = {
-            "status": "down",
-            "error": str(e)
-        }
+        components["database"] = {"status": "down", "error": str(e)}
         overall_status = "degraded"
 
     # TODO: Check Redis
-    components["redis"] = {
-        "status": "not_configured",
-        "message": "Redis health check not implemented yet"
-    }
+    components["redis"] = {"status": "not_configured", "message": "Redis health check not implemented yet"}
 
     # TODO: Check MongoDB
-    components["mongodb"] = {
-        "status": "not_configured",
-        "message": "MongoDB health check not implemented yet"
-    }
+    components["mongodb"] = {"status": "not_configured", "message": "MongoDB health check not implemented yet"}
 
     # TODO: Check OpenAI API
-    components["openai"] = {
-        "status": "not_configured",
-        "message": "OpenAI health check not implemented yet"
-    }
+    components["openai"] = {"status": "not_configured", "message": "OpenAI health check not implemented yet"}
 
-    return {
-        "status": overall_status,
-        "timestamp": datetime.utcnow().isoformat(),
-        "components": components
-    }
+    return {"status": overall_status, "timestamp": datetime.utcnow().isoformat(), "components": components}
 
 
 @router.get("/ready", status_code=status.HTTP_200_OK)
@@ -147,16 +118,11 @@ async def readiness_check(db: Session = Depends(get_db)) -> Dict[str, str]:
         # Check database connection
         db.execute(text("SELECT 1"))
 
-        return {
-            "status": "ready",
-            "timestamp": datetime.utcnow().isoformat()
-        }
+        return {"status": "ready", "timestamp": datetime.utcnow().isoformat()}
     except Exception as e:
         from fastapi import HTTPException
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"Service not ready: {str(e)}"
-        )
+
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=f"Service not ready: {str(e)}")
 
 
 @router.get("/live", status_code=status.HTTP_200_OK)
@@ -174,10 +140,7 @@ async def liveness_check() -> Dict[str, str]:
         GET /health/live
         Response: {"status": "alive"}
     """
-    return {
-        "status": "alive",
-        "timestamp": datetime.utcnow().isoformat()
-    }
+    return {"status": "alive", "timestamp": datetime.utcnow().isoformat()}
 
 
 @router.get("/startup", status_code=status.HTTP_200_OK)
@@ -210,13 +173,8 @@ async def startup_check(db: Session = Depends(get_db)) -> Dict[str, str]:
         # - Check required environment variables
         # - Check external services connectivity
 
-        return {
-            "status": "started",
-            "timestamp": datetime.utcnow().isoformat()
-        }
+        return {"status": "started", "timestamp": datetime.utcnow().isoformat()}
     except Exception as e:
         from fastapi import HTTPException
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"Service not started: {str(e)}"
-        )
+
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=f"Service not started: {str(e)}")

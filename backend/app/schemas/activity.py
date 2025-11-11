@@ -7,15 +7,10 @@ Request and response schemas for activity-related endpoints.
 from typing import Any, Dict, List, Optional
 from uuid import UUID
 
-from pydantic import Field, field_validator
-
 from app.schemas.common import BaseResponseSchema, BaseSchema
-from app.utils.constants import (
-    ActivityType,
-    DifficultyLevel,
-    MIN_ACTIVITY_DURATION,
-    MAX_ACTIVITY_DURATION,
-)
+from app.utils.constants import (MAX_ACTIVITY_DURATION, MIN_ACTIVITY_DURATION,
+                                 ActivityType, DifficultyLevel)
+from pydantic import Field, field_validator
 
 
 class ActivityGenerate(BaseSchema):
@@ -25,16 +20,13 @@ class ActivityGenerate(BaseSchema):
     activity_type: ActivityType = Field(..., description="Type of activity")
     difficulty: DifficultyLevel = Field(..., description="Difficulty level")
     duration_minutes: int = Field(
-        ...,
-        ge=MIN_ACTIVITY_DURATION,
-        le=MAX_ACTIVITY_DURATION,
-        description="Duration in minutes"
+        ..., ge=MIN_ACTIVITY_DURATION, le=MAX_ACTIVITY_DURATION, description="Duration in minutes"
     )
     theme: Optional[str] = Field(
         default=None,
         max_length=255,
         description="Optional theme/topic",
-        examples=["dinossauros", "sistema solar", "cores"]
+        examples=["dinossauros", "sistema solar", "cores"],
     )
 
 

@@ -6,31 +6,21 @@ This module defines the FastAPI routes for student operations.
 
 from typing import List
 from uuid import UUID
+
+from app.api.dependencies.auth import get_current_user
+from app.core.database import get_db
+from app.core.exceptions import PermissionDeniedError, StudentNotFoundError
+from app.schemas.student import StudentCreate, StudentResponse, StudentUpdate
+from app.services.student_service import StudentService
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.database import get_db
-from app.api.dependencies.auth import get_current_user
-from app.schemas.student import (
-    StudentCreate,
-    StudentUpdate,
-    StudentResponse
-)
-from app.services.student_service import StudentService
-from app.core.exceptions import StudentNotFoundError, PermissionDeniedError
-
-
-router = APIRouter(
-    prefix="/students",
-    tags=["students"]
-)
+router = APIRouter(prefix="/students", tags=["students"])
 
 
 @router.post("/", response_model=StudentResponse, status_code=status.HTTP_201_CREATED)
 def create_student(
-    student_data: StudentCreate,
-    current_user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    student_data: StudentCreate, current_user: dict = Depends(get_current_user), db: Session = Depends(get_db)
 ) -> StudentResponse:
     """
     Create a new student.
@@ -49,10 +39,7 @@ def create_student(
 
 
 @router.get("/{student_id}", response_model=StudentResponse)
-def get_student(
-    student_id: int,
-    db: Session = Depends(get_db)
-) -> StudentResponse:
+def get_student(student_id: int, db: Session = Depends(get_db)) -> StudentResponse:
     """
     Get a student by ID.
 
@@ -68,19 +55,12 @@ def get_student(
     """
     student = StudentService.get(db, student_id)
     if not student:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Student not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Student not found")
     return student
 
 
 @router.get("/", response_model=List[StudentResponse])
-def list_students(
-    skip: int = 0,
-    limit: int = 100,
-    db: Session = Depends(get_db)
-) -> List[StudentResponse]:
+def list_students(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)) -> List[StudentResponse]:
     """
     List students with pagination.
 
@@ -96,11 +76,7 @@ def list_students(
 
 
 @router.put("/{student_id}", response_model=StudentResponse)
-def update_student(
-    student_id: int,
-    student_data: StudentUpdate,
-    db: Session = Depends(get_db)
-) -> StudentResponse:
+def update_student(student_id: int, student_data: StudentUpdate, db: Session = Depends(get_db)) -> StudentResponse:
     """
     Update a student.
 
@@ -117,18 +93,12 @@ def update_student(
     """
     student = StudentService.update(db, student_id, student_data)
     if not student:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Student not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Student not found")
     return student
 
 
 @router.delete("/{student_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_student(
-    student_id: int,
-    db: Session = Depends(get_db)
-) -> None:
+def delete_student(student_id: int, db: Session = Depends(get_db)) -> None:
     """
     Delete a student.
 
@@ -141,7 +111,4 @@ def delete_student(
     """
     success = StudentService.delete(db, student_id)
     if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Student not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Student not found")
