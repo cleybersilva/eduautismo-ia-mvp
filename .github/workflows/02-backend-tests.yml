@@ -114,7 +114,6 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:testpass123@localhost:5432/eduautismo_test
         run: |
-          cd backend
           alembic upgrade head
           alembic downgrade -1
           alembic upgrade head
