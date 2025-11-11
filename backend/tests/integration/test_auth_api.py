@@ -89,4 +89,5 @@ class TestAuthAPI:
         """Test accessing protected endpoint without auth."""
         response = client.get("/api/v1/auth/me")
 
-        assert response.status_code == 403
+        # Should return 401 (Unauthorized) when no credentials provided
+        assert response.status_code == 401

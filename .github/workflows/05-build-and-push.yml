@@ -12,6 +12,13 @@ on:
     branches: [main, develop]
   workflow_call:
     # This workflow can be called by other workflows
+  workflow_dispatch:
+    inputs:
+      trigger_source:
+        description: 'What triggered this workflow'
+        required: false
+        type: string
+        default: 'manual'
 
 permissions:
   contents: read

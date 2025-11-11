@@ -1,0 +1,55 @@
+[1m============================= test session starts ==============================[0m
+platform linux -- Python 3.12.3, pytest-7.4.3, pluggy-1.6.0 -- /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/backend
+configfile: pytest.ini
+plugins: anyio-3.7.1
+[1mcollecting ... [0mcollected 15 items
+
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_success [32mPASSED[0m[33m [  6%][0m
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_without_auth [32mPASSED[0m[33m [ 13%][0m
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_nonexistent_student [32mPASSED[0m[33m [ 20%][0m
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_invalid_duration [32mPASSED[0m[33m [ 26%][0m
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_multiple_activity_types [32mPASSED[0m[33m [ 33%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_register_user_success [32mPASSED[0m[33m [ 40%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_register_duplicate_email [32mPASSED[0m[33m [ 46%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_login_success [32mPASSED[0m[33m [ 53%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_login_invalid_credentials [32mPASSED[0m[33m [ 60%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_get_current_user [32mPASSED[0m[33m [ 66%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_unauthorized_access [32mPASSED[0m[33m [ 73%][0m
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_success [32mPASSED[0m[33m [ 80%][0m
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_without_auth [32mPASSED[0m[33m [ 86%][0m
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_invalid_date [32mPASSED[0m[33m [ 93%][0m
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_too_young [31mFAILED[0m[31m [100%][0m
+
+=================================== FAILURES ===================================
+[31m[1m________________ TestStudentsAPI.test_create_student_too_young _________________[0m
+[1m[31mtests/integration/test_students_api.py[0m:80: in test_create_student_too_young
+    [94massert[39;49;00m response.status_code == [94m422[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 201 == 422[0m
+[1m[31mE    +  where 201 = <Response [201 Created]>.status_code[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+📥 POST /api/v1/auth/login
+📤 Status: 200
+[32m[INFO][0m - 2025-11-11 14:11:23 - httpx - HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m httpx:_client.py:1013 HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+----------------------------- Captured stdout call -----------------------------
+📥 POST /api/v1/students/
+[32m[INFO][0m - 2025-11-11 14:11:23 - app.services.student_service - Student created: 1b892142-c354-421d-8a92-085441d143ed by teacher f24a7445-490d-4761-93de-14d014799372
+📤 Status: 201
+[32m[INFO][0m - 2025-11-11 14:11:23 - httpx - HTTP Request: POST http://testserver/api/v1/students/ "HTTP/1.1 201 Created"
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m app.services.student_service:student_service.py:77 Student created: 1b892142-c354-421d-8a92-085441d143ed by teacher f24a7445-490d-4761-93de-14d014799372
+[32mINFO    [0m httpx:_client.py:1013 HTTP Request: POST http://testserver/api/v1/students/ "HTTP/1.1 201 Created"
+--------------------------- Captured stdout teardown ---------------------------
+🛑 Shutting down EduAutismo IA API
+[36m[1m=========================== short test summary info ============================[0m
+[31mFAILED[0m tests/integration/test_students_api.py::[1mTestStudentsAPI::test_create_student_too_young[0m - assert 201 == 422
+[31m============ [31m[1m1 failed[0m, [32m14 passed[0m, [33m92 warnings[0m[31m in 149.56s (0:02:29)[0m[31m =============[0m

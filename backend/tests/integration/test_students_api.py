@@ -71,10 +71,11 @@ class TestStudentsAPI:
             headers=auth_headers,
             json={
                 "name": "Too Young",
-                "date_of_birth": "2023-01-01",  # 2 years old
+                "date_of_birth": "2024-06-01",  # Less than 2 years old (1.5 years)
                 "diagnosis": "TEA",
                 "tea_level": "level_1"
             }
         )
 
+        # Should return 422 (Validation Error) because age < MIN_STUDENT_AGE (2 years)
         assert response.status_code == 422

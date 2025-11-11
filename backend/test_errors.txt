@@ -1,0 +1,786 @@
+[1m============================= test session starts ==============================[0m
+platform linux -- Python 3.12.3, pytest-7.4.3, pluggy-1.6.0 -- /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/backend
+configfile: pytest.ini
+plugins: anyio-3.7.1
+[1mcollecting ... [0mcollected 15 items
+
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_success [32mPASSED[0m[33m [  6%][0m
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_without_auth [31mERROR[0m[31m [ 13%][0m
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_nonexistent_student [31mERROR[0m[31m [ 20%][0m
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_invalid_duration [31mERROR[0m[31m [ 26%][0m
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_multiple_activity_types [31mERROR[0m[31m [ 33%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_register_user_success [32mPASSED[0m[31m [ 40%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_register_duplicate_email [31mERROR[0m[31m [ 46%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_login_success [31mERROR[0m[31m [ 53%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_login_invalid_credentials [31mERROR[0m[31m [ 60%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_get_current_user [31mERROR[0m[31m [ 66%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_unauthorized_access [31mFAILED[0m[31m [ 73%][0m
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_success [31mERROR[0m[31m [ 80%][0m
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_without_auth [32mPASSED[0m[31m [ 86%][0m
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_invalid_date [31mERROR[0m[31m [ 93%][0m
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_too_young [31mERROR[0m[31m [100%][0m
+
+==================================== ERRORS ====================================
+[31m[1m___ ERROR at setup of TestActivitiesAPI.test_generate_activity_without_auth ____[0m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+
+[33mThe above exception was the direct cause of the following exception:[0m
+[1m[31mtests/conftest.py[0m:92: in test_user
+    db_session.commit()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1969: in commit
+    trans.commit(_to_root=[94mTrue[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1256: in commit
+    [96mself[39;49;00m._prepare_impl()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1231: in _prepare_impl
+    [96mself[39;49;00m.session.flush()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4312: in flush
+    [96mself[39;49;00m._flush(objects)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4447: in _flush
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4408: in _flush
+    flush_context.execute()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:466: in execute
+    rec.execute([96mself[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:642: in execute
+    util.preloaded.orm_persistence.save_obj([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:93: in save_obj
+    _emit_insert_statements([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:1226: in _emit_insert_statements
+    result = connection.execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1416: in execute
+    [94mreturn[39;49;00m meth([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py[0m:516: in _execute_on_connection
+    [94mreturn[39;49;00m connection._execute_clauseelement([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1639: in _execute_clauseelement
+    ret = [96mself[39;49;00m._execute_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1848: in _execute_context
+    [94mreturn[39;49;00m [96mself[39;49;00m._exec_single_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1988: in _exec_single_context
+    [96mself[39;49;00m._handle_dbapi_exception([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:2343: in _handle_dbapi_exception
+    [94mraise[39;49;00m sqlalchemy_exception.with_traceback(exc_info[[94m2[39;49;00m]) [94mfrom[39;49;00m[90m [39;49;00m[04m[96me[39;49;00m[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+[1m[31mE   [0m
+[1m[31mE   [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)][0m
+[1m[31mE   [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$z3A6kCTNY219t6Eft4/9veF/QkZzC1QGWEaoyyMfMjKhMWCcAwmp2', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('ae9cc83c-2a6c-4b37-8d5b-fdf9ef09ae04'), 'created_at': datetime.datetime(2025, 11, 11, 17, 5, 16, 951094), 'updated_at': datetime.datetime(2025, 11, 11, 17, 5, 16, 951100)}][0m
+[1m[31mE   (Background on this error at: https://sqlalche.me/e/20/gkpj)[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[31m[1m_ ERROR at setup of TestActivitiesAPI.test_generate_activity_nonexistent_student _[0m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+
+[33mThe above exception was the direct cause of the following exception:[0m
+[1m[31mtests/conftest.py[0m:92: in test_user
+    db_session.commit()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1969: in commit
+    trans.commit(_to_root=[94mTrue[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1256: in commit
+    [96mself[39;49;00m._prepare_impl()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1231: in _prepare_impl
+    [96mself[39;49;00m.session.flush()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4312: in flush
+    [96mself[39;49;00m._flush(objects)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4447: in _flush
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4408: in _flush
+    flush_context.execute()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:466: in execute
+    rec.execute([96mself[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:642: in execute
+    util.preloaded.orm_persistence.save_obj([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:93: in save_obj
+    _emit_insert_statements([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:1226: in _emit_insert_statements
+    result = connection.execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1416: in execute
+    [94mreturn[39;49;00m meth([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py[0m:516: in _execute_on_connection
+    [94mreturn[39;49;00m connection._execute_clauseelement([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1639: in _execute_clauseelement
+    ret = [96mself[39;49;00m._execute_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1848: in _execute_context
+    [94mreturn[39;49;00m [96mself[39;49;00m._exec_single_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1988: in _exec_single_context
+    [96mself[39;49;00m._handle_dbapi_exception([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:2343: in _handle_dbapi_exception
+    [94mraise[39;49;00m sqlalchemy_exception.with_traceback(exc_info[[94m2[39;49;00m]) [94mfrom[39;49;00m[90m [39;49;00m[04m[96me[39;49;00m[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+[1m[31mE   [0m
+[1m[31mE   [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)][0m
+[1m[31mE   [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$U.2uwVJ.1AmouWvw5iBHLuQxyB2DfdP8ZMKl4y5c3BiGhDdYiEjFm', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('cc962da4-f40e-49a7-ad92-a6a575ea6eea'), 'created_at': datetime.datetime(2025, 11, 11, 17, 5, 28, 926736), 'updated_at': datetime.datetime(2025, 11, 11, 17, 5, 28, 926740)}][0m
+[1m[31mE   (Background on this error at: https://sqlalche.me/e/20/gkpj)[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[31m[1m_ ERROR at setup of TestActivitiesAPI.test_generate_activity_invalid_duration __[0m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+
+[33mThe above exception was the direct cause of the following exception:[0m
+[1m[31mtests/conftest.py[0m:92: in test_user
+    db_session.commit()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1969: in commit
+    trans.commit(_to_root=[94mTrue[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1256: in commit
+    [96mself[39;49;00m._prepare_impl()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1231: in _prepare_impl
+    [96mself[39;49;00m.session.flush()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4312: in flush
+    [96mself[39;49;00m._flush(objects)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4447: in _flush
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4408: in _flush
+    flush_context.execute()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:466: in execute
+    rec.execute([96mself[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:642: in execute
+    util.preloaded.orm_persistence.save_obj([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:93: in save_obj
+    _emit_insert_statements([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:1226: in _emit_insert_statements
+    result = connection.execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1416: in execute
+    [94mreturn[39;49;00m meth([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py[0m:516: in _execute_on_connection
+    [94mreturn[39;49;00m connection._execute_clauseelement([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1639: in _execute_clauseelement
+    ret = [96mself[39;49;00m._execute_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1848: in _execute_context
+    [94mreturn[39;49;00m [96mself[39;49;00m._exec_single_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1988: in _exec_single_context
+    [96mself[39;49;00m._handle_dbapi_exception([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:2343: in _handle_dbapi_exception
+    [94mraise[39;49;00m sqlalchemy_exception.with_traceback(exc_info[[94m2[39;49;00m]) [94mfrom[39;49;00m[90m [39;49;00m[04m[96me[39;49;00m[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+[1m[31mE   [0m
+[1m[31mE   [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)][0m
+[1m[31mE   [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$Jkvx09boqu97IBJZ2i/f7.1RuWgq8ZE6jhHEWBfAwPcu1bhNTDI8G', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('fec33da9-35ac-406f-80b3-d42211226735'), 'created_at': datetime.datetime(2025, 11, 11, 17, 5, 39, 622606), 'updated_at': datetime.datetime(2025, 11, 11, 17, 5, 39, 622621)}][0m
+[1m[31mE   (Background on this error at: https://sqlalche.me/e/20/gkpj)[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[31m[1m__ ERROR at setup of TestActivitiesAPI.test_generate_multiple_activity_types ___[0m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+
+[33mThe above exception was the direct cause of the following exception:[0m
+[1m[31mtests/conftest.py[0m:92: in test_user
+    db_session.commit()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1969: in commit
+    trans.commit(_to_root=[94mTrue[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1256: in commit
+    [96mself[39;49;00m._prepare_impl()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1231: in _prepare_impl
+    [96mself[39;49;00m.session.flush()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4312: in flush
+    [96mself[39;49;00m._flush(objects)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4447: in _flush
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4408: in _flush
+    flush_context.execute()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:466: in execute
+    rec.execute([96mself[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:642: in execute
+    util.preloaded.orm_persistence.save_obj([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:93: in save_obj
+    _emit_insert_statements([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:1226: in _emit_insert_statements
+    result = connection.execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1416: in execute
+    [94mreturn[39;49;00m meth([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py[0m:516: in _execute_on_connection
+    [94mreturn[39;49;00m connection._execute_clauseelement([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1639: in _execute_clauseelement
+    ret = [96mself[39;49;00m._execute_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1848: in _execute_context
+    [94mreturn[39;49;00m [96mself[39;49;00m._exec_single_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1988: in _exec_single_context
+    [96mself[39;49;00m._handle_dbapi_exception([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:2343: in _handle_dbapi_exception
+    [94mraise[39;49;00m sqlalchemy_exception.with_traceback(exc_info[[94m2[39;49;00m]) [94mfrom[39;49;00m[90m [39;49;00m[04m[96me[39;49;00m[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+[1m[31mE   [0m
+[1m[31mE   [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)][0m
+[1m[31mE   [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$57OJZZ451YMUHv6P4WPr0eqeIP.O1Qr6//WRrg/lXFl8qsTIBMpu2', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('5db103d0-78c4-4eaf-943d-110029e65793'), 'created_at': datetime.datetime(2025, 11, 11, 17, 5, 50, 364528), 'updated_at': datetime.datetime(2025, 11, 11, 17, 5, 50, 364535)}][0m
+[1m[31mE   (Background on this error at: https://sqlalche.me/e/20/gkpj)[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[31m[1m_________ ERROR at setup of TestAuthAPI.test_register_duplicate_email __________[0m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+
+[33mThe above exception was the direct cause of the following exception:[0m
+[1m[31mtests/conftest.py[0m:92: in test_user
+    db_session.commit()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1969: in commit
+    trans.commit(_to_root=[94mTrue[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1256: in commit
+    [96mself[39;49;00m._prepare_impl()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1231: in _prepare_impl
+    [96mself[39;49;00m.session.flush()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4312: in flush
+    [96mself[39;49;00m._flush(objects)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4447: in _flush
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4408: in _flush
+    flush_context.execute()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:466: in execute
+    rec.execute([96mself[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:642: in execute
+    util.preloaded.orm_persistence.save_obj([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:93: in save_obj
+    _emit_insert_statements([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:1226: in _emit_insert_statements
+    result = connection.execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1416: in execute
+    [94mreturn[39;49;00m meth([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py[0m:516: in _execute_on_connection
+    [94mreturn[39;49;00m connection._execute_clauseelement([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1639: in _execute_clauseelement
+    ret = [96mself[39;49;00m._execute_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1848: in _execute_context
+    [94mreturn[39;49;00m [96mself[39;49;00m._exec_single_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1988: in _exec_single_context
+    [96mself[39;49;00m._handle_dbapi_exception([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:2343: in _handle_dbapi_exception
+    [94mraise[39;49;00m sqlalchemy_exception.with_traceback(exc_info[[94m2[39;49;00m]) [94mfrom[39;49;00m[90m [39;49;00m[04m[96me[39;49;00m[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+[1m[31mE   [0m
+[1m[31mE   [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)][0m
+[1m[31mE   [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$n.AOwE8yKb4MrETFJ7zo6ODTjaVspRFmE7jLv.k83QlxASH0txmka', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('acda691f-2995-4bf5-8381-8e200098d7e7'), 'created_at': datetime.datetime(2025, 11, 11, 17, 6, 8, 925647), 'updated_at': datetime.datetime(2025, 11, 11, 17, 6, 8, 925652)}][0m
+[1m[31mE   (Background on this error at: https://sqlalche.me/e/20/gkpj)[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[31m[1m_______________ ERROR at setup of TestAuthAPI.test_login_success _______________[0m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+
+[33mThe above exception was the direct cause of the following exception:[0m
+[1m[31mtests/conftest.py[0m:92: in test_user
+    db_session.commit()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1969: in commit
+    trans.commit(_to_root=[94mTrue[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1256: in commit
+    [96mself[39;49;00m._prepare_impl()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1231: in _prepare_impl
+    [96mself[39;49;00m.session.flush()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4312: in flush
+    [96mself[39;49;00m._flush(objects)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4447: in _flush
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4408: in _flush
+    flush_context.execute()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:466: in execute
+    rec.execute([96mself[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:642: in execute
+    util.preloaded.orm_persistence.save_obj([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:93: in save_obj
+    _emit_insert_statements([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:1226: in _emit_insert_statements
+    result = connection.execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1416: in execute
+    [94mreturn[39;49;00m meth([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py[0m:516: in _execute_on_connection
+    [94mreturn[39;49;00m connection._execute_clauseelement([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1639: in _execute_clauseelement
+    ret = [96mself[39;49;00m._execute_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1848: in _execute_context
+    [94mreturn[39;49;00m [96mself[39;49;00m._exec_single_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1988: in _exec_single_context
+    [96mself[39;49;00m._handle_dbapi_exception([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:2343: in _handle_dbapi_exception
+    [94mraise[39;49;00m sqlalchemy_exception.with_traceback(exc_info[[94m2[39;49;00m]) [94mfrom[39;49;00m[90m [39;49;00m[04m[96me[39;49;00m[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+[1m[31mE   [0m
+[1m[31mE   [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)][0m
+[1m[31mE   [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$bi8Bx12fnbMEDVE5j9nLgOlSEn6wy3zL76GwtYZr0lfKpFwd8ZRRq', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('20278edf-8183-40ad-85a8-e636e6b7fb58'), 'created_at': datetime.datetime(2025, 11, 11, 17, 6, 19, 604532), 'updated_at': datetime.datetime(2025, 11, 11, 17, 6, 19, 604537)}][0m
+[1m[31mE   (Background on this error at: https://sqlalche.me/e/20/gkpj)[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[31m[1m_________ ERROR at setup of TestAuthAPI.test_login_invalid_credentials _________[0m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+
+[33mThe above exception was the direct cause of the following exception:[0m
+[1m[31mtests/conftest.py[0m:92: in test_user
+    db_session.commit()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1969: in commit
+    trans.commit(_to_root=[94mTrue[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1256: in commit
+    [96mself[39;49;00m._prepare_impl()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1231: in _prepare_impl
+    [96mself[39;49;00m.session.flush()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4312: in flush
+    [96mself[39;49;00m._flush(objects)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4447: in _flush
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4408: in _flush
+    flush_context.execute()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:466: in execute
+    rec.execute([96mself[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:642: in execute
+    util.preloaded.orm_persistence.save_obj([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:93: in save_obj
+    _emit_insert_statements([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:1226: in _emit_insert_statements
+    result = connection.execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1416: in execute
+    [94mreturn[39;49;00m meth([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py[0m:516: in _execute_on_connection
+    [94mreturn[39;49;00m connection._execute_clauseelement([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1639: in _execute_clauseelement
+    ret = [96mself[39;49;00m._execute_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1848: in _execute_context
+    [94mreturn[39;49;00m [96mself[39;49;00m._exec_single_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1988: in _exec_single_context
+    [96mself[39;49;00m._handle_dbapi_exception([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:2343: in _handle_dbapi_exception
+    [94mraise[39;49;00m sqlalchemy_exception.with_traceback(exc_info[[94m2[39;49;00m]) [94mfrom[39;49;00m[90m [39;49;00m[04m[96me[39;49;00m[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+[1m[31mE   [0m
+[1m[31mE   [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)][0m
+[1m[31mE   [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$AqusMdB9LLyUomlZ8mBtyOqXYK9t7Y.g/CWQX6nC4zEUVnJSeWrU2', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('4f5e653e-58b2-4dbb-ab2a-545c4de2c267'), 'created_at': datetime.datetime(2025, 11, 11, 17, 6, 27, 918826), 'updated_at': datetime.datetime(2025, 11, 11, 17, 6, 27, 918835)}][0m
+[1m[31mE   (Background on this error at: https://sqlalche.me/e/20/gkpj)[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[31m[1m_____________ ERROR at setup of TestAuthAPI.test_get_current_user ______________[0m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+
+[33mThe above exception was the direct cause of the following exception:[0m
+[1m[31mtests/conftest.py[0m:92: in test_user
+    db_session.commit()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1969: in commit
+    trans.commit(_to_root=[94mTrue[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1256: in commit
+    [96mself[39;49;00m._prepare_impl()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1231: in _prepare_impl
+    [96mself[39;49;00m.session.flush()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4312: in flush
+    [96mself[39;49;00m._flush(objects)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4447: in _flush
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4408: in _flush
+    flush_context.execute()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:466: in execute
+    rec.execute([96mself[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:642: in execute
+    util.preloaded.orm_persistence.save_obj([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:93: in save_obj
+    _emit_insert_statements([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:1226: in _emit_insert_statements
+    result = connection.execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1416: in execute
+    [94mreturn[39;49;00m meth([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py[0m:516: in _execute_on_connection
+    [94mreturn[39;49;00m connection._execute_clauseelement([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1639: in _execute_clauseelement
+    ret = [96mself[39;49;00m._execute_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1848: in _execute_context
+    [94mreturn[39;49;00m [96mself[39;49;00m._exec_single_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1988: in _exec_single_context
+    [96mself[39;49;00m._handle_dbapi_exception([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:2343: in _handle_dbapi_exception
+    [94mraise[39;49;00m sqlalchemy_exception.with_traceback(exc_info[[94m2[39;49;00m]) [94mfrom[39;49;00m[90m [39;49;00m[04m[96me[39;49;00m[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+[1m[31mE   [0m
+[1m[31mE   [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)][0m
+[1m[31mE   [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$UCGu0ngd/ylMDk4b94pkO.SmTxhDSnee7h7T50tFAq07Qx3ujy33m', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('24d846ce-c545-43b2-a5b2-86ec01567e1d'), 'created_at': datetime.datetime(2025, 11, 11, 17, 6, 38, 500578), 'updated_at': datetime.datetime(2025, 11, 11, 17, 6, 38, 500583)}][0m
+[1m[31mE   (Background on this error at: https://sqlalche.me/e/20/gkpj)[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[31m[1m________ ERROR at setup of TestStudentsAPI.test_create_student_success _________[0m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+
+[33mThe above exception was the direct cause of the following exception:[0m
+[1m[31mtests/conftest.py[0m:92: in test_user
+    db_session.commit()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1969: in commit
+    trans.commit(_to_root=[94mTrue[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1256: in commit
+    [96mself[39;49;00m._prepare_impl()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1231: in _prepare_impl
+    [96mself[39;49;00m.session.flush()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4312: in flush
+    [96mself[39;49;00m._flush(objects)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4447: in _flush
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4408: in _flush
+    flush_context.execute()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:466: in execute
+    rec.execute([96mself[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:642: in execute
+    util.preloaded.orm_persistence.save_obj([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:93: in save_obj
+    _emit_insert_statements([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:1226: in _emit_insert_statements
+    result = connection.execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1416: in execute
+    [94mreturn[39;49;00m meth([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py[0m:516: in _execute_on_connection
+    [94mreturn[39;49;00m connection._execute_clauseelement([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1639: in _execute_clauseelement
+    ret = [96mself[39;49;00m._execute_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1848: in _execute_context
+    [94mreturn[39;49;00m [96mself[39;49;00m._exec_single_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1988: in _exec_single_context
+    [96mself[39;49;00m._handle_dbapi_exception([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:2343: in _handle_dbapi_exception
+    [94mraise[39;49;00m sqlalchemy_exception.with_traceback(exc_info[[94m2[39;49;00m]) [94mfrom[39;49;00m[90m [39;49;00m[04m[96me[39;49;00m[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+[1m[31mE   [0m
+[1m[31mE   [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)][0m
+[1m[31mE   [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$1YfyR/p5S3ywpTM8LDFZ9OIfX4SSu4yNgy87ZjWWINmAbxVNR1Gqe', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('748aec31-c57e-4486-8668-cdcb04522623'), 'created_at': datetime.datetime(2025, 11, 11, 17, 6, 56, 866116), 'updated_at': datetime.datetime(2025, 11, 11, 17, 6, 56, 866122)}][0m
+[1m[31mE   (Background on this error at: https://sqlalche.me/e/20/gkpj)[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[31m[1m______ ERROR at setup of TestStudentsAPI.test_create_student_invalid_date ______[0m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+
+[33mThe above exception was the direct cause of the following exception:[0m
+[1m[31mtests/conftest.py[0m:92: in test_user
+    db_session.commit()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1969: in commit
+    trans.commit(_to_root=[94mTrue[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1256: in commit
+    [96mself[39;49;00m._prepare_impl()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1231: in _prepare_impl
+    [96mself[39;49;00m.session.flush()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4312: in flush
+    [96mself[39;49;00m._flush(objects)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4447: in _flush
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4408: in _flush
+    flush_context.execute()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:466: in execute
+    rec.execute([96mself[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:642: in execute
+    util.preloaded.orm_persistence.save_obj([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:93: in save_obj
+    _emit_insert_statements([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:1226: in _emit_insert_statements
+    result = connection.execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1416: in execute
+    [94mreturn[39;49;00m meth([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py[0m:516: in _execute_on_connection
+    [94mreturn[39;49;00m connection._execute_clauseelement([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1639: in _execute_clauseelement
+    ret = [96mself[39;49;00m._execute_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1848: in _execute_context
+    [94mreturn[39;49;00m [96mself[39;49;00m._exec_single_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1988: in _exec_single_context
+    [96mself[39;49;00m._handle_dbapi_exception([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:2343: in _handle_dbapi_exception
+    [94mraise[39;49;00m sqlalchemy_exception.with_traceback(exc_info[[94m2[39;49;00m]) [94mfrom[39;49;00m[90m [39;49;00m[04m[96me[39;49;00m[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+[1m[31mE   [0m
+[1m[31mE   [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)][0m
+[1m[31mE   [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$3ZPEmlrrPsW8nrp6x5Af/eegWmzBodqBRADr0HNdB54/Yg0vUiuKC', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('7dc77023-28d7-4f3c-911c-6efd348e5fe6'), 'created_at': datetime.datetime(2025, 11, 11, 17, 7, 15, 312981), 'updated_at': datetime.datetime(2025, 11, 11, 17, 7, 15, 312986)}][0m
+[1m[31mE   (Background on this error at: https://sqlalche.me/e/20/gkpj)[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[31m[1m_______ ERROR at setup of TestStudentsAPI.test_create_student_too_young ________[0m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+
+[33mThe above exception was the direct cause of the following exception:[0m
+[1m[31mtests/conftest.py[0m:92: in test_user
+    db_session.commit()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1969: in commit
+    trans.commit(_to_root=[94mTrue[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1256: in commit
+    [96mself[39;49;00m._prepare_impl()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py[0m:139: in _go
+    ret_value = fn([96mself[39;49;00m, *arg, **kw)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:1231: in _prepare_impl
+    [96mself[39;49;00m.session.flush()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4312: in flush
+    [96mself[39;49;00m._flush(objects)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4447: in _flush
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py[0m:4408: in _flush
+    flush_context.execute()[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:466: in execute
+    rec.execute([96mself[39;49;00m)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py[0m:642: in execute
+    util.preloaded.orm_persistence.save_obj([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:93: in save_obj
+    _emit_insert_statements([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py[0m:1226: in _emit_insert_statements
+    result = connection.execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1416: in execute
+    [94mreturn[39;49;00m meth([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py[0m:516: in _execute_on_connection
+    [94mreturn[39;49;00m connection._execute_clauseelement([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1639: in _execute_clauseelement
+    ret = [96mself[39;49;00m._execute_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1848: in _execute_context
+    [94mreturn[39;49;00m [96mself[39;49;00m._exec_single_context([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1988: in _exec_single_context
+    [96mself[39;49;00m._handle_dbapi_exception([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:2343: in _handle_dbapi_exception
+    [94mraise[39;49;00m sqlalchemy_exception.with_traceback(exc_info[[94m2[39;49;00m]) [94mfrom[39;49;00m[90m [39;49;00m[04m[96me[39;49;00m[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py[0m:1969: in _exec_single_context
+    [96mself[39;49;00m.dialect.do_execute([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py[0m:922: in do_execute
+    cursor.execute(statement, parameters)[90m[39;49;00m
+[1m[31mE   sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "ix_users_email"[0m
+[1m[31mE   DETAIL:  Key (email)=(test@example.com) already exists.[0m
+[1m[31mE   [0m
+[1m[31mE   [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)][0m
+[1m[31mE   [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$M1qLOZMv1BhoQDclFmS4YewrtM/6M.EVjHraEY95QYrStMJpfWkS.', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('9f22b25f-0b14-4a08-b2e8-3f4538781601'), 'created_at': datetime.datetime(2025, 11, 11, 17, 7, 26, 14386), 'updated_at': datetime.datetime(2025, 11, 11, 17, 7, 26, 14392)}][0m
+[1m[31mE   (Background on this error at: https://sqlalche.me/e/20/gkpj)[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+=================================== FAILURES ===================================
+[31m[1m_____________________ TestAuthAPI.test_unauthorized_access _____________________[0m
+[1m[31mtests/integration/test_auth_api.py[0m:92: in test_unauthorized_access
+    [94massert[39;49;00m response.status_code == [94m403[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 401 == 403[0m
+[1m[31mE    +  where 401 = <Response [401 Unauthorized]>.status_code[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+----------------------------- Captured stdout call -----------------------------
+📥 GET /api/v1/auth/me
+📤 Status: 401
+[32m[INFO][0m - 2025-11-11 14:06:46 - httpx - HTTP Request: GET http://testserver/api/v1/auth/me "HTTP/1.1 401 Unauthorized"
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m httpx:_client.py:1013 HTTP Request: GET http://testserver/api/v1/auth/me "HTTP/1.1 401 Unauthorized"
+--------------------------- Captured stdout teardown ---------------------------
+🛑 Shutting down EduAutismo IA API
+[36m[1m=========================== short test summary info ============================[0m
+[31mERROR[0m tests/integration/test_activities_api.py::[1mTestActivitiesAPI::test_generate_activity_without_auth[0m - sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate ...
+[31mERROR[0m tests/integration/test_activities_api.py::[1mTestActivitiesAPI::test_generate_activity_nonexistent_student[0m - sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate ...
+[31mERROR[0m tests/integration/test_activities_api.py::[1mTestActivitiesAPI::test_generate_activity_invalid_duration[0m - sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate ...
+[31mERROR[0m tests/integration/test_activities_api.py::[1mTestActivitiesAPI::test_generate_multiple_activity_types[0m - sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate ...
+[31mERROR[0m tests/integration/test_auth_api.py::[1mTestAuthAPI::test_register_duplicate_email[0m - sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate ...
+[31mERROR[0m tests/integration/test_auth_api.py::[1mTestAuthAPI::test_login_success[0m - sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate ...
+[31mERROR[0m tests/integration/test_auth_api.py::[1mTestAuthAPI::test_login_invalid_credentials[0m - sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate ...
+[31mERROR[0m tests/integration/test_auth_api.py::[1mTestAuthAPI::test_get_current_user[0m - sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate ...
+[31mERROR[0m tests/integration/test_students_api.py::[1mTestStudentsAPI::test_create_student_success[0m - sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate ...
+[31mERROR[0m tests/integration/test_students_api.py::[1mTestStudentsAPI::test_create_student_invalid_date[0m - sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate ...
+[31mERROR[0m tests/integration/test_students_api.py::[1mTestStudentsAPI::test_create_student_too_young[0m - sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate ...
+[31mFAILED[0m tests/integration/test_auth_api.py::[1mTestAuthAPI::test_unauthorized_access[0m - assert 401 == 403
+[31m======= [31m[1m1 failed[0m, [32m3 passed[0m, [33m40 warnings[0m, [31m[1m11 errors[0m[31m in 150.84s (0:02:30)[0m[31m ========[0m

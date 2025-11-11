@@ -53,8 +53,21 @@ def db_session(engine) -> Generator[Session, None, None]:
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     session = TestingSessionLocal()
 
+    # Clean up all data before each test
+    from app.models.user import User
+    from app.models.student import Student
+    from app.models.activity import Activity
+    from app.models.assessment import Assessment
+
+    session.query(Assessment).delete()
+    session.query(Activity).delete()
+    session.query(Student).delete()
+    session.query(User).delete()
+    session.commit()
+
     yield session
 
+    # Rollback any remaining transactions
     session.rollback()
     session.close()
 
