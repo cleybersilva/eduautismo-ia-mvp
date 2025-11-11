@@ -8,8 +8,7 @@ from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from app.schemas.common import BaseResponseSchema, BaseSchema
-from app.utils.constants import (MAX_ACTIVITY_DURATION, MIN_ACTIVITY_DURATION,
-                                 ActivityType, DifficultyLevel)
+from app.utils.constants import MAX_ACTIVITY_DURATION, MIN_ACTIVITY_DURATION, ActivityType, DifficultyLevel
 from pydantic import Field, field_validator
 
 

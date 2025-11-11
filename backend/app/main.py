@@ -9,6 +9,7 @@ import time
 from contextlib import asynccontextmanager
 
 from app.api import api_router
+
 # Import configuration and dependencies
 from app.core.config import settings
 from app.core.database import engine

@@ -8,8 +8,7 @@ from typing import Any, Dict, Optional
 from uuid import UUID
 
 from app.schemas.common import BaseResponseSchema, BaseSchema
-from app.utils.constants import (MAX_NOTES_LENGTH, CompletionStatus,
-                                 DifficultyRating, EngagementLevel)
+from app.utils.constants import MAX_NOTES_LENGTH, CompletionStatus, DifficultyRating, EngagementLevel
 from pydantic import Field, field_validator
 
 

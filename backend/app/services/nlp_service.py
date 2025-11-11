@@ -16,16 +16,20 @@ from typing import Any, Dict, List, Optional
 
 from app.core.config import settings
 from app.core.exceptions import MissingConfigurationError, OpenAIError
-from app.utils.constants import (DEFAULT_OPENAI_MODEL,
-                                 MAX_TOKENS_ACTIVITY_GENERATION,
-                                 MAX_TOKENS_PROGRESS_ANALYSIS,
-                                 MAX_TOKENS_RECOMMENDATION,
-                                 SYSTEM_PROMPT_ACTIVITY_GENERATION,
-                                 SYSTEM_PROMPT_PROGRESS_ANALYSIS,
-                                 SYSTEM_PROMPT_RECOMMENDATIONS,
-                                 TEMPERATURE_BALANCED, TEMPERATURE_CREATIVE,
-                                 TEMPERATURE_PRECISE, ActivityType,
-                                 DifficultyLevel)
+from app.utils.constants import (
+    DEFAULT_OPENAI_MODEL,
+    MAX_TOKENS_ACTIVITY_GENERATION,
+    MAX_TOKENS_PROGRESS_ANALYSIS,
+    MAX_TOKENS_RECOMMENDATION,
+    SYSTEM_PROMPT_ACTIVITY_GENERATION,
+    SYSTEM_PROMPT_PROGRESS_ANALYSIS,
+    SYSTEM_PROMPT_RECOMMENDATIONS,
+    TEMPERATURE_BALANCED,
+    TEMPERATURE_CREATIVE,
+    TEMPERATURE_PRECISE,
+    ActivityType,
+    DifficultyLevel,
+)
 from app.utils.logger import get_logger, log_openai_request
 from openai import AsyncOpenAI
 from openai import OpenAIError as OpenAIAPIError

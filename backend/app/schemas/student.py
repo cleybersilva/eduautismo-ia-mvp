@@ -9,8 +9,7 @@ from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from app.schemas.common import BaseResponseSchema, BaseSchema
-from app.utils.constants import (MAX_INTERESTS_COUNT, MAX_STUDENT_AGE,
-                                 MIN_STUDENT_AGE, TEALevel)
+from app.utils.constants import MAX_INTERESTS_COUNT, MAX_STUDENT_AGE, MIN_STUDENT_AGE, TEALevel
 from pydantic import Field, field_validator
 
 

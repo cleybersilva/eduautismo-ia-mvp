@@ -5,34 +5,70 @@ Exports all Pydantic schemas for API validation.
 """
 
 # Activity schemas
-from app.schemas.activity import (ActivityCreate, ActivityFilterParams,
-                                  ActivityGenerate, ActivityListResponse,
-                                  ActivityResponse, ActivityUpdate)
+from app.schemas.activity import (
+    ActivityCreate,
+    ActivityFilterParams,
+    ActivityGenerate,
+    ActivityListResponse,
+    ActivityResponse,
+    ActivityUpdate,
+)
+
 # Assessment schemas
-from app.schemas.assessment import (AssessmentCreate, AssessmentFilterParams,
-                                    AssessmentListResponse, AssessmentResponse,
-                                    AssessmentUpdate, ProgressAnalysisRequest,
-                                    ProgressAnalysisResponse)
+from app.schemas.assessment import (
+    AssessmentCreate,
+    AssessmentFilterParams,
+    AssessmentListResponse,
+    AssessmentResponse,
+    AssessmentUpdate,
+    ProgressAnalysisRequest,
+    ProgressAnalysisResponse,
+)
+
 # Common schemas
-from app.schemas.common import (BaseResponseSchema, BaseSchema,
-                                BulkDeleteRequest, BulkDeleteResponse,
-                                ComponentHealth, CountResponse,
-                                DateRangeFilter, DetailedHealthCheckResponse,
-                                ErrorDetail, ErrorResponse, FileUploadResponse,
-                                HealthCheckResponse, MessageResponse,
-                                PaginatedResponse, PaginationParams,
-                                SearchFilter, StatsResponse, SuccessResponse,
-                                TimestampSchema, Token, TokenRefresh,
-                                TokenResponse, UUIDSchema,
-                                ValidationErrorResponse)
+from app.schemas.common import (
+    BaseResponseSchema,
+    BaseSchema,
+    BulkDeleteRequest,
+    BulkDeleteResponse,
+    ComponentHealth,
+    CountResponse,
+    DateRangeFilter,
+    DetailedHealthCheckResponse,
+    ErrorDetail,
+    ErrorResponse,
+    FileUploadResponse,
+    HealthCheckResponse,
+    MessageResponse,
+    PaginatedResponse,
+    PaginationParams,
+    SearchFilter,
+    StatsResponse,
+    SuccessResponse,
+    TimestampSchema,
+    Token,
+    TokenRefresh,
+    TokenResponse,
+    UUIDSchema,
+    ValidationErrorResponse,
+)
+
 # Student schemas
-from app.schemas.student import (StudentCreate, StudentListResponse,
-                                 StudentResponse, StudentUpdate)
+from app.schemas.student import StudentCreate, StudentListResponse, StudentResponse, StudentUpdate
+
 # User schemas
-from app.schemas.user import (PasswordChange, PasswordReset,
-                              PasswordResetConfirm, UserAdminUpdate,
-                              UserDetailResponse, UserListResponse, UserLogin,
-                              UserRegister, UserResponse, UserUpdate)
+from app.schemas.user import (
+    PasswordChange,
+    PasswordReset,
+    PasswordResetConfirm,
+    UserAdminUpdate,
+    UserDetailResponse,
+    UserListResponse,
+    UserLogin,
+    UserRegister,
+    UserResponse,
+    UserUpdate,
+)
 
 __all__ = [
     # Common

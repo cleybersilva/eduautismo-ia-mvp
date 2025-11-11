@@ -69,6 +69,7 @@ def init_db() -> None:
     Use Alembic migrations for production.
     """
     from app.db.base import Base
+
     # Import all models to ensure they're registered
     from app.models import activity, assessment, student, user  # noqa
 

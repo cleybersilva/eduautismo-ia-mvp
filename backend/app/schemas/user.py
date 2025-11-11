@@ -9,8 +9,7 @@ from typing import Optional
 from uuid import UUID
 
 from app.schemas.common import BaseResponseSchema, BaseSchema
-from app.utils.constants import (MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH,
-                                 UserRole)
+from app.utils.constants import MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, UserRole
 from pydantic import EmailStr, Field, field_validator
 
 # ============================================================================

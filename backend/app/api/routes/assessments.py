@@ -9,11 +9,13 @@ from uuid import UUID
 
 from app.api.dependencies.auth import get_current_user
 from app.core.database import get_db
-from app.core.exceptions import (ActivityNotFoundError,
-                                 AssessmentNotFoundError,
-                                 PermissionDeniedError, StudentNotFoundError)
-from app.schemas.assessment import (AssessmentCreate, AssessmentResponse,
-                                    AssessmentUpdate)
+from app.core.exceptions import (
+    ActivityNotFoundError,
+    AssessmentNotFoundError,
+    PermissionDeniedError,
+    StudentNotFoundError,
+)
+from app.schemas.assessment import AssessmentCreate, AssessmentResponse, AssessmentUpdate
 from app.services.assessment_service import AssessmentService
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session

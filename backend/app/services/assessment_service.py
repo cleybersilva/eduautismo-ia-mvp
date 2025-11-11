@@ -7,9 +7,12 @@ Business logic for assessment management and progress analysis.
 from typing import List, Optional
 from uuid import UUID
 
-from app.core.exceptions import (ActivityNotFoundError,
-                                 AssessmentNotFoundError,
-                                 PermissionDeniedError, StudentNotFoundError)
+from app.core.exceptions import (
+    ActivityNotFoundError,
+    AssessmentNotFoundError,
+    PermissionDeniedError,
+    StudentNotFoundError,
+)
 from app.models.activity import Activity
 from app.models.assessment import Assessment
 from app.models.student import Student
