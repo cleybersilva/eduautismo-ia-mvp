@@ -67,8 +67,8 @@ services:
   # FastAPI Backend
   api:
     build:
-      context: ./backend
-      dockerfile: ../Dockerfile.api
+      context: .
+      dockerfile: ./Dockerfile.api
       args:
         PYTHON_VERSION: 3.11
     container_name: eduautismo-api
@@ -133,8 +133,8 @@ services:
   # Frontend (React/Vite)
   frontend:
     build:
-      context: ./frontend
-      dockerfile: ../Dockerfile.web
+      context: .
+      dockerfile: ./Dockerfile.web
       target: development
     container_name: eduautismo-frontend
     environment:

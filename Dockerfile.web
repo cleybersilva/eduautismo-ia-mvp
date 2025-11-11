@@ -29,8 +29,8 @@ WORKDIR /app
 # ============================================================================
 FROM base as dependencies
 
-# Copy package files
-COPY package*.json ./
+# Copy package files from frontend directory
+COPY frontend/package*.json ./
 
 # Install dependencies
 RUN npm ci --prefer-offline --no-audit
@@ -40,8 +40,8 @@ RUN npm ci --prefer-offline --no-audit
 # ============================================================================
 FROM dependencies as development
 
-# Copy application code
-COPY . .
+# Copy application code from frontend directory
+COPY frontend/ .
 
 # Use existing node user (uid/gid 1000) and set ownership
 RUN chown -R node:node /app
@@ -59,8 +59,8 @@ CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
 # ============================================================================
 FROM dependencies as builder
 
-# Copy application code
-COPY . .
+# Copy application code from frontend directory
+COPY frontend/ .
 
 # Build arguments for environment variables
 ARG VITE_API_URL=http://localhost:8000
