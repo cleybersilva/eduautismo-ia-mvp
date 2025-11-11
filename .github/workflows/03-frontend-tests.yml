@@ -1,16 +1,6 @@
 name: "🧪 Test: Frontend (ESLint + Vitest + Build)"
 
 on:
-  push:
-    branches: [main, staging, dev]
-    paths:
-      - "frontend/**"
-      - ".github/workflows/03-frontend-tests.yml"
-  pull_request:
-    branches: [main, staging, dev]
-    paths:
-      - "frontend/**"
-      - ".github/workflows/03-frontend-tests.yml"
   workflow_call:
     # This workflow can be called by other workflows
 

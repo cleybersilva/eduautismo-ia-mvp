@@ -1,19 +1,6 @@
 name: "🐳 Security: Container Image Scan"
 
 on:
-  push:
-    branches: [main, staging, dev]
-    paths:
-      - "Dockerfile.*"
-      - "backend/**"
-      - "frontend/**"
-      - ".github/workflows/04-container-scan.yml"
-  pull_request:
-    branches: [main, staging, dev]
-    paths:
-      - "Dockerfile.*"
-      - "backend/**"
-      - "frontend/**"
   workflow_call:
     # This workflow can be called by other workflows
 

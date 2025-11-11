@@ -1,18 +1,6 @@
 name: "🧪 Test: Backend (Unit + Integration)"
 
 on:
-  push:
-    branches: [main, staging, dev]
-    paths:
-      - "backend/**"
-      - ".github/workflows/02-backend-tests.yml"
-      - "docker-compose.yml"
-  pull_request:
-    branches: [main, staging, dev]
-    paths:
-      - "backend/**"
-      - ".github/workflows/02-backend-tests.yml"
-      - "docker-compose.yml"
   workflow_call:
     # This workflow can be called by other workflows
 
