@@ -113,6 +113,7 @@ jobs:
       - name: Validate Alembic migrations
         env:
           DATABASE_URL: postgresql://postgres:testpass123@localhost:5432/eduautismo_test
+          PYTHONPATH: backend
         run: |
           alembic upgrade head
           alembic downgrade -1
