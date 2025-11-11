@@ -141,3 +141,28 @@ def test_student(db_session, test_user) -> Student:
     db_session.commit()
     db_session.refresh(student)
     return student
+
+
+@pytest.fixture
+def test_activity(db_session, test_student, test_user):
+    """Create test activity."""
+    from app.models.activity import Activity
+
+    activity = Activity(
+        student_id=test_student.id,
+        title="Atividade de Teste",
+        description="Descrição da atividade de teste",
+        activity_type="cognitive",
+        difficulty="easy",
+        duration_minutes=30,
+        objectives=["Objetivo 1", "Objetivo 2"],
+        materials=["Material 1", "Material 2"],
+        instructions=["Instruções passo a passo"],  # Must be a list
+        theme="matemática",
+        generated_by_ai=True,
+        created_by_id=test_user.id  # Fixed: use created_by_id instead of teacher_id
+    )
+    db_session.add(activity)
+    db_session.commit()
+    db_session.refresh(activity)
+    return activity

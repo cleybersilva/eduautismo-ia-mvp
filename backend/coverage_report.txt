@@ -1,0 +1,372 @@
+[1m============================= test session starts ==============================[0m
+platform linux -- Python 3.12.3, pytest-7.4.3, pluggy-1.6.0 -- /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/backend
+configfile: pytest.ini
+plugins: anyio-3.7.1, cov-7.0.0
+[1mcollecting ... [0mcollected 26 items
+
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_success [32mPASSED[0m[33m [  3%][0m
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_without_auth [32mPASSED[0m[33m [  7%][0m
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_nonexistent_student [32mPASSED[0m[33m [ 11%][0m
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_invalid_duration [32mPASSED[0m[33m [ 15%][0m
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_multiple_activity_types [32mPASSED[0m[33m [ 19%][0m
+tests/integration/test_assessments_api.py::TestAssessmentsAPI::test_create_assessment_success [31mERROR[0m[31m [ 23%][0m
+tests/integration/test_assessments_api.py::TestAssessmentsAPI::test_create_assessment_without_auth [31mERROR[0m[31m [ 26%][0m
+tests/integration/test_assessments_api.py::TestAssessmentsAPI::test_create_assessment_invalid_activity [31mERROR[0m[31m [ 30%][0m
+tests/integration/test_assessments_api.py::TestAssessmentsAPI::test_create_assessment_minimal_data [31mERROR[0m[31m [ 34%][0m
+tests/integration/test_assessments_api.py::TestAssessmentsAPI::test_get_assessment_by_id [31mERROR[0m[31m [ 38%][0m
+tests/integration/test_assessments_api.py::TestAssessmentsAPI::test_get_assessment_not_found [31mFAILED[0m[31m [ 42%][0m
+tests/integration/test_assessments_api.py::TestAssessmentsAPI::test_list_assessments_by_student [31mERROR[0m[31m [ 46%][0m
+tests/integration/test_assessments_api.py::TestAssessmentsAPI::test_update_assessment [31mERROR[0m[31m [ 50%][0m
+tests/integration/test_assessments_api.py::TestAssessmentsAPI::test_create_assessment_with_skills_data [31mERROR[0m[31m [ 53%][0m
+tests/integration/test_assessments_api.py::TestAssessmentsAPI::test_create_assessment_invalid_completion_status [31mERROR[0m[31m [ 57%][0m
+tests/integration/test_assessments_api.py::TestAssessmentsAPI::test_create_assessment_negative_duration [31mERROR[0m[31m [ 61%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_register_user_success [32mPASSED[0m[31m [ 65%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_register_duplicate_email [32mPASSED[0m[31m [ 69%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_login_success [32mPASSED[0m[31m [ 73%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_login_invalid_credentials [32mPASSED[0m[31m [ 76%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_get_current_user [32mPASSED[0m[31m [ 80%][0m
+tests/integration/test_auth_api.py::TestAuthAPI::test_unauthorized_access [32mPASSED[0m[31m [ 84%][0m
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_success [32mPASSED[0m[31m [ 88%][0m
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_without_auth [32mPASSED[0m[31m [ 92%][0m
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_invalid_date [32mPASSED[0m[31m [ 96%][0m
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_too_young [32mPASSED[0m[31m [100%][0m[31m[1m
+ERROR: Coverage failure: total of 59 is less than fail-under=70
+[0m
+
+==================================== ERRORS ====================================
+[31m[1m_____ ERROR at setup of TestAssessmentsAPI.test_create_assessment_success ______[0m
+[1m[31mtests/conftest.py[0m:151: in test_activity
+    activity = Activity([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:566: in _initialize_instance
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:564: in _initialize_instance
+    manager.original_init(*mixed[[94m1[39;49;00m:], **kwargs)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/decl_base.py[0m:2142: in _declarative_constructor
+    [94mraise[39;49;00m [96mTypeError[39;49;00m([90m[39;49;00m
+[1m[31mE   TypeError: 'teacher_id' is an invalid keyword argument for Activity[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+📥 POST /api/v1/auth/login
+📤 Status: 200
+[32m[INFO][0m - 2025-11-11 14:36:59 - httpx - HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m httpx:_client.py:1013 HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+[31m[1m___ ERROR at setup of TestAssessmentsAPI.test_create_assessment_without_auth ___[0m
+[1m[31mtests/conftest.py[0m:151: in test_activity
+    activity = Activity([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:566: in _initialize_instance
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:564: in _initialize_instance
+    manager.original_init(*mixed[[94m1[39;49;00m:], **kwargs)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/decl_base.py[0m:2142: in _declarative_constructor
+    [94mraise[39;49;00m [96mTypeError[39;49;00m([90m[39;49;00m
+[1m[31mE   TypeError: 'teacher_id' is an invalid keyword argument for Activity[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[31m[1m_ ERROR at setup of TestAssessmentsAPI.test_create_assessment_invalid_activity _[0m
+[1m[31mtests/conftest.py[0m:151: in test_activity
+    activity = Activity([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:566: in _initialize_instance
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:564: in _initialize_instance
+    manager.original_init(*mixed[[94m1[39;49;00m:], **kwargs)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/decl_base.py[0m:2142: in _declarative_constructor
+    [94mraise[39;49;00m [96mTypeError[39;49;00m([90m[39;49;00m
+[1m[31mE   TypeError: 'teacher_id' is an invalid keyword argument for Activity[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+📥 POST /api/v1/auth/login
+📤 Status: 200
+[32m[INFO][0m - 2025-11-11 14:37:20 - httpx - HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m httpx:_client.py:1013 HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+[31m[1m___ ERROR at setup of TestAssessmentsAPI.test_create_assessment_minimal_data ___[0m
+[1m[31mtests/conftest.py[0m:151: in test_activity
+    activity = Activity([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:566: in _initialize_instance
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:564: in _initialize_instance
+    manager.original_init(*mixed[[94m1[39;49;00m:], **kwargs)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/decl_base.py[0m:2142: in _declarative_constructor
+    [94mraise[39;49;00m [96mTypeError[39;49;00m([90m[39;49;00m
+[1m[31mE   TypeError: 'teacher_id' is an invalid keyword argument for Activity[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+📥 POST /api/v1/auth/login
+📤 Status: 200
+[32m[INFO][0m - 2025-11-11 14:37:31 - httpx - HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m httpx:_client.py:1013 HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+[31m[1m________ ERROR at setup of TestAssessmentsAPI.test_get_assessment_by_id ________[0m
+[1m[31mtests/conftest.py[0m:151: in test_activity
+    activity = Activity([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:566: in _initialize_instance
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:564: in _initialize_instance
+    manager.original_init(*mixed[[94m1[39;49;00m:], **kwargs)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/decl_base.py[0m:2142: in _declarative_constructor
+    [94mraise[39;49;00m [96mTypeError[39;49;00m([90m[39;49;00m
+[1m[31mE   TypeError: 'teacher_id' is an invalid keyword argument for Activity[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+📥 POST /api/v1/auth/login
+📤 Status: 200
+[32m[INFO][0m - 2025-11-11 14:37:42 - httpx - HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m httpx:_client.py:1013 HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+[31m[1m____ ERROR at setup of TestAssessmentsAPI.test_list_assessments_by_student _____[0m
+[1m[31mtests/conftest.py[0m:151: in test_activity
+    activity = Activity([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:566: in _initialize_instance
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:564: in _initialize_instance
+    manager.original_init(*mixed[[94m1[39;49;00m:], **kwargs)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/decl_base.py[0m:2142: in _declarative_constructor
+    [94mraise[39;49;00m [96mTypeError[39;49;00m([90m[39;49;00m
+[1m[31mE   TypeError: 'teacher_id' is an invalid keyword argument for Activity[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+📥 POST /api/v1/auth/login
+📤 Status: 200
+[32m[INFO][0m - 2025-11-11 14:38:00 - httpx - HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m httpx:_client.py:1013 HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+[31m[1m_________ ERROR at setup of TestAssessmentsAPI.test_update_assessment __________[0m
+[1m[31mtests/conftest.py[0m:151: in test_activity
+    activity = Activity([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:566: in _initialize_instance
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:564: in _initialize_instance
+    manager.original_init(*mixed[[94m1[39;49;00m:], **kwargs)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/decl_base.py[0m:2142: in _declarative_constructor
+    [94mraise[39;49;00m [96mTypeError[39;49;00m([90m[39;49;00m
+[1m[31mE   TypeError: 'teacher_id' is an invalid keyword argument for Activity[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+📥 POST /api/v1/auth/login
+📤 Status: 200
+[32m[INFO][0m - 2025-11-11 14:38:11 - httpx - HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m httpx:_client.py:1013 HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+[31m[1m_ ERROR at setup of TestAssessmentsAPI.test_create_assessment_with_skills_data _[0m
+[1m[31mtests/conftest.py[0m:151: in test_activity
+    activity = Activity([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:566: in _initialize_instance
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:564: in _initialize_instance
+    manager.original_init(*mixed[[94m1[39;49;00m:], **kwargs)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/decl_base.py[0m:2142: in _declarative_constructor
+    [94mraise[39;49;00m [96mTypeError[39;49;00m([90m[39;49;00m
+[1m[31mE   TypeError: 'teacher_id' is an invalid keyword argument for Activity[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+📥 POST /api/v1/auth/login
+📤 Status: 200
+[32m[INFO][0m - 2025-11-11 14:38:19 - httpx - HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m httpx:_client.py:1013 HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+[31m[1m_ ERROR at setup of TestAssessmentsAPI.test_create_assessment_invalid_completion_status _[0m
+[1m[31mtests/conftest.py[0m:151: in test_activity
+    activity = Activity([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:566: in _initialize_instance
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:564: in _initialize_instance
+    manager.original_init(*mixed[[94m1[39;49;00m:], **kwargs)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/decl_base.py[0m:2142: in _declarative_constructor
+    [94mraise[39;49;00m [96mTypeError[39;49;00m([90m[39;49;00m
+[1m[31mE   TypeError: 'teacher_id' is an invalid keyword argument for Activity[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+📥 POST /api/v1/auth/login
+📤 Status: 200
+[32m[INFO][0m - 2025-11-11 14:38:30 - httpx - HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m httpx:_client.py:1013 HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+[31m[1m_ ERROR at setup of TestAssessmentsAPI.test_create_assessment_negative_duration _[0m
+[1m[31mtests/conftest.py[0m:151: in test_activity
+    activity = Activity([90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:566: in _initialize_instance
+    [94mwith[39;49;00m util.safe_reraise():[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py[0m:146: in __exit__
+    [94mraise[39;49;00m exc_value.with_traceback(exc_tb)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/state.py[0m:564: in _initialize_instance
+    manager.original_init(*mixed[[94m1[39;49;00m:], **kwargs)[90m[39;49;00m
+[1m[31m../venv/lib/python3.12/site-packages/sqlalchemy/orm/decl_base.py[0m:2142: in _declarative_constructor
+    [94mraise[39;49;00m [96mTypeError[39;49;00m([90m[39;49;00m
+[1m[31mE   TypeError: 'teacher_id' is an invalid keyword argument for Activity[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+📥 POST /api/v1/auth/login
+📤 Status: 200
+[32m[INFO][0m - 2025-11-11 14:38:38 - httpx - HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m httpx:_client.py:1013 HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+=================================== FAILURES ===================================
+[31m[1m_______________ TestAssessmentsAPI.test_get_assessment_not_found _______________[0m
+[1m[31mtests/integration/test_assessments_api.py[0m:134: in test_get_assessment_not_found
+    [94massert[39;49;00m response.status_code == [94m404[39;49;00m[90m[39;49;00m
+[1m[31mE   assert 422 == 404[0m
+[1m[31mE    +  where 422 = <Response [422 Unprocessable Entity]>.status_code[0m
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+📥 POST /api/v1/auth/login
+📤 Status: 200
+[32m[INFO][0m - 2025-11-11 14:37:50 - httpx - HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+------------------------------ Captured log setup ------------------------------
+[32mINFO    [0m httpx:_client.py:1013 HTTP Request: POST http://testserver/api/v1/auth/login "HTTP/1.1 200 OK"
+----------------------------- Captured stdout call -----------------------------
+📥 GET /api/v1/assessments/bd946b30-d687-487e-9ff4-e342ab202cf4
+📤 Status: 422
+[32m[INFO][0m - 2025-11-11 14:37:50 - httpx - HTTP Request: GET http://testserver/api/v1/assessments/bd946b30-d687-487e-9ff4-e342ab202cf4 "HTTP/1.1 422 Unprocessable Entity"
+------------------------------ Captured log call -------------------------------
+[32mINFO    [0m httpx:_client.py:1013 HTTP Request: GET http://testserver/api/v1/assessments/bd946b30-d687-487e-9ff4-e342ab202cf4 "HTTP/1.1 422 Unprocessable Entity"
+--------------------------- Captured stdout teardown ---------------------------
+🛑 Shutting down EduAutismo IA API
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.3-final-0 ________________
+
+Name                                 Stmts   Miss Branch BrPart  Cover   Missing
+--------------------------------------------------------------------------------
+app/__init__.py                          0      0      0      0   100%
+app/api/__init__.py                      9      0      0      0   100%
+app/api/analytics.py                     0      0      0      0   100%
+app/api/auth.py                          0      0      0      0   100%
+app/api/dependencies/__init__.py         0      0      0      0   100%
+app/api/dependencies/auth.py            20      6      4      2    67%   26-30, 54, 62
+app/api/routes.py                        0      0      0      0   100%
+app/api/routes/__init__.py               0      0      0      0   100%
+app/api/routes/activities.py            65     24     14      1    56%   65, 191-221, 242-248, 268, 291-297, 315-317
+app/api/routes/assessments.py           30     13      6      0    47%   41, 62-68, 88, 111-117, 135-137
+app/api/routes/auth.py                  95     37     20      3    57%   105, 213-244, 275, 303-313, 344-375, 416, 424, 432-433
+app/api/routes/health.py                48     29      0      0    40%   39, 73-118, 146-156, 177, 204-219
+app/api/routes/students.py              35     12      6      0    56%   69-75, 95, 118-124, 142-144
+app/api/students.py                      0      0      0      0   100%
+app/api/teachers.py                      0      0      0      0   100%
+app/config.py                            0      0      0      0   100%
+app/core/__init__.py                     0      0      0      0   100%
+app/core/config.py                      45      1      2      1    96%   62
+app/core/database.py                    12      4      0      0    67%   24-28
+app/core/exceptions.py                 137     67     22      0    44%   25-28, 32, 49, 60, 70, 80, 90, 100-104, 119-123, 138, 145, 152, 159, 175-181, 192, 203, 213, 224, 239, 253, 268, 292-299, 310, 321, 332, 343, 358-362, 373, 383, 397, 416-420, 431, 445-449, 460, 480-497
+app/core/security.py                    37      8      6      2    72%   57, 79, 102-103, 116-120
+app/db/__init__.py                       3      0      0      0   100%
+app/db/base.py                          26      7      2      0    68%   62-67, 71, 78
+app/db/session.py                       27     15      0      0    44%   49-58, 68-75, 80-81
+app/main.py                             61      8      2      1    86%   48-49, 54, 171-172, 193, 224-226
+app/main_simple.py                      20     20      2      0     0%   6-92
+app/models/__init__.py                   5      0      0      0   100%
+app/models/activity.py                  36      2      0      0    94%   106, 110
+app/models/assessment.py                38      4      0      0    89%   153, 157, 171, 176
+app/models/behavior.py                   0      0      0      0   100%
+app/models/student.py                   21      0      0      0   100%
+app/models/user.py                      33      4      0      0    88%   119, 124, 129, 133
+app/schemas/__init__.py                  6      0      0      0   100%
+app/schemas/activity.py                 81      3      2      0    94%   63-65
+app/schemas/assessment.py               84      3      2      0    94%   86-88
+app/schemas/auth.py                     17     17      0      0     0%   7-38
+app/schemas/common.py                   81      1      0      0    99%   102
+app/schemas/student.py                  50      2      6      2    93%   38, 40
+app/schemas/user.py                    103     41     34      0    45%   84-101, 107-112, 197-214, 236-253
+app/services/__init__.py                 5      0      0      0   100%
+app/services/activity_service.py       112     85     26      0    20%   55-122, 146-172, 195-214, 241-270, 295-307, 327-332, 355-372
+app/services/assessment_service.py     126     98     34      0    18%   57-92, 115-135, 162-187, 208-222, 238-245, 272-335, 355-419
+app/services/aws_service.py              0      0      0      0   100%
+app/services/ml_service.py               0      0      0      0   100%
+app/services/nlp_service.py            149    104     10      0    28%   85-90, 116-172, 194-248, 270-326, 341-380, 389-423, 432-465, 481-492, 515-518, 528-542
+app/services/student_service.py         26      4      0      0    85%   81-84
+app/utils/__init__.py                    0      0      0      0   100%
+app/utils/constants.py                 128      5      0      0    96%   370, 375, 380, 385, 390
+app/utils/helpers.py                     0      0      0      0   100%
+app/utils/logger.py                     97     44     26      4    48%   28-52, 85, 126, 136-154, 187-188, 192-193, 207-208, 231-243, 263-271, 293-304, 330-341, 348->exit
+--------------------------------------------------------------------------------
+TOTAL                                 1868    668    226     16    59%
+Coverage HTML written to dir coverage/html
+Coverage XML written to file coverage/coverage.xml
+[31m[1mFAIL Required test coverage of 70% not reached. Total coverage: 58.55%
+[0m[36m[1m=========================== short test summary info ============================[0m
+[31mERROR[0m tests/integration/test_assessments_api.py::[1mTestAssessmentsAPI::test_create_assessment_success[0m - TypeError: 'teacher_id' is an invalid keyword argument for Activity
+[31mERROR[0m tests/integration/test_assessments_api.py::[1mTestAssessmentsAPI::test_create_assessment_without_auth[0m - TypeError: 'teacher_id' is an invalid keyword argument for Activity
+[31mERROR[0m tests/integration/test_assessments_api.py::[1mTestAssessmentsAPI::test_create_assessment_invalid_activity[0m - TypeError: 'teacher_id' is an invalid keyword argument for Activity
+[31mERROR[0m tests/integration/test_assessments_api.py::[1mTestAssessmentsAPI::test_create_assessment_minimal_data[0m - TypeError: 'teacher_id' is an invalid keyword argument for Activity
+[31mERROR[0m tests/integration/test_assessments_api.py::[1mTestAssessmentsAPI::test_get_assessment_by_id[0m - TypeError: 'teacher_id' is an invalid keyword argument for Activity
+[31mERROR[0m tests/integration/test_assessments_api.py::[1mTestAssessmentsAPI::test_list_assessments_by_student[0m - TypeError: 'teacher_id' is an invalid keyword argument for Activity
+[31mERROR[0m tests/integration/test_assessments_api.py::[1mTestAssessmentsAPI::test_update_assessment[0m - TypeError: 'teacher_id' is an invalid keyword argument for Activity
+[31mERROR[0m tests/integration/test_assessments_api.py::[1mTestAssessmentsAPI::test_create_assessment_with_skills_data[0m - TypeError: 'teacher_id' is an invalid keyword argument for Activity
+[31mERROR[0m tests/integration/test_assessments_api.py::[1mTestAssessmentsAPI::test_create_assessment_invalid_completion_status[0m - TypeError: 'teacher_id' is an invalid keyword argument for Activity
+[31mERROR[0m tests/integration/test_assessments_api.py::[1mTestAssessmentsAPI::test_create_assessment_negative_duration[0m - TypeError: 'teacher_id' is an invalid keyword argument for Activity
+[31mFAILED[0m tests/integration/test_assessments_api.py::[1mTestAssessmentsAPI::test_get_assessment_not_found[0m - assert 422 == 404
+[31m====== [31m[1m1 failed[0m, [32m15 passed[0m, [33m162 warnings[0m, [31m[1m10 errors[0m[31m in 262.29s (0:04:22)[0m[31m =======[0m
