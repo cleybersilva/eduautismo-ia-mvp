@@ -5,16 +5,19 @@ This module defines the FastAPI routes for student operations.
 """
 
 from typing import List
+from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from backend.app.core.database import get_db
-from backend.app.schemas.student import (
+from app.core.database import get_db
+from app.api.dependencies.auth import get_current_user
+from app.schemas.student import (
     StudentCreate,
     StudentUpdate,
     StudentResponse
 )
-from backend.app.services.student_service import StudentService
+from app.services.student_service import StudentService
+from app.core.exceptions import StudentNotFoundError, PermissionDeniedError
 
 
 router = APIRouter(
@@ -26,6 +29,7 @@ router = APIRouter(
 @router.post("/", response_model=StudentResponse, status_code=status.HTTP_201_CREATED)
 def create_student(
     student_data: StudentCreate,
+    current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db)
 ) -> StudentResponse:
     """
@@ -33,12 +37,15 @@ def create_student(
 
     Args:
         student_data: Student creation data
+        current_user: Current authenticated user
         db: Database session
 
     Returns:
         Created student object
     """
-    return StudentService.create(db, student_data)
+    teacher_id = UUID(current_user["user_id"])
+    student = StudentService.create_student(db, student_data, teacher_id)
+    return student
 
 
 @router.get("/{student_id}", response_model=StudentResponse)

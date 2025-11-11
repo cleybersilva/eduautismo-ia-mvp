@@ -11,13 +11,13 @@ from sqlalchemy import Date, ForeignKey, Integer, String, Text, Enum as SQLEnum,
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.db.base import BaseModel
-from backend.app.utils.constants import TEALevel
+from app.db.base import BaseModel
+from app.utils.constants import TEALevel
 
 if TYPE_CHECKING:
-    from backend.app.models.user import User
-    from backend.app.models.activity import Activity
-    from backend.app.models.assessment import Assessment
+    from app.models.user import User
+    from app.models.activity import Activity
+    from app.models.assessment import Assessment
 
 
 class Student(BaseModel):

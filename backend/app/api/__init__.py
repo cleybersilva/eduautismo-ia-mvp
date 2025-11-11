@@ -6,7 +6,7 @@ This module aggregates all API routes into a single router.
 
 from fastapi import APIRouter
 
-from backend.app.api.routes import health, auth, students, activities, assessments
+from app.api.routes import health, auth, students, activities, assessments
 
 # Create main API router
 api_router = APIRouter()

@@ -12,7 +12,7 @@ from typing import Dict, Any
 from datetime import datetime
 import asyncio
 
-from backend.app.core.database import get_db
+from app.core.database import get_db
 
 router = APIRouter(
     prefix="/health",

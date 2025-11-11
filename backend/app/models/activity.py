@@ -10,13 +10,13 @@ from sqlalchemy import ForeignKey, Integer, String, Text, Enum as SQLEnum, Boole
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.db.base import BaseModel
-from backend.app.utils.constants import ActivityType, DifficultyLevel
+from app.db.base import BaseModel
+from app.utils.constants import ActivityType, DifficultyLevel
 
 if TYPE_CHECKING:
-    from backend.app.models.student import Student
-    from backend.app.models.assessment import Assessment
-    from backend.app.models.user import User
+    from app.models.student import Student
+    from app.models.assessment import Assessment
+    from app.models.user import User
 
 
 class Activity(BaseModel):

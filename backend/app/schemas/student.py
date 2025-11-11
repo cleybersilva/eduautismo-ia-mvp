@@ -10,8 +10,8 @@ from uuid import UUID
 
 from pydantic import Field, field_validator
 
-from backend.app.schemas.common import BaseResponseSchema, BaseSchema
-from backend.app.utils.constants import TEALevel, MIN_STUDENT_AGE, MAX_STUDENT_AGE, MAX_INTERESTS_COUNT
+from app.schemas.common import BaseResponseSchema, BaseSchema
+from app.utils.constants import TEALevel, MIN_STUDENT_AGE, MAX_STUDENT_AGE, MAX_INTERESTS_COUNT
 
 
 class StudentCreate(BaseSchema):

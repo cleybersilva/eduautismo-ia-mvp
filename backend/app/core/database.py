@@ -8,10 +8,11 @@ from app.core.config import settings
 
 # PostgreSQL
 engine = create_engine(
-    settings.DATABASE_URL,
+    settings.DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://") if not settings.DATABASE_URL.startswith("postgresql+psycopg2") else settings.DATABASE_URL,
     pool_size=settings.DATABASE_POOL_SIZE,
     max_overflow=settings.DATABASE_MAX_OVERFLOW,
-    echo=settings.DEBUG
+    echo=settings.DEBUG,
+    pool_pre_ping=True
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

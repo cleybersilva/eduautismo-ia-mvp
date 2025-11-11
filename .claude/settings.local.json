@@ -18,7 +18,19 @@
       "Bash(fi)",
       "Bash(if [ -f backend/.env ])",
       "Bash(then echo \"✅ backend/.env existe\")",
-      "Bash(else echo \"❌ backend/.env NÃO existe\")"
+      "Bash(else echo \"❌ backend/.env NÃO existe\")",
+      "Bash(find:*)",
+      "Bash(curl:*)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwcm9mZXNzb3IudGVzdGUyQGVkdWF1dGlzbW8uY29tIiwidXNlcl9pZCI6IjQxMWQ0ZjFmLWRjOGItNDU4Mi05MjgzLWU5Y2Q1YTk0NmI3NiIsInJvbGUiOiJ0ZWFjaGVyIiwiZXhwIjoxNzYyODI4MzUwfQ.7lHIOqoeAv08TpLbtICu7pKAGqTy0Kpz-Dk3CTNzWKE\")",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwcm9mZXNzb3IudGVzdGUyQGVkdWF1dGlzbW8uY29tIiwidXNlcl9pZCI6IjQxMWQ0ZjFmLWRjOGItNDU4Mi05MjgzLWU5Y2Q1YTk0NmI3NiIsInJvbGUiOiJ0ZWFjaGVyIiwiZXhwIjoxNzYyODI4NjY3fQ.5bQ1847zKcXucnvyrbFxiA1pibghEBfn1BETMUHtnb8\")",
+      "Bash(docker exec:*)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwcm9mZXNzb3IudGVzdGUyQGVkdWF1dGlzbW8uY29tIiwidXNlcl9pZCI6IjQxMWQ0ZjFmLWRjOGItNDU4Mi05MjgzLWU5Y2Q1YTk0NmI3NiIsInJvbGUiOiJ0ZWFjaGVyIiwiZXhwIjoxNzYyODI4Nzk3fQ.c90ObMxBPKv55IfgxqV8ach2qF3LtA1S12FUgMi9m48\")",
+      "Bash(python -m pytest:*)",
+      "Bash(pip install:*)",
+      "Bash(tee:*)",
+      "Bash(pip uninstall:*)",
+      "Bash(python3.13:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

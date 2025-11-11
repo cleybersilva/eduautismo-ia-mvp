@@ -20,15 +20,15 @@ from alembic import context
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 # Import models and config
-from backend.app.core.config import settings
-from backend.app.db.base import Base
+from app.core.config import settings
+from app.db.base import Base
 
 # Import all models to ensure they're registered with Base.metadata
 # This is critical for autogenerate to work properly
-from backend.app.models.user import User
-from backend.app.models.student import Student
-from backend.app.models.activity import Activity
-from backend.app.models.assessment import Assessment
+from app.models.user import User
+from app.models.student import Student
+from app.models.activity import Activity
+from app.models.assessment import Assessment
 
 # Alembic Config object
 config = context.config

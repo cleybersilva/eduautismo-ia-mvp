@@ -8,13 +8,13 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from backend.app.core.database import get_db
-from backend.app.schemas.assessment import (
+from app.core.database import get_db
+from app.schemas.assessment import (
     AssessmentCreate,
     AssessmentUpdate,
     AssessmentResponse
 )
-from backend.app.services.assessment_service import AssessmentService
+from app.services.assessment_service import AssessmentService
 
 
 router = APIRouter(

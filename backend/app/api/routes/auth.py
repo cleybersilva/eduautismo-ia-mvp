@@ -14,15 +14,22 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from typing import Optional
 
-from backend.app.core.database import get_db
-from backend.app.core.security import (
+from app.core.database import get_db
+from app.core.security import (
     create_access_token,
     create_refresh_token,
     verify_password,
     get_password_hash,
     verify_token
 )
-from backend.app.models.user import User
+from app.models.user import User
+from app.schemas.user import (
+    UserResponse,
+    UserLogin,
+    PasswordReset,
+    PasswordResetConfirm
+)
+from app.schemas.common import Token, TokenRefresh
 
 router = APIRouter(
     prefix="/auth",
@@ -33,29 +40,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
 # ============================================================================
-# Pydantic Schemas (TODO: Move to schemas/auth.py)
+# Temporary Schema (TODO: Move to schemas/auth.py)
 # ============================================================================
 
 from pydantic import BaseModel, EmailStr, Field
-
-
-class Token(BaseModel):
-    """Access token response."""
-    access_token: str
-    token_type: str = "bearer"
-    expires_in: int  # seconds
-    refresh_token: Optional[str] = None
-
-
-class TokenRefresh(BaseModel):
-    """Token refresh request."""
-    refresh_token: str
-
-
-class UserLogin(BaseModel):
-    """User login credentials."""
-    email: EmailStr
-    password: str = Field(..., min_length=8)
 
 
 class UserRegister(BaseModel):
@@ -64,30 +52,6 @@ class UserRegister(BaseModel):
     password: str = Field(..., min_length=8)
     full_name: str = Field(..., min_length=2, max_length=100)
     role: str = Field(default="teacher")  # teacher, admin
-
-
-class PasswordReset(BaseModel):
-    """Password reset request."""
-    email: EmailStr
-
-
-class PasswordResetConfirm(BaseModel):
-    """Password reset confirmation."""
-    token: str
-    new_password: str = Field(..., min_length=8)
-
-
-class UserResponse(BaseModel):
-    """User response data."""
-    id: int
-    email: str
-    full_name: str
-    role: str
-    is_active: bool
-    created_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 # ============================================================================
@@ -147,13 +111,13 @@ async def login(
     # Create access token
     access_token_expires = timedelta(minutes=30)  # TODO: Get from config
     access_token = create_access_token(
-        data={"sub": user.email, "user_id": user.id, "role": user.role},
+        data={"sub": user.email, "user_id": str(user.id), "role": user.role},
         expires_delta=access_token_expires
     )
 
     # Create refresh token
     refresh_token = create_refresh_token(
-        data={"sub": user.email, "user_id": user.id}
+        data={"sub": user.email, "user_id": str(user.id)}
     )
 
     # Update last login
@@ -219,7 +183,7 @@ async def register(
     db.commit()
     db.refresh(new_user)
 
-    return UserResponse.from_orm(new_user)
+    return UserResponse.model_validate(new_user)
 
 
 @router.post("/refresh", response_model=Token, status_code=status.HTTP_200_OK)
@@ -266,7 +230,7 @@ async def refresh_token(
         # Create new access token
         access_token_expires = timedelta(minutes=30)
         access_token = create_access_token(
-            data={"sub": user.email, "user_id": user.id, "role": user.role},
+            data={"sub": user.email, "user_id": str(user.id), "role": user.role},
             expires_delta=access_token_expires
         )
 
@@ -463,7 +427,7 @@ async def get_current_user_info(
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        return UserResponse.from_orm(user)
+        return UserResponse.model_validate(user)
 
     except Exception as e:
         raise HTTPException(

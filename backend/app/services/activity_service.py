@@ -10,18 +10,18 @@ from uuid import UUID
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.core.exceptions import (
+from app.core.exceptions import (
     ActivityNotFoundError,
     StudentNotFoundError,
     PermissionDeniedError,
     OpenAIError,
 )
-from backend.app.models.activity import Activity
-from backend.app.models.student import Student
-from backend.app.schemas.activity import ActivityCreate, ActivityUpdate, ActivityGenerate
-from backend.app.services.nlp_service import get_nlp_service
-from backend.app.utils.constants import ActivityType, DifficultyLevel
-from backend.app.utils.logger import get_logger
+from app.models.activity import Activity
+from app.models.student import Student
+from app.schemas.activity import ActivityCreate, ActivityUpdate, ActivityGenerate
+from app.services.nlp_service import get_nlp_service
+from app.utils.constants import ActivityType, DifficultyLevel
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

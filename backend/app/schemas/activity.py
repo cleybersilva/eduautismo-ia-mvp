@@ -9,8 +9,8 @@ from uuid import UUID
 
 from pydantic import Field, field_validator
 
-from backend.app.schemas.common import BaseResponseSchema, BaseSchema
-from backend.app.utils.constants import (
+from app.schemas.common import BaseResponseSchema, BaseSchema
+from app.utils.constants import (
     ActivityType,
     DifficultyLevel,
     MIN_ACTIVITY_DURATION,

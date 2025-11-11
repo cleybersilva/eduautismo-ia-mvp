@@ -10,8 +10,8 @@ from uuid import UUID
 
 from pydantic import EmailStr, Field, field_validator
 
-from backend.app.schemas.common import BaseResponseSchema, BaseSchema
-from backend.app.utils.constants import (
+from app.schemas.common import BaseResponseSchema, BaseSchema
+from app.utils.constants import (
     UserRole,
     MIN_PASSWORD_LENGTH,
     MAX_PASSWORD_LENGTH,

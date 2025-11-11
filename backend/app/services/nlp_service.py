@@ -17,10 +17,10 @@ import asyncio
 from openai import AsyncOpenAI, OpenAIError as OpenAIAPIError
 from pydantic import BaseModel
 
-from backend.app.core.config import settings
-from backend.app.core.exceptions import OpenAIError, MissingConfigurationError
-from backend.app.utils.logger import get_logger, log_openai_request
-from backend.app.utils.constants import (
+from app.core.config import settings
+from app.core.exceptions import OpenAIError, MissingConfigurationError
+from app.utils.logger import get_logger, log_openai_request
+from app.utils.constants import (
     DEFAULT_OPENAI_MODEL,
     MAX_TOKENS_ACTIVITY_GENERATION,
     MAX_TOKENS_PROGRESS_ANALYSIS,

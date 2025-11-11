@@ -12,15 +12,11 @@ from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import time
 
-# Try different import paths for development flexibility
-try:
-    from backend.app.core.config import settings
-    from backend.app.core.database import engine, Base
-    from backend.app.api import api_router
-except ImportError:
-    from app.core.config import settings
-    from app.core.database import engine, Base
-    from app.api import api_router
+# Import configuration and dependencies
+from app.core.config import settings
+from app.core.database import engine
+from app.db.base import Base  # Use the Base where models are registered
+from app.api import api_router
 
 
 # ============================================================================
@@ -45,6 +41,12 @@ async def lifespan(app: FastAPI):
     print("🚀 Starting EduAutismo IA API")
     print(f"📍 Environment: {settings.ENVIRONMENT}")
     print(f"🔧 Debug Mode: {settings.DEBUG}")
+
+    # Import all models to ensure they're registered with Base
+    try:
+        from app.models import student, user, activity, assessment  # noqa
+    except Exception as e:
+        print(f"⚠️  Could not import models: {e}")
 
     # Create database tables
     try:

@@ -1,0 +1,321 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.3, pluggy-1.6.0 -- /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/backend
+plugins: anyio-3.7.1
+collecting ... collected 15 items
+
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_success ERROR [  6%]
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_without_auth ERROR [ 13%]
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_nonexistent_student ERROR [ 20%]
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_invalid_duration ERROR [ 26%]
+tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_multiple_activity_types ERROR [ 33%]
+tests/integration/test_auth_api.py::TestAuthAPI::test_register_user_success FAILED [ 40%]
+tests/integration/test_auth_api.py::TestAuthAPI::test_register_duplicate_email ERROR [ 46%]
+tests/integration/test_auth_api.py::TestAuthAPI::test_login_success ERROR [ 53%]
+tests/integration/test_auth_api.py::TestAuthAPI::test_login_invalid_credentials ERROR [ 60%]
+tests/integration/test_auth_api.py::TestAuthAPI::test_get_current_user ERROR [ 66%]
+tests/integration/test_auth_api.py::TestAuthAPI::test_unauthorized_access FAILED [ 73%]
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_success ERROR [ 80%]
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_without_auth PASSED [ 86%]
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_invalid_date ERROR [ 93%]
+tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_too_young ERROR [100%]
+
+==================================== ERRORS ====================================
+______ ERROR at setup of TestActivitiesAPI.test_generate_activity_success ______
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+    
+    [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)]
+    [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$OEi4m6w2qjGQn5EOh/YLrOtBBZMxQwmqFjdGnBA4OulMqQi/z3t.e', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('98531bdd-0368-475f-a0a7-17fac942faf6'), 'created_at': datetime.datetime(2025, 11, 11, 13, 52, 18, 853738), 'updated_at': datetime.datetime(2025, 11, 11, 13, 52, 18, 853747)}]
+    (Background on this error at: https://sqlalche.me/e/20/f405)
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+[33m[WARNING][0m - 2025-11-11 10:52:18 - passlib.handlers.bcrypt - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/venv/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+------------------------------ Captured log setup ------------------------------
+WARNING  passlib.handlers.bcrypt:bcrypt.py:622 (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/venv/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+___ ERROR at setup of TestActivitiesAPI.test_generate_activity_without_auth ____
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+    
+    [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)]
+    [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$dmUEWcm1NEvdUn3EXEfDd.DhgNB1GvXyrkeHYG2vny3GUG.qtx1K6', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('6dab5482-c885-4ec8-9c62-ed6908348f8f'), 'created_at': datetime.datetime(2025, 11, 11, 13, 52, 28, 954790), 'updated_at': datetime.datetime(2025, 11, 11, 13, 52, 28, 954797)}]
+    (Background on this error at: https://sqlalche.me/e/20/f405)
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+_ ERROR at setup of TestActivitiesAPI.test_generate_activity_nonexistent_student _
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+    
+    [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)]
+    [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$cLE9Hhod/QA6RXI8yOXVjOJE6l1Qjmn/8r473t43N21CIfFUgMWI2', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('c54f0b40-97f7-4be9-a654-6d60d02de170'), 'created_at': datetime.datetime(2025, 11, 11, 13, 52, 41, 150523), 'updated_at': datetime.datetime(2025, 11, 11, 13, 52, 41, 150532)}]
+    (Background on this error at: https://sqlalche.me/e/20/f405)
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+_ ERROR at setup of TestActivitiesAPI.test_generate_activity_invalid_duration __
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+    
+    [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)]
+    [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$JE9.Xa5lpaof.xaeYd39Eejudk2955/wH6yQtDMXfkNhXkRKgc6Zy', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('41f7bb1f-d5f7-48e1-8fe9-641c547ab94a'), 'created_at': datetime.datetime(2025, 11, 11, 13, 52, 51, 147254), 'updated_at': datetime.datetime(2025, 11, 11, 13, 52, 51, 147263)}]
+    (Background on this error at: https://sqlalche.me/e/20/f405)
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+__ ERROR at setup of TestActivitiesAPI.test_generate_multiple_activity_types ___
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+    
+    [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)]
+    [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$T.Jr2uCVPGhzTKgK4ZFDTOK.IgGgedXlZqtZdG6HLgoaaAoVgcwoK', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('5c104c4a-e271-4b6d-a533-9705aa313fc7'), 'created_at': datetime.datetime(2025, 11, 11, 13, 53, 3, 141452), 'updated_at': datetime.datetime(2025, 11, 11, 13, 53, 3, 141473)}]
+    (Background on this error at: https://sqlalche.me/e/20/f405)
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+_________ ERROR at setup of TestAuthAPI.test_register_duplicate_email __________
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+    
+    [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)]
+    [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$wnhVYQD9XPOaEXEoQI6UEegUi3WNiCLxRSICqvjVxQLdeqoVCPLf6', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('8a504138-9f68-4c49-924c-1de5e7ca8485'), 'created_at': datetime.datetime(2025, 11, 11, 13, 53, 23, 451440), 'updated_at': datetime.datetime(2025, 11, 11, 13, 53, 23, 451449)}]
+    (Background on this error at: https://sqlalche.me/e/20/f405)
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+_______________ ERROR at setup of TestAuthAPI.test_login_success _______________
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+    
+    [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)]
+    [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$yFVeqqnS0BaAYZPdkFx30OKtK.eGTMik.NNvi1VyyJXsDbb55Bid.', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('df723166-9029-4e09-9563-0399145b9cdd'), 'created_at': datetime.datetime(2025, 11, 11, 13, 53, 35, 617920), 'updated_at': datetime.datetime(2025, 11, 11, 13, 53, 35, 617930)}]
+    (Background on this error at: https://sqlalche.me/e/20/f405)
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+_________ ERROR at setup of TestAuthAPI.test_login_invalid_credentials _________
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+    
+    [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)]
+    [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$a4IqYj0yT3grMPrk6K8P0OOpEvmweJvSRmjZgKnJzXJVGBW4eNUJS', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('a5649852-4d4a-4c90-a185-0f8eb8612a1f'), 'created_at': datetime.datetime(2025, 11, 11, 13, 53, 45, 275410), 'updated_at': datetime.datetime(2025, 11, 11, 13, 53, 45, 275424)}]
+    (Background on this error at: https://sqlalche.me/e/20/f405)
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+_____________ ERROR at setup of TestAuthAPI.test_get_current_user ______________
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+    
+    [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)]
+    [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$zU/7p/gv5CnhSAj.xp2Qa.P6egNf4MuVTe85mv9sGZi/9jbbHm3OW', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('c7a0f79d-0a0c-410f-9516-7234080085f9'), 'created_at': datetime.datetime(2025, 11, 11, 13, 53, 56, 970036), 'updated_at': datetime.datetime(2025, 11, 11, 13, 53, 56, 970043)}]
+    (Background on this error at: https://sqlalche.me/e/20/f405)
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+________ ERROR at setup of TestStudentsAPI.test_create_student_success _________
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+    
+    [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)]
+    [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$ikFwe6Z0yDq57h94qWtYceLnkrLwWzDHx3B0GR7piHPC230boWYzC', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('a6fb71ec-0e76-4b3d-b0df-0de2c50a279b'), 'created_at': datetime.datetime(2025, 11, 11, 13, 54, 15, 350607), 'updated_at': datetime.datetime(2025, 11, 11, 13, 54, 15, 350636)}]
+    (Background on this error at: https://sqlalche.me/e/20/f405)
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+______ ERROR at setup of TestStudentsAPI.test_create_student_invalid_date ______
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+    
+    [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)]
+    [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$dFMn9OIduVbDfnaEx.M1P.oA/DjHZIBJtP1PWqlwRSGxRtdOF20Ku', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('26607fc7-6252-4b45-8e33-0a8b38492372'), 'created_at': datetime.datetime(2025, 11, 11, 13, 54, 35, 922694), 'updated_at': datetime.datetime(2025, 11, 11, 13, 54, 35, 922700)}]
+    (Background on this error at: https://sqlalche.me/e/20/f405)
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+_______ ERROR at setup of TestStudentsAPI.test_create_student_too_young ________
+E   psycopg2.errors.UndefinedTable: relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+
+The above exception was the direct cause of the following exception:
+E   sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+    LINE 1: INSERT INTO users (email, hashed_password, full_name, role, ...
+                        ^
+    
+    [SQL: INSERT INTO users (email, hashed_password, full_name, role, is_active, is_verified, phone, avatar_url, bio, institution, last_login, reset_token, reset_token_expires, verification_token, id, created_at, updated_at) VALUES (%(email)s, %(hashed_password)s, %(full_name)s, %(role)s, %(is_active)s, %(is_verified)s, %(phone)s, %(avatar_url)s, %(bio)s, %(institution)s, %(last_login)s, %(reset_token)s, %(reset_token_expires)s, %(verification_token)s, %(id)s::UUID, %(created_at)s, %(updated_at)s)]
+    [parameters: {'email': 'test@example.com', 'hashed_password': '$2b$12$G7ptP1ppocWhIiw3ERqFrOMfyN2AAi6f40SrHjLtInSx7QJ1M1vMG', 'full_name': 'Test User', 'role': 'TEACHER', 'is_active': True, 'is_verified': True, 'phone': None, 'avatar_url': None, 'bio': None, 'institution': None, 'last_login': None, 'reset_token': None, 'reset_token_expires': None, 'verification_token': None, 'id': UUID('e0511768-3df2-45ca-bbce-9c59ba4aff27'), 'created_at': datetime.datetime(2025, 11, 11, 13, 54, 47, 674647), 'updated_at': datetime.datetime(2025, 11, 11, 13, 54, 47, 674653)}]
+    (Background on this error at: https://sqlalche.me/e/20/f405)
+---------------------------- Captured stdout setup -----------------------------
+🚀 Starting EduAutismo IA API
+📍 Environment: development
+🔧 Debug Mode: True
+⚠️  Database initialization warning: (psycopg2.OperationalError) could not translate host name "postgres" to address: Temporary failure in name resolution
+
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+=================================== FAILURES ===================================
+/mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py:922: sqlalchemy.exc.ProgrammingError: (psycopg2.errors.UndefinedTable) relation "users" does not exist
+/mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/backend/tests/integration/test_auth_api.py:92: assert 401 == 403
+=============================== warnings summary ===============================
+../venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:268
+../venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:268
+  /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:268: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+app/core/database.py:20
+  /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/backend/app/core/database.py:20: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+app/db/base.py:18
+  /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/backend/app/db/base.py:18: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+../venv/lib/python3.12/site-packages/passlib/utils/__init__.py:854
+  /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/venv/lib/python3.12/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+tests/integration/test_activities_api.py: 10 warnings
+tests/integration/test_auth_api.py: 8 warnings
+tests/integration/test_students_api.py: 6 warnings
+  /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/venv/lib/python3.12/site-packages/sqlalchemy/sql/schema.py:3592: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_auth_api.py::TestAuthAPI::test_register_user_success
+FAILED tests/integration/test_auth_api.py::TestAuthAPI::test_unauthorized_access
+ERROR tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_success
+ERROR tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_without_auth
+ERROR tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_nonexistent_student
+ERROR tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_activity_invalid_duration
+ERROR tests/integration/test_activities_api.py::TestActivitiesAPI::test_generate_multiple_activity_types
+ERROR tests/integration/test_auth_api.py::TestAuthAPI::test_register_duplicate_email
+ERROR tests/integration/test_auth_api.py::TestAuthAPI::test_login_success - s...
+ERROR tests/integration/test_auth_api.py::TestAuthAPI::test_login_invalid_credentials
+ERROR tests/integration/test_auth_api.py::TestAuthAPI::test_get_current_user
+ERROR tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_success
+ERROR tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_invalid_date
+ERROR tests/integration/test_students_api.py::TestStudentsAPI::test_create_student_too_young
+======= 2 failed, 1 passed, 29 warnings, 12 errors in 161.49s (0:02:41) ========

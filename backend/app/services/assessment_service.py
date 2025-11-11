@@ -10,20 +10,20 @@ from uuid import UUID
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.core.exceptions import (
+from app.core.exceptions import (
     AssessmentNotFoundError,
     ActivityNotFoundError,
     StudentNotFoundError,
     PermissionDeniedError,
     OpenAIError,
 )
-from backend.app.models.assessment import Assessment
-from backend.app.models.activity import Activity
-from backend.app.models.student import Student
-from backend.app.schemas.assessment import AssessmentCreate, AssessmentUpdate
-from backend.app.services.nlp_service import get_nlp_service
-from backend.app.utils.constants import CompletionStatus, EngagementLevel, DifficultyRating
-from backend.app.utils.logger import get_logger
+from app.models.assessment import Assessment
+from app.models.activity import Activity
+from app.models.student import Student
+from app.schemas.assessment import AssessmentCreate, AssessmentUpdate
+from app.services.nlp_service import get_nlp_service
+from app.utils.constants import CompletionStatus, EngagementLevel, DifficultyRating
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

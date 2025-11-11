@@ -17,7 +17,7 @@ import json
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 
-from backend.app.core.config import settings
+from app.core.config import settings
 
 
 class JSONFormatter(logging.Formatter):
@@ -122,7 +122,7 @@ def setup_logging(
     console_handler.setLevel(level)
 
     # Use JSON formatter in production, colored formatter in development
-    if json_logs or settings.ENV == "production":
+    if json_logs or settings.ENVIRONMENT == "production":
         console_formatter = JSONFormatter()
     else:
         console_formatter = ColoredFormatter()
@@ -131,7 +131,7 @@ def setup_logging(
     root_logger.addHandler(console_handler)
 
     # File handler (if log file specified or in production)
-    if log_file or settings.ENV == "production":
+    if log_file or settings.ENVIRONMENT == "production":
         # Create logs directory if it doesn't exist
         log_dir = Path("logs")
         log_dir.mkdir(exist_ok=True)
@@ -162,8 +162,8 @@ def setup_logging(
     # Log initial message
     logger = logging.getLogger(__name__)
     logger.info(
-        f"Logging configured: level={level_name}, env={settings.ENV}, "
-        f"json_logs={json_logs or settings.ENV == 'production'}"
+        f"Logging configured: level={level_name}, env={settings.ENVIRONMENT}, "
+        f"json_logs={json_logs or settings.ENVIRONMENT == 'production'}"
     )
 
 

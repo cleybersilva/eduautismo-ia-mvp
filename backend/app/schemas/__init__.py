@@ -5,7 +5,7 @@ Exports all Pydantic schemas for API validation.
 """
 
 # Common schemas
-from backend.app.schemas.common import (
+from app.schemas.common import (
     BaseSchema,
     BaseResponseSchema,
     TimestampSchema,
@@ -33,7 +33,7 @@ from backend.app.schemas.common import (
 )
 
 # User schemas
-from backend.app.schemas.user import (
+from app.schemas.user import (
     UserRegister,
     UserLogin,
     UserUpdate,
@@ -47,7 +47,7 @@ from backend.app.schemas.user import (
 )
 
 # Student schemas
-from backend.app.schemas.student import (
+from app.schemas.student import (
     StudentCreate,
     StudentUpdate,
     StudentResponse,
@@ -55,7 +55,7 @@ from backend.app.schemas.student import (
 )
 
 # Activity schemas
-from backend.app.schemas.activity import (
+from app.schemas.activity import (
     ActivityGenerate,
     ActivityCreate,
     ActivityUpdate,
@@ -65,7 +65,7 @@ from backend.app.schemas.activity import (
 )
 
 # Assessment schemas
-from backend.app.schemas.assessment import (
+from app.schemas.assessment import (
     AssessmentCreate,
     AssessmentUpdate,
     AssessmentResponse,

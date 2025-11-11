@@ -10,11 +10,11 @@ from typing import TYPE_CHECKING, List
 from sqlalchemy import Boolean, String, Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from backend.app.db.base import BaseModel
-from backend.app.utils.constants import UserRole
+from app.db.base import BaseModel
+from app.utils.constants import UserRole
 
 if TYPE_CHECKING:
-    from backend.app.models.student import Student
+    from app.models.student import Student
 
 
 class User(BaseModel):
