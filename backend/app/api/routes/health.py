@@ -9,10 +9,11 @@ import asyncio
 from datetime import datetime
 from typing import Any, Dict
 
-from app.core.database import get_db
 from fastapi import APIRouter, Depends, status
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+
+from app.core.database import get_db
 
 router = APIRouter(prefix="/health", tags=["health"])
 

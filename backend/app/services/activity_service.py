@@ -7,6 +7,9 @@ Business logic for activity management and AI generation.
 from typing import List, Optional
 from uuid import UUID
 
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.exceptions import ActivityNotFoundError, OpenAIError, PermissionDeniedError, StudentNotFoundError
 from app.models.activity import Activity
 from app.models.student import Student
@@ -14,8 +17,6 @@ from app.schemas.activity import ActivityCreate, ActivityGenerate, ActivityUpdat
 from app.services.nlp_service import get_nlp_service
 from app.utils.constants import ActivityType, DifficultyLevel
 from app.utils.logger import get_logger
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = get_logger(__name__)
 

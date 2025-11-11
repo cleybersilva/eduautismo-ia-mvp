@@ -5,9 +5,10 @@ Security utilities for authentication and authorization.
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 
-from app.core.config import settings
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+
+from app.core.config import settings
 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

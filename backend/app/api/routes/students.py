@@ -7,12 +7,13 @@ This module defines the FastAPI routes for student operations.
 from typing import List
 from uuid import UUID
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
 from app.api.dependencies.auth import get_current_user
 from app.core.database import get_db
 from app.schemas.student import StudentCreate, StudentResponse, StudentUpdate
 from app.services.student_service import StudentService
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/students", tags=["students"])
 

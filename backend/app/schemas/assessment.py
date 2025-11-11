@@ -7,9 +7,10 @@ Request and response schemas for assessment-related endpoints.
 from typing import Any, Dict, Optional
 from uuid import UUID
 
+from pydantic import Field, field_validator
+
 from app.schemas.common import BaseResponseSchema, BaseSchema
 from app.utils.constants import MAX_NOTES_LENGTH, CompletionStatus, DifficultyRating, EngagementLevel
-from pydantic import Field, field_validator
 
 
 class AssessmentCreate(BaseSchema):

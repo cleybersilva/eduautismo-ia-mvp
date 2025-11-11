@@ -7,6 +7,9 @@ This module defines the FastAPI routes for activity operations.
 from typing import List
 from uuid import UUID
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
 from app.api.dependencies.auth import get_current_user
 from app.core.database import get_db
 from app.models.activity import Activity
@@ -14,8 +17,6 @@ from app.models.student import Student
 from app.schemas.activity import ActivityCreate, ActivityGenerate, ActivityResponse, ActivityUpdate
 from app.services.activity_service import ActivityService
 from app.utils.logger import get_logger
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)
 

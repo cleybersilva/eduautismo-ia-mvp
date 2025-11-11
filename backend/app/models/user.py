@@ -7,12 +7,13 @@ Represents system users (teachers, admins, parents, therapists).
 from datetime import datetime
 from typing import TYPE_CHECKING, List
 
-from app.db.base import BaseModel
-from app.utils.constants import UserRole
 from sqlalchemy import Boolean
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.db.base import BaseModel
+from app.utils.constants import UserRole
 
 if TYPE_CHECKING:
     from app.models.student import Student

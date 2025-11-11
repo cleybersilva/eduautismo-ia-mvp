@@ -6,13 +6,14 @@ Represents educational activities generated for students.
 
 from typing import TYPE_CHECKING, Any, Dict, List
 
-from app.db.base import BaseModel
-from app.utils.constants import ActivityType, DifficultyLevel
 from sqlalchemy import Boolean
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.db.base import BaseModel
+from app.utils.constants import ActivityType, DifficultyLevel
 
 if TYPE_CHECKING:
     from app.models.assessment import Assessment

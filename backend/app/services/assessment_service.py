@@ -7,6 +7,8 @@ Business logic for assessment management and progress analysis.
 from typing import List, Optional
 from uuid import UUID
 
+from sqlalchemy.orm import Session
+
 from app.core.exceptions import (
     ActivityNotFoundError,
     AssessmentNotFoundError,
@@ -18,7 +20,6 @@ from app.models.assessment import Assessment
 from app.models.student import Student
 from app.schemas.assessment import AssessmentCreate, AssessmentUpdate
 from app.utils.logger import get_logger
-from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)
 

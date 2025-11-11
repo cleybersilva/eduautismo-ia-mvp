@@ -7,13 +7,14 @@ Represents students with autism spectrum disorder (TEA).
 from datetime import date
 from typing import TYPE_CHECKING, Any, Dict, List
 
-from app.db.base import BaseModel
-from app.utils.constants import TEALevel
 from sqlalchemy import Boolean, Date
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.db.base import BaseModel
+from app.utils.constants import TEALevel
 
 if TYPE_CHECKING:
     from app.models.activity import Activity

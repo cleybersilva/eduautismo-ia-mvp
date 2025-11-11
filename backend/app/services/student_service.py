@@ -7,10 +7,11 @@ Business logic for student management.
 from datetime import date
 from uuid import UUID
 
+from sqlalchemy.orm import Session
+
 from app.models.student import Student
 from app.schemas.student import StudentCreate
 from app.utils.logger import get_logger
-from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)
 

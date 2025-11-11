@@ -4,8 +4,9 @@ API package initialization.
 This module aggregates all API routes into a single router.
 """
 
-from app.api.routes import activities, assessments, auth, health, students
 from fastapi import APIRouter
+
+from app.api.routes import activities, assessments, auth, health, students
 
 # Create main API router
 api_router = APIRouter()

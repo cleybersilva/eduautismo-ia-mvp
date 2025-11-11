@@ -9,15 +9,16 @@ import os
 from typing import Generator
 
 import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
+
 from app.core.database import get_db
 from app.core.security import get_password_hash
 from app.db.base import Base  # Use the correct Base
 from app.main import app
 from app.models.student import Student
 from app.models.user import User
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
 
 # Test database URL - use separate test database
 # Use 'postgres' hostname when running inside Docker, 'localhost' otherwise

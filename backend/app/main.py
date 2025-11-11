@@ -8,16 +8,17 @@ It configures the FastAPI application with middleware, exception handlers, and r
 import time
 from contextlib import asynccontextmanager
 
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
+
 from app.api import api_router
 
 # Import configuration and dependencies
 from app.core.config import settings
 from app.core.database import engine
 from app.db.base import Base  # Use the Base where models are registered
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
 
 # ============================================================================
 # Lifecycle Management

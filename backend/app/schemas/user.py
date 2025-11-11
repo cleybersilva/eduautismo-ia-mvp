@@ -7,9 +7,10 @@ Request and response schemas for user-related endpoints.
 from datetime import datetime
 from typing import Optional
 
+from pydantic import EmailStr, Field, field_validator
+
 from app.schemas.common import BaseResponseSchema, BaseSchema
 from app.utils.constants import MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, UserRole
-from pydantic import EmailStr, Field, field_validator
 
 # ============================================================================
 # Request Schemas

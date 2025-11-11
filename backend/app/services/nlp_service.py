@@ -13,6 +13,10 @@ import json
 import time
 from typing import Any, Dict, List, Optional
 
+from openai import AsyncOpenAI
+from openai import OpenAIError as OpenAIAPIError
+from pydantic import BaseModel
+
 from app.core.config import settings
 from app.core.exceptions import MissingConfigurationError, OpenAIError
 from app.utils.constants import (
@@ -30,9 +34,6 @@ from app.utils.constants import (
     DifficultyLevel,
 )
 from app.utils.logger import get_logger, log_openai_request
-from openai import AsyncOpenAI
-from openai import OpenAIError as OpenAIAPIError
-from pydantic import BaseModel
 
 logger = get_logger(__name__)
 

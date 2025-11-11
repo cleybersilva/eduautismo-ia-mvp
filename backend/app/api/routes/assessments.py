@@ -7,6 +7,9 @@ This module defines the FastAPI routes for assessment operations.
 from typing import List, Optional
 from uuid import UUID
 
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy.orm import Session
+
 from app.api.dependencies.auth import get_current_user
 from app.core.database import get_db
 from app.core.exceptions import (
@@ -17,8 +20,6 @@ from app.core.exceptions import (
 )
 from app.schemas.assessment import AssessmentCreate, AssessmentResponse, AssessmentUpdate
 from app.services.assessment_service import AssessmentService
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/assessments", tags=["assessments"])
 

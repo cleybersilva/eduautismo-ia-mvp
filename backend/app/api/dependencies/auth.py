@@ -6,11 +6,12 @@ This module provides dependency injection functions for FastAPI routes.
 
 from typing import Generator
 
-from app.core.database import SessionLocal
-from app.core.security import verify_token
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
+
+from app.core.database import SessionLocal
+from app.core.security import verify_token
 
 security = HTTPBearer()
 

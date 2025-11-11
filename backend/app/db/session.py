@@ -6,11 +6,12 @@ Synchronous database session management with SQLAlchemy.
 
 from typing import Generator
 
-from app.core.config import settings
-from app.utils.logger import get_logger
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import NullPool
+
+from app.core.config import settings
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
