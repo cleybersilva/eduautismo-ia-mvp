@@ -235,7 +235,7 @@ class ActivityService:
             query = query.where(Activity.difficulty == difficulty)
 
         # Only published activities
-        query = query.where(Activity.is_published == True)
+        query = query.where(Activity.is_published.is_(True))
 
         # Count
         count_query = select(func.count()).select_from(query.subquery())
@@ -337,7 +337,7 @@ class ActivityService:
         if teacher_id:
             query = query.join(Student).where(Student.teacher_id == teacher_id)
 
-        query = query.where(Activity.is_published == True)
+        query = query.where(Activity.is_published.is_(True))
 
         # Count
         count_query = select(func.count()).select_from(query.subquery())

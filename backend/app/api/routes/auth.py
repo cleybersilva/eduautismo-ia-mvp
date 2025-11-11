@@ -10,6 +10,11 @@ This module provides authentication and authorization endpoints including:
 
 from datetime import datetime, timedelta
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from pydantic import BaseModel, EmailStr, Field
+from sqlalchemy.orm import Session
+
 from app.core.database import get_db
 from app.core.security import (
     create_access_token,
@@ -21,9 +26,6 @@ from app.core.security import (
 from app.models.user import User
 from app.schemas.common import Token, TokenRefresh
 from app.schemas.user import PasswordReset, PasswordResetConfirm, UserResponse
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
@@ -33,8 +35,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 # ============================================================================
 # Temporary Schema (TODO: Move to schemas/auth.py)
 # ============================================================================
-
-from pydantic import BaseModel, EmailStr, Field
 
 
 class UserRegister(BaseModel):

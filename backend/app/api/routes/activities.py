@@ -12,6 +12,7 @@ from app.core.database import get_db
 from app.models.activity import Activity
 from app.models.student import Student
 from app.schemas.activity import ActivityCreate, ActivityGenerate, ActivityResponse, ActivityUpdate
+from app.services.activity_service import ActivityService
 from app.utils.logger import get_logger
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
