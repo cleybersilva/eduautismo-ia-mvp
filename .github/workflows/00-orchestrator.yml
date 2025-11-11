@@ -1,0 +1,395 @@
+name: "🎼 CI/CD Orchestrator: Sequential Pipeline"name: "🎼 CI/CD Orchestrator: Sequential Pipeline"
+
+
+
+on:on:
+
+  push:  push:
+
+    branches: [main, develop]    branches: [main, develop]
+
+  pull_request:  pull_request:
+
+    branches: [main, develop]    branches: [main, develop]
+
+  schedule:
+
+permissions:    - cron: "0 2 * * *"  # Daily at 2 AM UTC
+
+  contents: read
+
+  pull-requests: writepermissions:
+
+  security-events: write  contents: read
+
+  packages: write  pull-requests: write
+
+  security-events: write
+
+concurrency:  packages: write
+
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+  cancel-in-progress: trueconcurrency:
+
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:  cancel-in-progress: true
+
+  # ============================================================================
+
+  # Stage 1: Security Scanningjobs:
+
+  # ============================================================================  # ============================================================================
+
+  security-scan:  # Stage 1: Security Scanning
+
+    name: "🔒 Stage 1: Security Scanning"  # ============================================================================
+
+    runs-on: ubuntu-latest  security-scan:
+
+        name: "🔒 Stage 1: Security Scanning"
+
+    steps:    uses: ./.github/workflows/01-security-scan.yml
+
+      - name: Checkout code    secrets: inherit
+
+        uses: actions/checkout@v4
+
+        with:  # ============================================================================
+
+          fetch-depth: 0  # Stage 2: Backend Tests (depends on security scan)
+
+        # ============================================================================
+
+      - name: Trigger Security Scan Workflow  backend-tests:
+
+        run: |    name: "🧪 Stage 2: Backend Tests"
+
+          echo "🔒 Starting Security Scanning..."    needs: security-scan
+
+          echo "- Secrets scanning (Gitleaks, TruffleHog)"    uses: ./.github/workflows/02-backend-tests.yml
+
+          echo "- Dependency checks (Safety, pip-audit, npm audit)"    secrets: inherit
+
+          echo "- License compliance scan"
+
+          echo "- SAST scanning (Bandit, ESLint)"  # ============================================================================
+
+  # Stage 3: Frontend Tests (depends on backend tests)
+
+  # ============================================================================  # ============================================================================
+
+  # Stage 2: Backend Tests (depends on security scan)  frontend-tests:
+
+  # ============================================================================    name: "🎨 Stage 3: Frontend Tests"
+
+  backend-tests:    needs: backend-tests
+
+    name: "🧪 Stage 2: Backend Tests"    uses: ./.github/workflows/03-frontend-tests.yml
+
+    needs: security-scan    secrets: inherit
+
+    runs-on: ubuntu-latest
+
+      # ============================================================================
+
+    steps:  # Stage 4: Container Scan (depends on frontend tests)
+
+      - name: Checkout code  # ============================================================================
+
+        uses: actions/checkout@v4  container-scan:
+
+          name: "🐳 Stage 4: Container Scan"
+
+      - name: Trigger Backend Tests Workflow    needs: frontend-tests
+
+        run: |    uses: ./.github/workflows/04-container-scan.yml
+
+          echo "🧪 Starting Backend Tests..."    secrets: inherit
+
+          echo "- Lint (Black, isort, flake8, mypy)"
+
+          echo "- Unit & Integration Tests"  # ============================================================================
+
+          echo "- Coverage reporting"  # Stage 5: Build & Push (depends on container scan)
+
+  # ============================================================================
+
+  # ============================================================================  build-and-push:
+
+  # Stage 3: Frontend Tests (depends on backend tests)    name: "🚀 Stage 5: Build & Push"
+
+  # ============================================================================    needs: container-scan
+
+  frontend-tests:    uses: ./.github/workflows/05-build-and-push.yml
+
+    name: "🎨 Stage 3: Frontend Tests"    secrets: inherit
+
+    needs: backend-tests
+
+    runs-on: ubuntu-latest  # ============================================================================
+
+      # Final: Pipeline Status Report
+
+    steps:  # ============================================================================
+
+      - name: Checkout code  pipeline-status:
+
+        uses: actions/checkout@v4    name: "✅ Pipeline Complete"
+
+          runs-on: ubuntu-latest
+
+      - name: Trigger Frontend Tests Workflow    needs: [security-scan, backend-tests, frontend-tests, container-scan, build-and-push]
+
+        run: |    if: always()
+
+          echo "🎨 Starting Frontend Tests..."    
+
+          echo "- Lint & Format (ESLint, Prettier)"    steps:
+
+          echo "- Unit Tests (Vitest)"      - name: Check workflow status
+
+          echo "- Build verification"        run: |
+
+          if [ "${{ needs.security-scan.result }}" == "success" ] && \
+
+  # ============================================================================             [ "${{ needs.backend-tests.result }}" == "success" ] && \
+
+  # Stage 4: Container Scan (depends on frontend tests)             [ "${{ needs.frontend-tests.result }}" == "success" ] && \
+
+  # ============================================================================             [ "${{ needs.container-scan.result }}" == "success" ] && \
+
+  container-scan:             [ "${{ needs.build-and-push.result }}" == "success" ]; then
+
+    name: "🐳 Stage 4: Container Scan"            echo "✅ All pipeline stages completed successfully!"
+
+    needs: frontend-tests            exit 0
+
+    runs-on: ubuntu-latest          else
+
+                echo "❌ Pipeline failed at one or more stages"
+
+    steps:            echo ""
+
+      - name: Checkout code            echo "Stage Results:"
+
+        uses: actions/checkout@v4            echo "  🔒 Security Scan: ${{ needs.security-scan.result }}"
+
+                  echo "  🧪 Backend Tests: ${{ needs.backend-tests.result }}"
+
+      - name: Trigger Container Scan Workflow            echo "  🎨 Frontend Tests: ${{ needs.frontend-tests.result }}"
+
+        run: |            echo "  🐳 Container Scan: ${{ needs.container-scan.result }}"
+
+          echo "🐳 Starting Container Scan..."            echo "  🚀 Build & Push: ${{ needs.build-and-push.result }}"
+
+          echo "- Build container images"            exit 1
+
+          echo "- Vulnerability scan (Trivy, Grype)"          fi
+
+          echo "- SBOM generation (Syft)"      
+
+      - name: Comment PR with pipeline status
+
+  # ============================================================================        if: github.event_name == 'pull_request' && always()
+
+  # Stage 5: Build & Push (depends on container scan)        uses: actions/github-script@v7
+
+  # ============================================================================        with:
+
+  build-and-push:          script: |
+
+    name: "🚀 Stage 5: Build & Push"            const status = context.payload.pull_request.head.sha;
+
+    needs: container-scan            const stages = [
+
+    if: github.event_name == 'push'              { name: '🔒 Security Scan', result: '${{ needs.security-scan.result }}' },
+
+    runs-on: ubuntu-latest              { name: '🧪 Backend Tests', result: '${{ needs.backend-tests.result }}' },
+
+                  { name: '🎨 Frontend Tests', result: '${{ needs.frontend-tests.result }}' },
+
+    steps:              { name: '🐳 Container Scan', result: '${{ needs.container-scan.result }}' },
+
+      - name: Checkout code              { name: '🚀 Build & Push', result: '${{ needs.build-and-push.result }}' }
+
+        uses: actions/checkout@v4            ];
+
+                  
+
+      - name: Trigger Build & Push Workflow            let body = '## 🎼 CI/CD Pipeline Status\n\n';
+
+        run: |            body += '| Stage | Status |\n';
+
+          echo "🚀 Starting Build & Push..."            body += '|-------|--------|\n';
+
+          echo "- Build and push to registry"            
+
+          echo "- Generate software bill of materials"            let allSuccess = true;
+
+            for (const stage of stages) {
+
+  # ============================================================================              const icon = stage.result === 'success' ? '✅' : '❌';
+
+  # Final: Pipeline Status Report              body += `| ${stage.name} | ${icon} ${stage.result.toUpperCase()} |\n`;
+
+  # ============================================================================              if (stage.result !== 'success') allSuccess = false;
+
+  pipeline-status:            }
+
+    name: "✅ Pipeline Complete"            
+
+    runs-on: ubuntu-latest            if (allSuccess) {
+
+    needs: [security-scan, backend-tests, frontend-tests, container-scan]              body += '\n🎉 **All stages passed!**';
+
+    if: always()            } else {
+
+                  body += '\n⚠️ **Some stages failed. Please check the workflow logs.**';
+
+    steps:            }
+
+      - name: Check workflow status            
+
+        run: |            github.rest.issues.createComment({
+
+          if [ "${{ needs.security-scan.result }}" == "success" ] && \              issue_number: context.issue.number,
+
+             [ "${{ needs.backend-tests.result }}" == "success" ] && \              owner: context.repo.owner,
+
+             [ "${{ needs.frontend-tests.result }}" == "success" ] && \              repo: context.repo.repo,
+
+             [ "${{ needs.container-scan.result }}" == "success" ]; then              body: body
+
+            echo "✅ All pipeline stages completed successfully!"            });
+
+            exit 0
+
+          else# ============================================================================
+
+            echo "❌ Pipeline failed at one or more stages"# Pipeline Flow Documentation
+
+            echo ""# ============================================================================
+
+            echo "Stage Results:"# 
+
+            echo "  🔒 Security Scan: ${{ needs.security-scan.result }}"# This orchestrator workflow ensures sequential execution of all CI/CD stages:
+
+            echo "  🧪 Backend Tests: ${{ needs.backend-tests.result }}"#
+
+            echo "  🎨 Frontend Tests: ${{ needs.frontend-tests.result }}"# 1. 🔒 SECURITY SCAN (01-security-scan.yml)
+
+            echo "  🐳 Container Scan: ${{ needs.container-scan.result }}"#    └─ Secrets scanning (Gitleaks, TruffleHog)
+
+            exit 1#    └─ Dependency checks (Safety, pip-audit, npm audit)
+
+          fi#    └─ License compliance scan
+
+      #    └─ SAST scanning (Bandit, ESLint)
+
+      - name: Comment PR with pipeline status#    
+
+        if: github.event_name == 'pull_request' && always()# 2. 🧪 BACKEND TESTS (02-backend-tests.yml) [depends on Stage 1]
+
+        uses: actions/github-script@v7#    └─ Lint (Black, isort, flake8, mypy)
+
+        with:#    └─ Unit & Integration Tests
+
+          script: |#    └─ Coverage reporting
+
+            const stages = [#    
+
+              { name: '🔒 Security Scan', result: '${{ needs.security-scan.result }}' },# 3. 🎨 FRONTEND TESTS (03-frontend-tests.yml) [depends on Stage 2]
+
+              { name: '🧪 Backend Tests', result: '${{ needs.backend-tests.result }}' },#    └─ Lint & Format (ESLint, Prettier)
+
+              { name: '🎨 Frontend Tests', result: '${{ needs.frontend-tests.result }}' },#    └─ Unit Tests (Vitest)
+
+              { name: '🐳 Container Scan', result: '${{ needs.container-scan.result }}' }#    └─ Build verification
+
+            ];#    
+
+            # 4. 🐳 CONTAINER SCAN (04-container-scan.yml) [depends on Stage 3]
+
+            let body = '## 🎼 CI/CD Pipeline Status\n\n';#    └─ Build container images
+
+            body += '| Stage | Status |\n';#    └─ Vulnerability scan (Trivy, Grype)
+
+            body += '|-------|--------|\n';#    └─ SBOM generation (Syft)
+
+            #    
+
+            let allSuccess = true;# 5. 🚀 BUILD & PUSH (05-build-and-push.yml) [depends on Stage 4]
+
+            for (const stage of stages) {#    └─ Build and push to registry
+
+              const icon = stage.result === 'success' ? '✅' : stage.result === 'skipped' ? '⏭️' : '❌';#    └─ Generate software bill of materials
+
+              body += `| ${stage.name} | ${icon} ${stage.result.toUpperCase()} |\n`;#    
+
+              if (stage.result !== 'success' && stage.result !== 'skipped') allSuccess = false;# 6. ✅ PIPELINE STATUS [depends on all]
+
+            }#    └─ Report overall pipeline status
+
+            #    └─ Comment on PR with results
+
+            if (allSuccess) {#
+
+              body += '\n🎉 **All stages passed!**';# ============================================================================
+
+            } else {
+              body += '\n⚠️ **Some stages failed. Please check the workflow logs.**';
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+# ============================================================================
+# Pipeline Flow Documentation
+# ============================================================================
+# 
+# This orchestrator ensures sequential execution of all CI/CD stages:
+#
+# 1. 🔒 SECURITY SCAN (01-security-scan.yml)
+#    └─ Secrets scanning (Gitleaks, TruffleHog)
+#    └─ Dependency checks (Safety, pip-audit, npm audit)
+#    └─ License compliance scan
+#    └─ SAST scanning (Bandit, ESLint)
+#    └─ Each sub-job depends on the previous
+#    
+# 2. 🧪 BACKEND TESTS (02-backend-tests.yml) [requires Stage 1 success]
+#    └─ Lint job (Black, isort, flake8, mypy)
+#    └─ Test job [requires Lint success]
+#    └─ Coverage reporting
+#    
+# 3. 🎨 FRONTEND TESTS (03-frontend-tests.yml) [requires Stage 2 success]
+#    └─ Lint job (ESLint, Prettier)
+#    └─ Test job [requires Lint success]
+#    └─ Build verification
+#    
+# 4. 🐳 CONTAINER SCAN (04-container-scan.yml) [requires Stage 3 success]
+#    └─ Build container images
+#    └─ Scan job [requires Build success]
+#    └─ Vulnerability scan (Trivy, Grype)
+#    └─ SBOM generation (Syft)
+#    
+# 5. 🚀 BUILD & PUSH (05-build-and-push.yml) [requires Stage 4 success]
+#    └─ Build & Push job
+#    └─ SBOM job [requires Build & Push success]
+#    
+# 6. ✅ PIPELINE STATUS [requires all stages]
+#    └─ Report overall pipeline status
+#    └─ Comment on PR with results
+#
+# Key Features:
+# - Sequential execution: Each stage only starts after previous succeeds
+# - Concurrency control: Prevents multiple runs on same ref
+# - PR commenting: Reports pipeline status on pull requests
+# - Comprehensive logging: Each stage shows what's being executed
+#
+# ============================================================================

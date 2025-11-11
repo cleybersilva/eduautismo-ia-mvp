@@ -10,6 +10,8 @@ on:
       - ".github/workflows/05-build-and-push.yml"
   pull_request:
     branches: [main, develop]
+  workflow_call:
+    # This workflow can be called by other workflows
 
 permissions:
   contents: read
