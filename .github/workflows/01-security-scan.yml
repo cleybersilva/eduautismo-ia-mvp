@@ -87,12 +87,15 @@ jobs:
           pip-audit --desc > pip-audit-report.txt || true
       
       - name: Check NPM dependencies
-        if: hashFiles('frontend/package-lock.json') != ''
         run: |
-          cd frontend
-          npm ci
-          npm audit --json > npm-audit.json || true
-          npm audit --audit-level=moderate || echo "NPM audit completed with warnings"
+          if [ -d "frontend" ] && [ -f "frontend/package-lock.json" ]; then
+            cd frontend
+            npm ci
+            npm audit --json > npm-audit.json || true
+            npm audit --audit-level=moderate || echo "NPM audit completed with warnings"
+          else
+            echo "Frontend directory or package-lock.json not found, skipping NPM audit"
+          fi
       
       - name: Upload dependency reports
         if: always()
@@ -126,11 +129,14 @@ jobs:
           pip-licenses --format=markdown > python-licenses.md
       
       - name: Check Node licenses
-        if: hashFiles('frontend/package-lock.json') != ''
         run: |
-          cd frontend
-          npm ci
-          npx license-report --output=json > node-licenses.json || true
+          if [ -d "frontend" ] && [ -f "frontend/package-lock.json" ]; then
+            cd frontend
+            npm ci
+            npx license-report --output=json > node-licenses.json || true
+          else
+            echo "Frontend directory or package-lock.json not found, skipping license check"
+          fi
       
       - name: Upload license reports
         if: always()
@@ -181,7 +187,6 @@ jobs:
     name: SAST - JavaScript Security (ESLint)
     runs-on: ubuntu-latest
     needs: sast-python
-    if: hashFiles('frontend/package.json') != ''
     
     steps:
       - name: Checkout code
@@ -196,15 +201,24 @@ jobs:
       
       - name: Install dependencies
         run: |
-          cd frontend
-          npm ci
-          npm install --save-dev eslint-plugin-security
+          if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then
+            cd frontend
+            npm ci
+            npm install --save-dev eslint-plugin-security
+          else
+            echo "Frontend directory not found, skipping ESLint"
+            exit 0
+          fi
       
       - name: Run ESLint with security plugin
         run: |
-          cd frontend
-          npx eslint . --ext js,jsx --plugin security --format json --output-file eslint-report.json || true
-          npx eslint . --ext js,jsx --plugin security || echo "ESLint completed with warnings"
+          if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then
+            cd frontend
+            npx eslint . --ext js,jsx --plugin security --format json --output-file eslint-report.json || true
+            npx eslint . --ext js,jsx --plugin security || echo "ESLint completed with warnings"
+          else
+            echo "Frontend directory not found, skipping ESLint"
+          fi
       
       - name: Upload ESLint report
         if: always()

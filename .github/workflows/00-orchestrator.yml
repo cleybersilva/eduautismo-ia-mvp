@@ -69,7 +69,7 @@ jobs:
   pipeline-status:
     name: "✅ Pipeline Complete"
     runs-on: ubuntu-latest
-    needs: [security-scan, backend-tests, frontend-tests, container-scan, build-and-push]
+    needs: [backend-tests, frontend-tests, security-scan, container-scan, build-and-push]
     if: always()
 
     steps:
@@ -78,17 +78,17 @@ jobs:
           echo "🎼 Sequential Pipeline Execution Report"
           echo "======================================"
           echo ""
-          echo "Stage 1: Security Scan"
-          echo "  Status: ${{ needs.security-scan.result }}"
-          [ "${{ needs.security-scan.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
-          echo ""
-          echo "Stage 2: Backend Tests"
+          echo "Stage 1: Backend Tests"
           echo "  Status: ${{ needs.backend-tests.result }}"
           [ "${{ needs.backend-tests.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
           echo ""
-          echo "Stage 3: Frontend Tests"
+          echo "Stage 2: Frontend Tests"
           echo "  Status: ${{ needs.frontend-tests.result }}"
           [ "${{ needs.frontend-tests.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
+          echo ""
+          echo "Stage 3: Security Scan"
+          echo "  Status: ${{ needs.security-scan.result }}"
+          [ "${{ needs.security-scan.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
           echo ""
           echo "Stage 4: Container Scan"
           echo "  Status: ${{ needs.container-scan.result }}"

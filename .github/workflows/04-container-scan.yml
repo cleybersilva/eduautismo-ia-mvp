@@ -147,7 +147,7 @@ jobs:
       
       - name: Upload Grype results
         uses: github/codeql-action/upload-sarif@v3
-        if: always() && hashFiles('results.sarif') != ''
+        if: always()
         with:
           sarif_file: results.sarif
           category: 'grype-${{ matrix.image.name }}'
