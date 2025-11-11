@@ -211,22 +211,4 @@ jobs:
           check_name: Backend Test Results
           comment_mode: always
       
-      - name: Trigger Build & Push workflow on success
-        if: success() && github.event_name == 'push'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            console.log('✅ Backend Tests completed successfully!');
-            console.log('🚀 Dispatching Build & Push workflow...');
-            
-            github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: '05-build-and-push.yml',
-              ref: context.ref,
-              inputs: {
-                trigger_source: 'backend-tests'
-              }
-            });
-            
-            console.log('✅ Build & Push workflow dispatched!');
+

@@ -19,20 +19,47 @@ concurrency:
 
 jobs:
   # ============================================================================
-  # Stage 1: Backend Tests (Unit + Integration)
+  # Stage 1: Security Scan
+  # ============================================================================
+  security-scan:
+    name: "🔒 Stage 1: Security Scan"
+    uses: ./.github/workflows/01-security-scan.yml
+    secrets: inherit
+
+  # ============================================================================
+  # Stage 2: Backend Tests (only after Security Scan succeeds)
   # ============================================================================
   backend-tests:
-    name: "🧪 Stage 1: Backend Tests (Unit + Integration)"
+    name: "🧪 Stage 2: Backend Tests"
+    needs: security-scan
     uses: ./.github/workflows/02-backend-tests.yml
     secrets: inherit
 
   # ============================================================================
-  # Stage 2: Build & Push (only after Backend Tests succeed)
+  # Stage 3: Frontend Tests (only after Backend Tests succeed)
+  # ============================================================================
+  frontend-tests:
+    name: "🎨 Stage 3: Frontend Tests"
+    needs: backend-tests
+    uses: ./.github/workflows/03-frontend-tests.yml
+    secrets: inherit
+
+  # ============================================================================
+  # Stage 4: Container Scan (only after Frontend Tests succeed)
+  # ============================================================================
+  container-scan:
+    name: "🐳 Stage 4: Container Scan"
+    needs: frontend-tests
+    uses: ./.github/workflows/04-container-scan.yml
+    secrets: inherit
+
+  # ============================================================================
+  # Stage 5: Build & Push (only after Container Scan succeeds and on push)
   # ============================================================================
   build-and-push:
-    name: "🚀 Stage 2: Build & Push Container Registry"
+    name: "🚀 Stage 5: Build & Push"
     if: success() && github.event_name == 'push'
-    needs: backend-tests
+    needs: container-scan
     uses: ./.github/workflows/05-build-and-push.yml
     secrets: inherit
 
@@ -42,7 +69,7 @@ jobs:
   pipeline-status:
     name: "✅ Pipeline Complete"
     runs-on: ubuntu-latest
-    needs: [backend-tests, build-and-push]
+    needs: [security-scan, backend-tests, frontend-tests, container-scan, build-and-push]
     if: always()
 
     steps:
@@ -51,22 +78,30 @@ jobs:
           echo "🎼 Sequential Pipeline Execution Report"
           echo "======================================"
           echo ""
-          echo "Stage 1: Backend Tests"
-          echo "  Status: ${{ needs.backend-tests.result }}"
-          if [ "${{ needs.backend-tests.result }}" == "success" ]; then
-            echo "  ✅ Passed - Proceeding to next stage"
-          else
-            echo "  ❌ Failed - Pipeline halted"
-          fi
+          echo "Stage 1: Security Scan"
+          echo "  Status: ${{ needs.security-scan.result }}"
+          [ "${{ needs.security-scan.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
           echo ""
-          echo "Stage 2: Build & Push"
+          echo "Stage 2: Backend Tests"
+          echo "  Status: ${{ needs.backend-tests.result }}"
+          [ "${{ needs.backend-tests.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
+          echo ""
+          echo "Stage 3: Frontend Tests"
+          echo "  Status: ${{ needs.frontend-tests.result }}"
+          [ "${{ needs.frontend-tests.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
+          echo ""
+          echo "Stage 4: Container Scan"
+          echo "  Status: ${{ needs.container-scan.result }}"
+          [ "${{ needs.container-scan.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
+          echo ""
+          echo "Stage 5: Build & Push"
           echo "  Status: ${{ needs.build-and-push.result }}"
           if [ "${{ needs.build-and-push.result }}" == "success" ]; then
             echo "  ✅ Passed - Ready for deployment"
           elif [ "${{ needs.build-and-push.result }}" == "skipped" ]; then
             echo "  ⏭️  Skipped - Only runs on push events"
           else
-            echo "  ❌ Failed - Pipeline halted"
+            echo "  ❌ Failed"
           fi
           echo ""
 

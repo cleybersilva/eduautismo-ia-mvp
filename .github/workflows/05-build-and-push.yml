@@ -136,14 +136,4 @@ jobs:
           path: sbom-*.json
           retention-days: 90
       
-      - name: Trigger next workflow after SBOM generation
-        if: success() && github.event_name == 'push'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            console.log('✅ Build & Push completed successfully!');
-            console.log('🎯 Next step: Trigger security/quality checks or deployment');
-            console.log('📊 Artifacts generated:');
-            console.log('  - Container images (api, web)');
-            console.log('  - SBOM reports (SPDX format)');
-            console.log('🎉 Pipeline stage 5 of 5 complete!');
+
