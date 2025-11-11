@@ -19,37 +19,37 @@ concurrency:
 
 jobs:
   # ============================================================================
-  # Stage 1: Security Scan
-  # ============================================================================
-  security-scan:
-    name: "🔒 Stage 1: Security Scan"
-    uses: ./.github/workflows/01-security-scan.yml
-    secrets: inherit
-
-  # ============================================================================
-  # Stage 2: Backend Tests (only after Security Scan succeeds)
+  # Stage 1: Backend Tests
   # ============================================================================
   backend-tests:
-    name: "🧪 Stage 2: Backend Tests"
-    needs: security-scan
+    name: "🧪 Stage 1: Backend Tests"
     uses: ./.github/workflows/02-backend-tests.yml
     secrets: inherit
 
   # ============================================================================
-  # Stage 3: Frontend Tests (only after Backend Tests succeed)
+  # Stage 2: Frontend Tests (only after Backend Tests succeed)
   # ============================================================================
   frontend-tests:
-    name: "🎨 Stage 3: Frontend Tests"
+    name: "🎨 Stage 2: Frontend Tests"
     needs: backend-tests
     uses: ./.github/workflows/03-frontend-tests.yml
     secrets: inherit
 
   # ============================================================================
-  # Stage 4: Container Scan (only after Frontend Tests succeed)
+  # Stage 3: Security Scan (only after Frontend Tests succeed)
+  # ============================================================================
+  security-scan:
+    name: "🔒 Stage 3: Security Scan"
+    needs: frontend-tests
+    uses: ./.github/workflows/01-security-scan.yml
+    secrets: inherit
+
+  # ============================================================================
+  # Stage 4: Container Scan (only after Security Scan succeeds)
   # ============================================================================
   container-scan:
     name: "🐳 Stage 4: Container Scan"
-    needs: frontend-tests
+    needs: security-scan
     uses: ./.github/workflows/04-container-scan.yml
     secrets: inherit
 
