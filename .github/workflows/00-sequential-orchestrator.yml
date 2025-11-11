@@ -1,0 +1,83 @@
+name: "🎼 Sequential CI/CD Orchestrator"
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+  packages: write
+  actions: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # ============================================================================
+  # Stage 1: Backend Tests (Unit + Integration)
+  # ============================================================================
+  backend-tests:
+    name: "🧪 Stage 1: Backend Tests (Unit + Integration)"
+    uses: ./.github/workflows/02-backend-tests.yml
+    secrets: inherit
+
+  # ============================================================================
+  # Stage 2: Build & Push (only after Backend Tests succeed)
+  # ============================================================================
+  build-and-push:
+    name: "🚀 Stage 2: Build & Push Container Registry"
+    if: success() && github.event_name == 'push'
+    needs: backend-tests
+    uses: ./.github/workflows/05-build-and-push.yml
+    secrets: inherit
+
+  # ============================================================================
+  # Final: Report Status
+  # ============================================================================
+  pipeline-status:
+    name: "✅ Pipeline Complete"
+    runs-on: ubuntu-latest
+    needs: [backend-tests, build-and-push]
+    if: always()
+
+    steps:
+      - name: Determine pipeline status
+        run: |
+          echo "🎼 Sequential Pipeline Execution Report"
+          echo "======================================"
+          echo ""
+          echo "Stage 1: Backend Tests"
+          echo "  Status: ${{ needs.backend-tests.result }}"
+          if [ "${{ needs.backend-tests.result }}" == "success" ]; then
+            echo "  ✅ Passed - Proceeding to next stage"
+          else
+            echo "  ❌ Failed - Pipeline halted"
+          fi
+          echo ""
+          echo "Stage 2: Build & Push"
+          echo "  Status: ${{ needs.build-and-push.result }}"
+          if [ "${{ needs.build-and-push.result }}" == "success" ]; then
+            echo "  ✅ Passed - Ready for deployment"
+          elif [ "${{ needs.build-and-push.result }}" == "skipped" ]; then
+            echo "  ⏭️  Skipped - Only runs on push events"
+          else
+            echo "  ❌ Failed - Pipeline halted"
+          fi
+          echo ""
+
+      - name: Check overall success
+        if: failure()
+        run: |
+          echo "❌ Pipeline failed at one or more stages"
+          exit 1
+
+      - name: Report success
+        if: success()
+        run: |
+          echo "✅ All stages completed successfully!"
+          echo "🎉 Pipeline execution complete"
