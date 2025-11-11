@@ -2,9 +2,6 @@
 Integration tests for assessments API.
 """
 
-import pytest
-from fastapi.testclient import TestClient
-
 
 class TestAssessmentsAPI:
     """Test class for assessments API endpoints."""

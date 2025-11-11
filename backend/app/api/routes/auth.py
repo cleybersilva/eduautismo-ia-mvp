@@ -9,7 +9,6 @@ This module provides authentication and authorization endpoints including:
 """
 
 from datetime import datetime, timedelta
-from typing import Optional
 
 from app.core.database import get_db
 from app.core.security import (
@@ -21,7 +20,7 @@ from app.core.security import (
 )
 from app.models.user import User
 from app.schemas.common import Token, TokenRefresh
-from app.schemas.user import PasswordReset, PasswordResetConfirm, UserLogin, UserResponse
+from app.schemas.user import PasswordReset, PasswordResetConfirm, UserResponse
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session

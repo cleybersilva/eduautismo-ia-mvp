@@ -5,15 +5,11 @@ Business logic for student management.
 """
 
 from datetime import date
-from typing import List, Optional
 from uuid import UUID
 
-from app.core.exceptions import PermissionDeniedError, StudentNotFoundError
-from app.core.exceptions import ValidationError as AppValidationError
 from app.models.student import Student
-from app.schemas.student import StudentCreate, StudentUpdate
+from app.schemas.student import StudentCreate
 from app.utils.logger import get_logger
-from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)

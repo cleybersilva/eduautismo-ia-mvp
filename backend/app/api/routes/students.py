@@ -9,7 +9,6 @@ from uuid import UUID
 
 from app.api.dependencies.auth import get_current_user
 from app.core.database import get_db
-from app.core.exceptions import PermissionDeniedError, StudentNotFoundError
 from app.schemas.student import StudentCreate, StudentResponse, StudentUpdate
 from app.services.student_service import StudentService
 from fastapi import APIRouter, Depends, HTTPException, status

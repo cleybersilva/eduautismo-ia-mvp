@@ -2,9 +2,6 @@
 Integration tests for activities API.
 """
 
-import pytest
-from fastapi.testclient import TestClient
-
 
 class TestActivitiesAPI:
     """Test class for activities API endpoints."""

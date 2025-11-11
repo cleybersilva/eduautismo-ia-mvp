@@ -5,7 +5,7 @@ Versão minimalista para testes e validação de documentação
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 
 app = FastAPI(
     title="EduAutismo IA",

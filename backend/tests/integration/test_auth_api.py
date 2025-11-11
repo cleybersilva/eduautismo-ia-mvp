@@ -2,9 +2,6 @@
 Integration tests for authentication API.
 """
 
-import pytest
-from fastapi.testclient import TestClient
-
 
 class TestAuthAPI:
     """Test class for authentication API endpoints."""

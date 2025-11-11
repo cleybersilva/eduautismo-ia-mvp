@@ -2,7 +2,6 @@
 Configurações da aplicação
 """
 
-import os
 from typing import List, Union
 
 from pydantic import field_validator

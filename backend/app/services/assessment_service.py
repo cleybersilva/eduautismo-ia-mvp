@@ -18,7 +18,6 @@ from app.models.assessment import Assessment
 from app.models.student import Student
 from app.schemas.assessment import AssessmentCreate, AssessmentUpdate
 from app.utils.logger import get_logger
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)

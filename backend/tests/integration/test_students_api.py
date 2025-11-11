@@ -2,9 +2,6 @@
 Integration tests for students API.
 """
 
-import pytest
-from fastapi.testclient import TestClient
-
 
 class TestStudentsAPI:
     """Test class for students API endpoints."""
