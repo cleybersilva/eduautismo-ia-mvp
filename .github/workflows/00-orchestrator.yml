@@ -3,10 +3,6 @@ name: "🎼 Sequential CI/CD Orchestrator"
 on:
   push:
     branches: [dev, staging, main]
-    branches-ignore:
-      - 'feature/**'
-      - 'bugfix/**'
-      - 'hotfix/**'
   pull_request:
     branches: [dev, staging, main]
     types: [closed]
