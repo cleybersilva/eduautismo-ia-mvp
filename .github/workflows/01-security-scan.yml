@@ -1,0 +1,207 @@
+name: "🔒 Security: Secrets Scanning"
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: "0 2 * * *"  # Daily at 2 AM UTC
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  gitleaks:
+    name: Gitleaks Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          config: .gitleaks.toml
+          enable-comments: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Upload Gitleaks report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: gitleaks-report
+          path: report.json
+
+  trufflehog:
+    name: TruffleHog Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --json
+        continue-on-error: true
+
+  dependency-check:
+    name: Dependency Vulnerability Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Run Safety (Python dependencies)
+        run: |
+          pip install safety
+          safety check --json --continue-on-error > safety-report.json || true
+          safety check || echo "Safety check completed with warnings"
+      
+      - name: Run pip-audit (Python dependencies)
+        run: |
+          pip install pip-audit
+          pip-audit --desc > pip-audit-report.txt || true
+      
+      - name: Check NPM dependencies
+        if: hashFiles('frontend/package-lock.json') != ''
+        run: |
+          cd frontend
+          npm ci
+          npm audit --json > npm-audit.json || true
+          npm audit --audit-level=moderate || echo "NPM audit completed with warnings"
+      
+      - name: Upload dependency reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-reports
+          path: |
+            safety-report.json
+            pip-audit-report.txt
+            frontend/npm-audit.json
+
+  license-scan:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Check Python licenses
+        run: |
+          pip install pip-licenses
+          pip install -q -r backend/requirements.txt
+          pip-licenses --format=json --output-file=python-licenses.json || true
+          pip-licenses --format=markdown > python-licenses.md
+      
+      - name: Check Node licenses
+        if: hashFiles('frontend/package-lock.json') != ''
+        run: |
+          cd frontend
+          npm ci
+          npx license-report --output=json > node-licenses.json || true
+      
+      - name: Upload license reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: license-reports
+          path: |
+            python-licenses.*
+            frontend/node-licenses.json
+
+  sast-python:
+    name: SAST - Python Security (Bandit)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Run Bandit
+        run: |
+          pip install bandit
+          bandit -r backend/app -f json -o bandit-report.json -ll || true
+          bandit -r backend/app -f txt
+      
+      - name: Upload Bandit report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: bandit-report
+          path: bandit-report.json
+      
+      - name: Check Bandit findings
+        run: |
+          pip install bandit
+          if bandit -r backend/app -q -ll; then
+            echo "✅ No critical security issues found"
+          else
+            echo "⚠️ Security findings detected"
+          fi
+
+  sast-javascript:
+    name: SAST - JavaScript Security (ESLint)
+    runs-on: ubuntu-latest
+    if: hashFiles('frontend/package.json') != ''
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+          npm install --save-dev eslint-plugin-security
+      
+      - name: Run ESLint with security plugin
+        run: |
+          cd frontend
+          npx eslint . --ext js,jsx --plugin security --format json --output-file eslint-report.json || true
+          npx eslint . --ext js,jsx --plugin security || echo "ESLint completed with warnings"
+      
+      - name: Upload ESLint report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: eslint-report
+          path: frontend/eslint-report.json

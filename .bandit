@@ -1,0 +1,63 @@
+[bandit]
+# Configuration for Bandit - Python Security Analysis
+# For EduAutismo IA project
+
+# tests to run
+tests = [
+    "B101",   # assert_used
+    "B102",   # exec_used
+    "B103",   # set_bad_file_permissions
+    "B104",   # hardcoded_bind_all_interfaces
+    "B105",   # hardcoded_password_string
+    "B106",   # hardcoded_password_funcarg
+    "B107",   # hardcoded_password_default
+    "B108",   # hardcoded_tmp_directory
+    "B110",   # try_except_pass
+    "B112",   # try_except_handler_order
+    "B201",   # flask_debug_true
+    "B301",   # pickle
+    "B302",   # marshal
+    "B303",   # md5
+    "B304",   # ciphers
+    "B305",   # cipher_modes
+    "B306",   # mktemp_q
+    "B307",   # eval
+    "B308",   # mark_safe
+    "B309",   # httpsconnection
+    "B310",   # urllib_urlopen
+    "B311",   # random
+    "B312",   # telnetlib
+    "B313",   # xml_bad_etree
+    "B314",   # xml_bad_etree
+    "B315",   # xml_bad_expat
+    "B316",   # xml_bad_dom
+    "B317",   # xml_bad_sax
+    "B318",   # xml_bad_pulldom
+    "B319",   # xml_bad_etree
+    "B320",   # xml_bad_etree
+    "B321",   # ftplib
+    "B322",   # unverified_context
+    "B323",   # unverified_context
+    "B324",   # hashlib
+    "B325",   # tempnam
+]
+
+# tests to skip
+skips = [
+    "B101",   # assert_used - allow in tests
+    "B601",   # paramiko_calls - false positives
+]
+
+# exclude certain paths
+exclude_dirs = [
+    "tests",
+    "venv",
+    ".venv",
+    "migrations"
+]
+
+# Report format: csv, json, txt, yaml
+report_format = "json"
+
+# Severity levels: LOW, MEDIUM, HIGH
+severity_level = "MEDIUM"

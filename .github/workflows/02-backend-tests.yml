@@ -1,0 +1,186 @@
+name: "🧪 Test: Backend (Unit + Integration)"
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "backend/**"
+      - ".github/workflows/02-backend-tests.yml"
+      - "docker-compose.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "backend/**"
+      - ".github/workflows/02-backend-tests.yml"
+      - "docker-compose.yml"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  test:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_PASSWORD: testpass123
+          POSTGRES_DB: eduautismo_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-dev.txt
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libpq-dev \
+            postgresql-client
+      
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install -r backend/requirements.txt
+          pip install -r backend/requirements-dev.txt
+      
+      - name: Lint with Black
+        run: |
+          black --check backend/app backend/tests --line-length=120
+      
+      - name: Sort imports with isort
+        run: |
+          isort --check-only backend/app backend/tests
+      
+      - name: Lint with flake8
+        run: |
+          flake8 backend/app backend/tests \
+            --max-line-length=120 \
+            --extend-ignore=E203,W503,E501 \
+            --exclude=__pycache__,venv,.venv
+      
+      - name: Type checking with mypy
+        run: |
+          mypy backend/app \
+            --ignore-missing-imports \
+            --explicit-package-bases \
+            --namespace-packages \
+            || true
+      
+      - name: Validate Alembic migrations
+        env:
+          DATABASE_URL: postgresql://postgres:testpass123@localhost:5432/eduautismo_test
+        run: |
+          cd backend
+          alembic upgrade head
+          alembic downgrade -1
+          alembic upgrade head
+          echo "✅ Migrations validated"
+      
+      - name: Run Unit Tests
+        env:
+          DATABASE_URL: postgresql://postgres:testpass123@localhost:5432/eduautismo_test
+          REDIS_URL: redis://localhost:6379/0
+          ENVIRONMENT: test
+          JWT_SECRET: test-secret-key-12345
+          OPENAI_API_KEY: sk-test-dummy
+        run: |
+          cd backend
+          pytest tests/unit \
+            -v \
+            --cov=app \
+            --cov-report=xml:coverage-unit.xml \
+            --cov-report=html:coverage-unit-html \
+            --junitxml=junit-unit.xml \
+            --tb=short
+      
+      - name: Run Integration Tests
+        env:
+          DATABASE_URL: postgresql://postgres:testpass123@localhost:5432/eduautismo_test
+          REDIS_URL: redis://localhost:6379/0
+          ENVIRONMENT: test
+          JWT_SECRET: test-secret-key-12345
+          OPENAI_API_KEY: sk-test-dummy
+        run: |
+          cd backend
+          pytest tests/integration \
+            -v \
+            --cov=app \
+            --cov-report=xml:coverage-integration.xml \
+            --cov-report=html:coverage-integration-html \
+            --junitxml=junit-integration.xml \
+            --tb=short || true
+      
+      - name: Merge coverage reports
+        if: always()
+        run: |
+          pip install coverage
+          cd backend
+          coverage combine coverage-*.xml || true
+          coverage xml -o coverage.xml
+          coverage report --fail-under=80
+      
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./backend/coverage.xml
+          flags: backend
+          name: backend-coverage
+          fail_ci_if_error: false
+      
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-test-reports
+          path: |
+            backend/junit-*.xml
+            backend/coverage-*/
+            backend/coverage.xml
+      
+      - name: Comment PR with coverage
+        if: github.event_name == 'pull_request' && always()
+        uses: py-cov-action/python-coverage-comment-action@v3
+        with:
+          GITHUB_TOKEN: ${{ github.token }}
+          MINIMUM_GREEN: 85
+          MINIMUM_ORANGE: 70
+          MERGE_COVERAGE_FILES: true
+      
+      - name: Publish test results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: backend/junit-*.xml
+          check_name: Backend Test Results
+          comment_mode: always

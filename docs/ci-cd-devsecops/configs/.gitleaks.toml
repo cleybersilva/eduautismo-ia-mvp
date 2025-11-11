@@ -1,0 +1,91 @@
+[source]
+name = "gitleaks config - EduAutismo IA"
+description = "Configuration for detecting secrets and sensitive data"
+verbose = true
+
+# AWS Credentials
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key ID"
+pattern = "(?i)(?P<key>AKIA[0-9A-Z]{16})"
+entropy = 3.5
+keywords = ["aws", "credential"]
+scope = "all"
+tags = ["aws", "critical"]
+
+[[rules]]
+id = "aws-secret-key"
+description = "AWS Secret Access Key"
+pattern = "(?i)aws(.{0,20})?(?-i)['\"][0-9a-zA-Z/+=]{40}['\"]"
+entropy = 3.5
+keywords = ["aws", "secret"]
+scope = "all"
+tags = ["aws", "critical"]
+
+# OpenAI API Keys
+[[rules]]
+id = "openai-api-key"
+description = "OpenAI API Key"
+pattern = "sk-[A-Za-z0-9]{48}"
+entropy = 3.5
+keywords = ["openai", "sk-"]
+scope = "all"
+tags = ["openai", "critical"]
+
+# JWT Secrets
+[[rules]]
+id = "jwt-secret"
+description = "JWT Secret or Private Key"
+pattern = "(?i)jwt(.{0,20})?=(.{20,})"
+entropy = 3.5
+keywords = ["jwt", "secret", "private"]
+scope = "all"
+tags = ["jwt", "critical"]
+
+# Database URLs
+[[rules]]
+id = "database-url"
+description = "Database Connection String"
+pattern = "(?i)(postgres|mysql|mongodb)://[a-zA-Z0-9:@/]+\\.com"
+entropy = 3.0
+keywords = ["postgres", "mysql", "mongodb", "database"]
+scope = "all"
+tags = ["database", "high"]
+
+# Redis URL
+[[rules]]
+id = "redis-url"
+description = "Redis Connection URL"
+pattern = "(?i)redis://[a-zA-Z0-9:@/]+"
+entropy = 3.0
+keywords = ["redis"]
+scope = "all"
+tags = ["cache", "high"]
+
+# Generic sensitive patterns
+[[rules]]
+id = "high-entropy-string"
+description = "High entropy string (potential secret)"
+pattern = "[A-Za-z0-9]{20,}"
+entropy = 4.0
+keywords = ["secret", "password", "token", "key"]
+scope = "all"
+tags = ["generic"]
+
+# Allowlist - false positives
+[allowlist]
+description = "Patterns to ignore"
+paths = [
+  "(?i)(test|spec|mock|fixture)",
+  "(?i)example|placeholder",
+  "docs/.*\\.md"
+]
+
+regexes = [
+  "^Bearer eyJ0eXAi",  # JWT examples in docs
+  "^sk-[A-Za-z0-9-]{20}example"  # Example keys
+]
+
+commits = [
+  "0000000000000000000000000000000000000000",  # Null commit
+]

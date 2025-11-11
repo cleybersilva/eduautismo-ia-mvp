@@ -1,0 +1,72 @@
+repo: https://github.com/cleybersilva/eduautismo-ia-mvp
+branch: main
+branches:
+  - main
+  - develop
+
+# Codecov settings
+codecov:
+  require_ci_to_pass: true
+  after_n_builds: 2
+  max_report_delay: 600
+
+coverage:
+  precision: 2
+  round: down
+  range: [70, 100]
+  status:
+    project:
+      default:
+        target: 80
+        threshold: null
+        base: auto
+      backend:
+        target: 85
+        threshold: 2
+        flags: backend
+        paths:
+          - backend/app
+      frontend:
+        target: 75
+        threshold: 2
+        flags: frontend
+        paths:
+          - frontend/src
+
+comment:
+  layout: "reach,diff,flags,tree"
+  behavior: default
+  require_changes: false
+  require_base: no
+  require_head: yes
+  delete_outdated: false
+  hide_project_coverage: false
+  hide_branch_coverage: true
+
+# Ignore certain files/paths
+ignore:
+  - "tests"
+  - "migrations"
+  - "node_modules"
+  - ".venv"
+
+# Flags for different test suites
+flags:
+  backend:
+    carryforward: true
+    paths:
+      - backend/
+  frontend:
+    carryforward: true
+    paths:
+      - frontend/
+
+# Upload settings
+upload:
+  max_retries: 3
+  retrydelay: 5
+
+# Fail CI if coverage decreases
+fail:
+  default:
+    threshold: 2.0
