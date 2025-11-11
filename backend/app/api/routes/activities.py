@@ -45,7 +45,7 @@ def generate_activity(
     student = db.query(Student).filter(Student.id == activity_data.student_id).first()
 
     if not student:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Aluno não encontrado")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Aluno não encontrado")
 
     # Check permission
     if student.teacher_id != teacher_id:
@@ -89,18 +89,18 @@ def generate_activity(
         difficulty=activity_data.difficulty,
         duration_minutes=activity_data.duration_minutes,
         objectives=[
-            f"Desenvolver habilidades {type_name.lower()}s adequadas ao nível do aluno",
+            f"Desenvolver habilidades de {type_name.lower()} adequadas ao nível do aluno",
             "Promover engajamento através de atividades adaptadas",
             "Respeitar o perfil sensorial e ritmo de aprendizagem",
         ],
         materials=["Material visual de apoio", "Recursos adaptados para TEA", "Ambiente estruturado e previsível"],
         instructions=[
-            f"1. Prepare o ambiente garantindo que esteja calmo e organizado",
-            f"2. Apresente a atividade de forma clara e visual",
-            f"3. Divida a tarefa em pequenos passos",
-            f"4. Ofereça suporte quando necessário",
-            f"5. Reforce positivamente cada conquista",
-            f"6. Permita pausas sensoriais se o aluno demonstrar necessidade",
+            "1. Prepare o ambiente garantindo que esteja calmo e organizado",
+            "2. Apresente a atividade de forma clara e visual",
+            "3. Divida a tarefa em pequenos passos",
+            "4. Ofereça suporte quando necessário",
+            "5. Reforce positivamente cada conquista",
+            "6. Permita pausas sensoriais se o aluno demonstrar necessidade",
         ],
         adaptations=[
             "Use apoios visuais (imagens, pictogramas)",
@@ -214,7 +214,7 @@ def get_activity(activity_id: int, db: Session = Depends(get_db)) -> ActivityRes
     """
     activity = ActivityService.get(db, activity_id)
     if not activity:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Activity not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Activity not found")
     return activity
 
 
@@ -252,7 +252,7 @@ def update_activity(activity_id: int, activity_data: ActivityUpdate, db: Session
     """
     activity = ActivityService.update(db, activity_id, activity_data)
     if not activity:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Activity not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Activity not found")
     return activity
 
 
@@ -270,4 +270,4 @@ def delete_activity(activity_id: int, db: Session = Depends(get_db)) -> None:
     """
     success = ActivityService.delete(db, activity_id)
     if not success:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Activity not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Activity not found")

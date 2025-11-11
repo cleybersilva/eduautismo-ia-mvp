@@ -210,7 +210,7 @@ async def refresh_token(token_data: TokenRefresh, db: Session = Depends(get_db))
         )
 
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Invalid refresh token: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Invalid refresh token: {e}")
 
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
@@ -321,7 +321,7 @@ async def password_reset_confirm(reset_data: PasswordResetConfirm, db: Session =
         return {"message": "Password successfully reset"}
 
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Password reset failed: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Password reset failed: {e}")
 
 
 @router.get("/me", response_model=UserResponse, status_code=status.HTTP_200_OK)
@@ -375,6 +375,6 @@ async def get_current_user_info(token: str = Depends(oauth2_scheme), db: Session
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Could not validate credentials: {str(e)}",
+            detail=f"Could not validate credentials: {e}",
             headers={"WWW-Authenticate": "Bearer"},
         )

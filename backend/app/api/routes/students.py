@@ -54,7 +54,7 @@ def get_student(student_id: int, db: Session = Depends(get_db)) -> StudentRespon
     """
     student = StudentService.get(db, student_id)
     if not student:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Student not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
     return student
 
 
@@ -92,7 +92,7 @@ def update_student(student_id: int, student_data: StudentUpdate, db: Session = D
     """
     student = StudentService.update(db, student_id, student_data)
     if not student:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Student not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
     return student
 
 
@@ -110,4 +110,4 @@ def delete_student(student_id: int, db: Session = Depends(get_db)) -> None:
     """
     success = StudentService.delete(db, student_id)
     if not success:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Student not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
