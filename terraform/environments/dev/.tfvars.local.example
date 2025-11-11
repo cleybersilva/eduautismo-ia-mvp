@@ -1,0 +1,14 @@
+# ============================================================================
+# .tfvars.local - Development Environment (Local)
+# ============================================================================
+# NOTA: Este arquivo é para uso LOCAL APENAS - Não fazer commit no Git!
+# Adicione a .gitignore: *.tfvars.local, *.tfvars.secret
+# 
+# Use caso esteja desenvolvendo localmente:
+#   terraform apply -var-file="environments/dev/terraform.tfvars" -var-file="environments/dev/.tfvars.local"
+
+# Valores locais de desenvolvimento (podem sobrescrever terraform.tfvars)
+# Exemplo:
+#
+# aws_region = "us-east-1"
+# rds_instance_class = "db.t3.micro"  # Mais barato para desenvolvimento local

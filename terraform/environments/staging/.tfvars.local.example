@@ -1,0 +1,8 @@
+# ============================================================================
+# .tfvars.local - Staging Environment (Local Override)
+# ============================================================================
+# NOTA: Este arquivo é para testes LOCAIS com valores de staging
+# Não fazer commit no Git! Adicione a .gitignore
+# 
+# Use:
+#   terraform apply -var-file="environments/staging/terraform.tfvars" -var-file="environments/staging/.tfvars.local"

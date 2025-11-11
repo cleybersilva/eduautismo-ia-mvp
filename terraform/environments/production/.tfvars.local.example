@@ -1,0 +1,11 @@
+# ============================================================================
+# .tfvars.local - Production Environment (Local Override)
+# ============================================================================
+# NOTA: Este arquivo é para testes LOCAIS com valores de produção
+# NÃO FAZER COMMIT NO GIT! Use .gitignore rigorosamente!
+#
+# IMPORTANTE: Arquivo .tfvars.local nunca deve ser versionado
+# Segredos críticos devem estar em AWS Secrets Manager ou Parameter Store
+# 
+# Use APENAS em ambientes seguros:
+#   terraform apply -var-file="environments/production/terraform.tfvars"
