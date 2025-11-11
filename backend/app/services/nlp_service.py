@@ -481,7 +481,7 @@ Gere 3-5 recomendações práticas e acionáveis, priorizando as mais relevantes
             OpenAIError: If connection fails
         """
         try:
-            response = await self.client.chat.completions.create(
+            await self.client.chat.completions.create(
                 model=self.default_model,
                 messages=[{"role": "user", "content": "Test connection"}],
                 max_tokens=5,
