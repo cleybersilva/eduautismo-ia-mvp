@@ -30,7 +30,9 @@
       "Bash(tee:*)",
       "Bash(pip uninstall:*)",
       "Bash(python3.13:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(tests/unit/__init__.py)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []
