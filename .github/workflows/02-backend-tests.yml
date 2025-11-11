@@ -2,13 +2,13 @@ name: "🧪 Test: Backend (Unit + Integration)"
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, staging, dev]
     paths:
       - "backend/**"
       - ".github/workflows/02-backend-tests.yml"
       - "docker-compose.yml"
   pull_request:
-    branches: [main, develop]
+    branches: [main, staging, dev]
     paths:
       - "backend/**"
       - ".github/workflows/02-backend-tests.yml"

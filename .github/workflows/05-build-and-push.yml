@@ -2,18 +2,32 @@ name: "🚀 Build & Push: Container Registry"
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, staging, dev]
     paths:
       - "backend/**"
       - "frontend/**"
       - "Dockerfile.*"
       - ".github/workflows/05-build-and-push.yml"
   pull_request:
-    branches: [main, develop]
+    branches: [main, staging, dev]
   workflow_call:
-    # This workflow can be called by other workflows
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: false
+        type: string
+        default: 'dev'
   workflow_dispatch:
     inputs:
+      environment:
+        description: 'Target environment'
+        required: false
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
+        default: 'dev'
       trigger_source:
         description: 'What triggered this workflow'
         required: false
@@ -27,6 +41,7 @@ permissions:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  ENVIRONMENT: ${{ inputs.environment || (github.ref == 'refs/heads/main' && 'production' || github.ref == 'refs/heads/staging' && 'staging' || 'dev') }}
 
 jobs:
   build-and-push:
@@ -69,6 +84,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha,prefix={{branch}}-
+            type=raw,value=${{ env.ENVIRONMENT }}-latest
             type=raw,value=latest,enable={{is_default_branch}}
       
       - name: Build and push Docker image
@@ -90,6 +106,7 @@ jobs:
         if: github.event_name == 'push'
         run: |
           echo "Image pushed successfully"
+          echo "Environment: ${{ env.ENVIRONMENT }}"
           echo "Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.image.name }}"
           echo "Tags: ${{ steps.meta.outputs.tags }}"
       

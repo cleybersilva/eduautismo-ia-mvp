@@ -2,9 +2,14 @@ name: "🎼 Sequential CI/CD Orchestrator"
 
 on:
   push:
-    branches: [main, develop]
+    branches: [dev, staging, main]
+    branches-ignore:
+      - 'feature/**'
+      - 'bugfix/**'
+      - 'hotfix/**'
   pull_request:
-    branches: [main, develop]
+    branches: [dev, staging, main]
+    types: [closed]
 
 permissions:
   contents: read
@@ -17,39 +22,42 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
+env:
+  ENVIRONMENT: ${{ github.ref == 'refs/heads/main' && 'production' || github.ref == 'refs/heads/staging' && 'staging' || 'dev' }}
+
 jobs:
   # ============================================================================
-  # Stage 1: Backend Tests
+  # Stage 1: Security Scan
+  # ============================================================================
+  security-scan:
+    name: "🔒 Stage 1: Security Scan"
+    uses: ./.github/workflows/01-security-scan.yml
+    secrets: inherit
+
+  # ============================================================================
+  # Stage 2: Backend Tests (only after Security Scan succeeds)
   # ============================================================================
   backend-tests:
-    name: "🧪 Stage 1: Backend Tests"
+    name: "🧪 Stage 2: Backend Tests"
+    needs: security-scan
     uses: ./.github/workflows/02-backend-tests.yml
     secrets: inherit
 
   # ============================================================================
-  # Stage 2: Frontend Tests (only after Backend Tests succeed)
+  # Stage 3: Frontend Tests (only after Backend Tests succeed)
   # ============================================================================
   frontend-tests:
-    name: "🎨 Stage 2: Frontend Tests"
+    name: "🎨 Stage 3: Frontend Tests"
     needs: backend-tests
     uses: ./.github/workflows/03-frontend-tests.yml
     secrets: inherit
 
   # ============================================================================
-  # Stage 3: Security Scan (only after Frontend Tests succeed)
-  # ============================================================================
-  security-scan:
-    name: "🔒 Stage 3: Security Scan"
-    needs: frontend-tests
-    uses: ./.github/workflows/01-security-scan.yml
-    secrets: inherit
-
-  # ============================================================================
-  # Stage 4: Container Scan (only after Security Scan succeeds)
+  # Stage 4: Container Scan (only after Frontend Tests succeed)
   # ============================================================================
   container-scan:
     name: "🐳 Stage 4: Container Scan"
-    needs: security-scan
+    needs: frontend-tests
     uses: ./.github/workflows/04-container-scan.yml
     secrets: inherit
 
@@ -57,11 +65,13 @@ jobs:
   # Stage 5: Build & Push (only after Container Scan succeeds and on push)
   # ============================================================================
   build-and-push:
-    name: "🚀 Stage 5: Build & Push"
+    name: "🚀 Stage 5: Build & Push [${{ github.ref == 'refs/heads/main' && 'production' || github.ref == 'refs/heads/staging' && 'staging' || 'dev' }}]"
     if: success() && github.event_name == 'push'
     needs: container-scan
     uses: ./.github/workflows/05-build-and-push.yml
     secrets: inherit
+    with:
+      environment: ${{ github.ref == 'refs/heads/main' && 'production' || github.ref == 'refs/heads/staging' && 'staging' || 'dev' }}
 
   # ============================================================================
   # Final: Report Status
@@ -69,35 +79,38 @@ jobs:
   pipeline-status:
     name: "✅ Pipeline Complete"
     runs-on: ubuntu-latest
-    needs: [backend-tests, frontend-tests, security-scan, container-scan, build-and-push]
+    needs: [security-scan, backend-tests, frontend-tests, container-scan, build-and-push]
     if: always()
 
     steps:
       - name: Determine pipeline status
         run: |
+          ENVIRONMENT="${{ github.ref == 'refs/heads/main' && 'production' || github.ref == 'refs/heads/staging' && 'staging' || 'dev' }}"
           echo "🎼 Sequential Pipeline Execution Report"
           echo "======================================"
+          echo "Environment: $ENVIRONMENT"
+          echo "Branch: ${{ github.ref_name }}"
           echo ""
-          echo "Stage 1: Backend Tests"
+          echo "Stage 1: Security Scan"
+          echo "  Status: ${{ needs.security-scan.result }}"
+          [ "${{ needs.security-scan.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
+          echo ""
+          echo "Stage 2: Backend Tests"
           echo "  Status: ${{ needs.backend-tests.result }}"
           [ "${{ needs.backend-tests.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
           echo ""
-          echo "Stage 2: Frontend Tests"
+          echo "Stage 3: Frontend Tests"
           echo "  Status: ${{ needs.frontend-tests.result }}"
           [ "${{ needs.frontend-tests.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
-          echo ""
-          echo "Stage 3: Security Scan"
-          echo "  Status: ${{ needs.security-scan.result }}"
-          [ "${{ needs.security-scan.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
           echo ""
           echo "Stage 4: Container Scan"
           echo "  Status: ${{ needs.container-scan.result }}"
           [ "${{ needs.container-scan.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
           echo ""
-          echo "Stage 5: Build & Push"
+          echo "Stage 5: Build & Push [$ENVIRONMENT]"
           echo "  Status: ${{ needs.build-and-push.result }}"
           if [ "${{ needs.build-and-push.result }}" == "success" ]; then
-            echo "  ✅ Passed - Ready for deployment"
+            echo "  ✅ Passed - Ready for $ENVIRONMENT deployment"
           elif [ "${{ needs.build-and-push.result }}" == "skipped" ]; then
             echo "  ⏭️  Skipped - Only runs on push events"
           else

@@ -2,14 +2,14 @@ name: "🐳 Security: Container Image Scan"
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, staging, dev]
     paths:
       - "Dockerfile.*"
       - "backend/**"
       - "frontend/**"
-      - ".github/workflows/03-container-scan.yml"
+      - ".github/workflows/04-container-scan.yml"
   pull_request:
-    branches: [main, develop]
+    branches: [main, staging, dev]
     paths:
       - "Dockerfile.*"
       - "backend/**"
