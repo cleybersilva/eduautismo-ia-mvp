@@ -353,6 +353,17 @@ class EmailServiceError(ExternalServiceError):
         )
 
 
+class AWSError(ExternalServiceError):
+    """AWS service error (S3, KMS, etc)."""
+
+    def __init__(self, message: str, original_error: Optional[Exception] = None):
+        super().__init__(
+            service_name="AWS",
+            message=message,
+            original_error=original_error,
+        )
+
+
 # ============================================================================
 # File Upload Exceptions
 # ============================================================================

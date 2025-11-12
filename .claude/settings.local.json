@@ -32,7 +32,9 @@
       "Bash(python3.13:*)",
       "Bash(python:*)",
       "Bash(tests/unit/__init__.py)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(pytest:*)",
+      "Bash(source:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,20 +1,22 @@
-# 🤖 AI Assistant Guide - EduAutismo IA
+# CLAUDE.md
 
-> **Versão**: 1.0.0  
-> **Última Atualização**: 2025-01-15  
-> **Autor**: Cleyber Silva  
+Este arquivo fornece orientações para o Claude Code (claude.ai/code) ao trabalhar com código neste repositório.
+
+> **Versão**: 1.1.0
+> **Última Atualização**: 2025-01-12
+> **Autor**: Cleyber Silva
 > **Projeto**: TCC MBA IA & Big Data - USP
 
 ---
 
 ## 📋 Índice
 
-1. [Visão Geral do Projeto](#1-visão-geral-do-projeto)
-2. [Arquitetura e Stack Tecnológico](#2-arquitetura-e-stack-tecnológico)
-3. [Estrutura de Código](#3-estrutura-de-código)
-4. [Padrões e Convenções](#4-padrões-e-convenções)
-5. [Guia de Implementação](#5-guia-de-implementação)
-6. [Exemplos de Código](#6-exemplos-de-código)
+1. [Informações Críticas](#1-informações-críticas-leia-primeiro)
+2. [Visão Geral do Projeto](#2-visão-geral-do-projeto)
+3. [Arquitetura e Stack Tecnológico](#3-arquitetura-e-stack-tecnológico)
+4. [Estrutura de Código](#4-estrutura-de-código)
+5. [Padrões e Convenções](#5-padrões-e-convenções)
+6. [Comandos Comuns](#6-comandos-comuns)
 7. [Testes e Validação](#7-testes-e-validação)
 8. [Deploy e DevOps](#8-deploy-e-devops)
 9. [Troubleshooting](#9-troubleshooting)
@@ -22,9 +24,140 @@
 
 ---
 
-## 1. Visão Geral do Projeto
+## 1. Informações Críticas (LEIA PRIMEIRO)
 
-### 1.1 Contexto
+### 🚨 Informações Críticas sobre Caminhos
+
+**IMPORTANTE:** A estrutura real do código difere da documentação inicial:
+
+```
+✅ CAMINHOS CORRETOS:
+- Código backend: backend/app/
+- Testes: backend/tests/
+- Entrada principal: backend/app/main.py
+- Imports: from app.module import ...
+
+❌ INCORRETO (da documentação antiga):
+- src/
+- from src.module import ...
+```
+
+### 🎯 Principais Insights de Arquitetura
+
+**1. Padrão de Camada de Banco de Dados**
+```python
+# O projeto usa uma abordagem de banco de dados em duas camadas:
+app/db/base.py          # Modelo base com UUIDMixin, TimestampMixin
+app/models/*.py         # Modelos ORM SQLAlchemy herdam de Base
+app/core/database.py    # Gerenciamento de sessão BD com get_db()
+```
+
+**2. Organização de Rotas**
+O projeto tem AMBAS estruturas de rotas antiga e nova:
+```
+app/api/routes/         # NOVA estrutura organizada (use esta)
+├── students.py
+├── activities.py
+├── assessments.py
+├── auth.py
+└── health.py
+
+app/api/                # Estrutura LEGADA plana (sendo descontinuada)
+├── students.py
+├── auth.py
+└── analytics.py
+```
+
+**3. Gerenciamento de Configuração**
+```python
+# Existem dois arquivos de config:
+app/core/config.py      # NOVO Pydantic Settings (use este)
+app/config.py           # Config LEGADO (deprecated)
+```
+
+**4. Arquivos Principais da Aplicação**
+```python
+app/main.py             # App completo com todas as rotas
+app/main_simple.py      # App mínimo para testes
+```
+
+### 📝 Tarefas Comuns de Desenvolvimento
+
+**Executar a API:**
+```bash
+cd backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Executar Testes:**
+```bash
+cd backend
+pytest                                    # Todos os testes
+pytest --cov=app --cov-report=html       # Com coverage
+pytest tests/integration/test_students_api.py -v  # Teste específico
+```
+
+**Migrações de Banco de Dados:**
+```bash
+cd backend
+alembic upgrade head                     # Aplicar migrations
+alembic revision --autogenerate -m "msg" # Criar migration
+```
+
+**Qualidade de Código:**
+```bash
+cd backend
+black app/ tests/ --line-length=120     # Formatar
+isort app/ tests/                       # Ordenar imports
+flake8 app/ tests/ --max-line-length=120  # Lint
+```
+
+### 🔑 Principais Dependências
+
+```python
+# Framework Core
+FastAPI 0.104.1         # Framework REST assíncrono
+SQLAlchemy 2.0.23       # ORM
+Pydantic 2.5.0          # Validação
+Alembic 1.12.1          # Migrações
+
+# Autenticação
+python-jose 3.3.0       # Tokens JWT
+passlib 1.7.4           # Hashing de senhas
+
+# Testes
+pytest 7.4.3            # Framework de testes
+pytest-asyncio 0.21.1   # Testes assíncronos
+pytest-cov 4.1.0        # Coverage
+
+# Integração AWS
+boto3 1.34.106          # AWS SDK
+
+# IA/ML (se usar)
+openai 1.12.0           # Integração GPT
+scikit-learn 1.3.2      # Modelos ML
+```
+
+### ⚡ Início Rápido (Copy-Paste)
+
+```bash
+# Setup completo em um comando
+cd /mnt/d/ENGINEER/VS_Code/eduautismo-ia-mvp/backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+cp .env.example .env
+# Edite .env com suas credenciais
+alembic upgrade head
+uvicorn app.main:app --reload
+```
+
+---
+
+## 2. Visão Geral do Projeto
+
+### 2.1 Contexto
 
 **EduAutismo IA** é uma plataforma de apoio pedagógico para professores da rede pública que trabalham com alunos do Transtorno do Espectro Autista (TEA).
 
@@ -101,12 +234,12 @@ RNF05_Manutenibilidade:
 
 ---
 
-## 2. Arquitetura e Stack Tecnológico
+## 3. Arquitetura e Stack Tecnológico
 
-### 2.1 Arquitetura High-Level
+### 3.1 Arquitetura de Alto Nível
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    PRESENTATION                         │
+│                    APRESENTAÇÃO                         │
 │  ┌──────────────┐              ┌──────────────┐         │
 │  │  Streamlit   │              │   REST API   │         │
 │  │  Web UI      │◄────────────►│   Docs       │         │
@@ -115,7 +248,7 @@ RNF05_Manutenibilidade:
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────┐
-│                    APPLICATION                          │
+│                    APLICAÇÃO                            │
 │  ┌──────────────────────────────────────────────────┐   │
 │  │              FastAPI Backend                     │   │
 │  │  ┌─────────┐  ┌─────────┐  ┌─────────┐          │   │
@@ -126,10 +259,10 @@ RNF05_Manutenibilidade:
 │  │       └────────────┼────────────┘                 │   │
 │  │                    │                              │   │
 │  │  ┌─────────────────▼─────────────────┐           │   │
-│  │  │        Business Logic              │           │   │
-│  │  │  • Validation                      │           │   │
-│  │  │  • Authorization                   │           │   │
-│  │  │  • Orchestration                   │           │   │
+│  │  │        Lógica de Negócio           │           │   │
+│  │  │  • Validação                       │           │   │
+│  │  │  • Autorização                     │           │   │
+│  │  │  • Orquestração                    │           │   │
 │  │  └────────────────────────────────────┘           │   │
 │  └──────────────────────────────────────────────────┘   │
 └────────────────────────┬────────────────────────────────┘
@@ -139,22 +272,22 @@ RNF05_Manutenibilidade:
         ▼                ▼                ▼
 ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
 │  PostgreSQL  │  │  DocumentDB  │  │      S3      │
-│    (RDS)     │  │  (MongoDB)   │  │   Storage    │
+│    (RDS)     │  │  (MongoDB)   │  │ Armazenamento│
 └──────────────┘  └──────────────┘  └──────────────┘
         │                │                │
         └────────────────┼────────────────┘
                          │
                          ▼
 ┌─────────────────────────────────────────────────────────┐
-│                    EXTERNAL SERVICES                    │
+│                 SERVIÇOS EXTERNOS                       │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
 │  │  OpenAI      │  │  Datadog     │  │   AWS KMS    │  │
-│  │  GPT-4       │  │  Monitoring  │  │  Encryption  │  │
+│  │  GPT-4       │  │  Monitoring  │  │  Criptografia│  │
 │  └──────────────┘  └──────────────┘  └──────────────┘  │
 └─────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 Stack Detalhado
+### 3.2 Stack Detalhado
 ```python
 # Backend Core
 PYTHON_VERSION = "3.11+"
@@ -164,36 +297,36 @@ VALIDATION = "Pydantic V2"
 AUTHENTICATION = "JWT (python-jose)"
 ASYNC_SUPPORT = "asyncio, aiohttp"
 
-# Databases
+# Bancos de Dados
 RELATIONAL_DB = {
     "engine": "PostgreSQL 15.4",
     "provider": "AWS RDS",
-    "purpose": "Structured data (students, assessments, activities)"
+    "purpose": "Dados estruturados (alunos, avaliações, atividades)"
 }
 
 DOCUMENT_DB = {
     "engine": "MongoDB 5.0",
     "provider": "AWS DocumentDB",
-    "purpose": "Logs, analytics, semi-structured data"
+    "purpose": "Logs, analytics, dados semi-estruturados"
 }
 
 CACHE = {
     "engine": "Redis 7.2",
     "provider": "AWS ElastiCache / Local",
-    "purpose": "Session cache, API cache"
+    "purpose": "Cache de sessão, cache de API"
 }
 
-# AI/ML Stack
+# Stack IA/ML
 NLP = {
     "provider": "OpenAI",
     "model": "GPT-4",
-    "use_cases": ["Activity generation", "Content adaptation"]
+    "use_cases": ["Geração de atividades", "Adaptação de conteúdo"]
 }
 
 ML_FRAMEWORK = {
     "library": "scikit-learn 1.3+",
     "models": ["RandomForest", "GradientBoosting"],
-    "use_cases": ["Behavioral classification", "Risk prediction"]
+    "use_cases": ["Classificação comportamental", "Predição de risco"]
 }
 
 DATA_PROCESSING = [
@@ -202,7 +335,7 @@ DATA_PROCESSING = [
     "scipy 1.11+"
 ]
 
-# Infrastructure
+# Infraestrutura
 CLOUD = "AWS"
 CONTAINER = "Docker + ECS Fargate"
 IaC = "Terraform 1.5+"
@@ -210,10 +343,10 @@ CI_CD = "GitHub Actions"
 MONITORING = "Datadog (APM, Logs, Metrics)"
 ```
 
-### 2.3 Diagrama de Componentes
+### 2.3 Diagrama de Componentes (Estrutura Real)
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    src/                                      │
+│                    backend/app/                              │
 │                                                              │
 │  ┌────────────────────────────────────────────────────┐     │
 │  │  api/                                              │     │
@@ -221,53 +354,60 @@ MONITORING = "Datadog (APM, Logs, Metrics)"
 │  │  │   ├── students.py   # /api/v1/students         │     │
 │  │  │   ├── activities.py # /api/v1/activities       │     │
 │  │  │   ├── assessments.py# /api/v1/assessments      │     │
-│  │  │   └── auth.py       # /api/v1/auth             │     │
+│  │  │   ├── auth.py       # /api/v1/auth             │     │
+│  │  │   └── health.py     # /health endpoints        │     │
 │  │  ├── dependencies/     # FastAPI dependencies      │     │
-│  │  └── main.py           # FastAPI app               │     │
+│  │  │   └── auth.py       # JWT auth dependency      │     │
+│  │  ├── auth.py           # Auth endpoints (legacy)   │     │
+│  │  ├── students.py       # Student endpoints (legacy)│     │
+│  │  ├── analytics.py      # Analytics endpoints      │     │
+│  │  └── routes.py         # Route aggregator         │     │
 │  └────────────────────────────────────────────────────┘     │
 │                                                              │
 │  ┌────────────────────────────────────────────────────┐     │
 │  │  services/                                          │     │
-│  │  ├── student_service.py      # Business logic     │     │
+│  │  ├── student_service.py      # Student logic      │     │
 │  │  ├── activity_service.py     # Activity CRUD      │     │
 │  │  ├── assessment_service.py   # Assessment logic   │     │
-│  │  ├── nlp_service.py          # OpenAI integration │     │
-│  │  ├── ml_service.py           # ML predictions     │     │
-│  │  └── recommendation_service.py # Recommendations  │     │
+│  │  └── aws_service.py          # AWS S3/KMS ops     │     │
 │  └────────────────────────────────────────────────────┘     │
 │                                                              │
 │  ┌────────────────────────────────────────────────────┐     │
-│  │  models/                                            │     │
-│  │  ├── database/         # SQLAlchemy models         │     │
-│  │  │   ├── student.py                                │     │
-│  │  │   ├── activity.py                               │     │
-│  │  │   └── assessment.py                             │     │
-│  │  └── ml/               # ML models                 │     │
-│  │      ├── behavioral_classifier.py                  │     │
-│  │      └── activity_recommender.py                   │     │
+│  │  models/               # SQLAlchemy ORM models     │     │
+│  │  ├── student.py        # Student table             │     │
+│  │  ├── activity.py       # Activity table            │     │
+│  │  ├── assessment.py     # Assessment table          │     │
+│  │  ├── user.py           # User/Teacher table        │     │
+│  │  └── behavior.py       # Behavioral data           │     │
 │  └────────────────────────────────────────────────────┘     │
 │                                                              │
 │  ┌────────────────────────────────────────────────────┐     │
 │  │  schemas/              # Pydantic schemas          │     │
-│  │  ├── student.py                                    │     │
-│  │  ├── activity.py                                   │     │
-│  │  └── assessment.py                                 │     │
+│  │  ├── student.py        # Student DTOs              │     │
+│  │  ├── activity.py       # Activity DTOs             │     │
+│  │  ├── assessment.py     # Assessment DTOs           │     │
+│  │  ├── auth.py           # Auth DTOs                 │     │
+│  │  ├── user.py           # User DTOs                 │     │
+│  │  └── common.py         # Shared schemas            │     │
 │  └────────────────────────────────────────────────────┘     │
 │                                                              │
 │  ┌────────────────────────────────────────────────────┐     │
-│  │  core/                 # Core utilities            │     │
-│  │  ├── config.py         # Settings                  │     │
-│  │  ├── database.py       # DB connection             │     │
-│  │  ├── security.py       # Auth, encryption          │     │
+│  │  core/                 # Core functionality        │     │
+│  │  ├── config.py         # Pydantic Settings         │     │
+│  │  ├── database.py       # SQLAlchemy setup          │     │
+│  │  ├── security.py       # JWT, hashing, crypto      │     │
 │  │  └── exceptions.py     # Custom exceptions         │     │
 │  └────────────────────────────────────────────────────┘     │
 │                                                              │
 │  ┌────────────────────────────────────────────────────┐     │
-│  │  utils/                # Helper functions          │     │
-│  │  ├── logger.py                                     │     │
-│  │  ├── validators.py                                 │     │
-│  │  └── helpers.py                                    │     │
+│  │  db/                   # Database utilities        │     │
+│  │  ├── base.py           # Base model + mixins       │     │
+│  │  └── session.py        # Session management        │     │
 │  └────────────────────────────────────────────────────┘     │
+│                                                              │
+│  ├── main.py              # FastAPI app (full)        │     │
+│  ├── main_simple.py       # FastAPI app (minimal)     │     │
+│  └── config.py            # Config (legacy)           │     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -275,151 +415,162 @@ MONITORING = "Datadog (APM, Logs, Metrics)"
 
 ## 3. Estrutura de Código
 
-### 3.1 Diretórios Principais
+### 3.1 Diretórios Principais (Estrutura Real do Projeto)
 ```bash
-eduautismo-ia/
+eduautismo-ia-mvp/
 ├── .github/
-│   └── workflows/              # CI/CD pipelines
-│       ├── test.yml            # Run tests on PR
-│       ├── deploy-staging.yml  # Deploy to staging
-│       └── deploy-prod.yml     # Deploy to production
+│   └── workflows/                      # GitHub Actions CI/CD
+│       ├── 00-orchestrator.yml         # Main orchestrator
+│       ├── 01-security-scan.yml        # Security scanning
+│       ├── 02-backend-tests.yml        # Backend tests
+│       ├── 03-frontend-tests.yml       # Frontend tests
+│       ├── 04-container-scan.yml       # Docker scanning
+│       ├── 05-build-and-push.yml       # Build images
+│       ├── 06-deploy-environment.yml   # Deploy to AWS
+│       ├── 07-feature-branch.yml       # Feature workflow
+│       └── 08-rollback.yml             # Rollback workflow
 │
-├── docs/                       # Documentation
-│   ├── api/                    # API documentation
-│   ├── architecture/           # Architecture docs
-│   └── guides/                 # User guides
-│
-├── ml_models/                  # Trained ML models
-│   ├── behavioral_classifier/
-│   │   ├── model.pkl
-│   │   ├── scaler.pkl
-│   │   └── metadata.json
-│   └── recommender/
-│       ├── model.pkl
-│       └── metadata.json
-│
-├── scripts/                    # Automation scripts
-│   ├── train_behavioral_model.py
-│   ├── train_recommender.py
-│   ├── seed_database.py
-│   ├── backup.sh
-│   ├── deploy.sh
-│   └── generate_reports.py
-│
-├── src/
-│   ├── api/                    # FastAPI application
-│   │   ├── routes/
-│   │   │   ├── __init__.py
-│   │   │   ├── students.py
-│   │   │   ├── activities.py
-│   │   │   ├── assessments.py
-│   │   │   ├── auth.py
-│   │   │   └── health.py
-│   │   ├── dependencies/
-│   │   │   ├── __init__.py
-│   │   │   ├── auth.py
-│   │   │   └── database.py
-│   │   └── main.py
+├── backend/                            # Backend application
+│   ├── alembic/                        # Database migrations
+│   │   ├── versions/                   # Migration scripts
+│   │   │   ├── 20250110_0001_initial_migration.py
+│   │   │   └── __init__.py
+│   │   ├── env.py                      # Alembic environment
+│   │   └── __init__.py
 │   │
-│   ├── core/                   # Core functionality
+│   ├── app/                            # Main application code
+│   │   ├── api/                        # API layer
+│   │   │   ├── routes/                 # API routes (organized)
+│   │   │   │   ├── students.py         # Student endpoints
+│   │   │   │   ├── activities.py       # Activity endpoints
+│   │   │   │   ├── assessments.py      # Assessment endpoints
+│   │   │   │   ├── auth.py             # Auth endpoints
+│   │   │   │   ├── health.py           # Health check
+│   │   │   │   └── __init__.py
+│   │   │   ├── dependencies/           # FastAPI dependencies
+│   │   │   │   ├── auth.py             # JWT auth
+│   │   │   │   └── __init__.py
+│   │   │   ├── analytics.py            # Analytics endpoints
+│   │   │   ├── auth.py                 # Auth (legacy)
+│   │   │   ├── students.py             # Students (legacy)
+│   │   │   ├── teachers.py             # Teachers endpoint
+│   │   │   ├── routes.py               # Route aggregator
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── core/                       # Core functionality
+│   │   │   ├── config.py               # Pydantic Settings
+│   │   │   ├── database.py             # SQLAlchemy setup
+│   │   │   ├── security.py             # JWT, hashing, crypto
+│   │   │   ├── exceptions.py           # Custom exceptions
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── db/                         # Database utilities
+│   │   │   ├── base.py                 # Base + mixins
+│   │   │   ├── session.py              # Session management
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── models/                     # SQLAlchemy ORM
+│   │   │   ├── activity.py             # Activity model
+│   │   │   ├── assessment.py           # Assessment model
+│   │   │   ├── behavior.py             # Behavior model
+│   │   │   ├── student.py              # Student model
+│   │   │   ├── user.py                 # User/Teacher model
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── schemas/                    # Pydantic schemas
+│   │   │   ├── activity.py             # Activity DTOs
+│   │   │   ├── assessment.py           # Assessment DTOs
+│   │   │   ├── auth.py                 # Auth DTOs
+│   │   │   ├── common.py               # Shared schemas
+│   │   │   ├── student.py              # Student DTOs
+│   │   │   ├── user.py                 # User DTOs
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── services/                   # Business logic
+│   │   │   ├── activity_service.py     # Activity operations
+│   │   │   ├── assessment_service.py   # Assessment logic
+│   │   │   ├── aws_service.py          # AWS integration
+│   │   │   ├── student_service.py      # Student operations
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── main.py                     # FastAPI app (full)
+│   │   ├── main_simple.py              # FastAPI app (minimal)
+│   │   └── config.py                   # Config (legacy)
+│   │
+│   ├── ml_models/                      # ML models directory
+│   │   ├── behavioral_classifier/      # Classifier models
+│   │   └── recommender/                # Recommender models
+│   │
+│   ├── tests/                          # Test suite
 │   │   ├── __init__.py
-│   │   ├── config.py           # Settings (Pydantic)
-│   │   ├── database.py         # DB sessions
-│   │   ├── security.py         # Auth, JWT
-│   │   └── exceptions.py       # Custom exceptions
+│   │   ├── conftest.py                 # Pytest fixtures
+│   │   ├── integration/                # Integration tests
+│   │   │   ├── test_activities_api.py
+│   │   │   ├── test_assessments_api.py
+│   │   │   ├── test_auth_api.py
+│   │   │   ├── test_students_api.py
+│   │   │   └── __init__.py
+│   │   └── unit/                       # Unit tests
+│   │       └── __init__.py
 │   │
-│   ├── models/
-│   │   ├── database/           # SQLAlchemy ORM models
-│   │   │   ├── __init__.py
-│   │   │   ├── base.py
-│   │   │   ├── student.py
-│   │   │   ├── activity.py
-│   │   │   ├── assessment.py
-│   │   │   └── user.py
-│   │   └── ml/                 # ML models
-│   │       ├── __init__.py
-│   │       ├── base_model.py
-│   │       ├── behavioral_classifier.py
-│   │       └── activity_recommender.py
-│   │
-│   ├── schemas/                # Pydantic schemas
-│   │   ├── __init__.py
-│   │   ├── student.py
-│   │   ├── activity.py
-│   │   ├── assessment.py
-│   │   ├── auth.py
-│   │   └── common.py
-│   │
-│   ├── services/               # Business logic
-│   │   ├── __init__.py
-│   │   ├── student_service.py
-│   │   ├── activity_service.py
-│   │   ├── assessment_service.py
-│   │   ├── nlp_service.py
-│   │   ├── ml_service.py
-│   │   └── recommendation_service.py
-│   │
-│   ├── utils/                  # Utilities
-│   │   ├── __init__.py
-│   │   ├── logger.py
-│   │   ├── validators.py
-│   │   ├── helpers.py
-│   │   └── constants.py
-│   │
-│   └── web/                    # Streamlit UI
-│       ├── app.py              # Main app
-│       ├── pages/
-│       │   ├── students.py
-│       │   ├── activities.py
-│       │   └── reports.py
-│       └── components/
-│           ├── sidebar.py
-│           └── charts.py
+│   ├── .coverage                       # Coverage data
+│   ├── .env                            # Environment variables (git-ignored)
+│   ├── .env.example                    # Environment template
+│   ├── .isort.cfg                      # isort configuration
+│   ├── pytest.ini                      # Pytest configuration
+│   ├── requirements.txt                # Production dependencies
+│   └── requirements-dev.txt            # Development dependencies
 │
-├── terraform/                  # Infrastructure as Code
-│   ├── main.tf
-│   ├── variables.tf
-│   ├── outputs.tf
-│   ├── vpc.tf
-│   ├── ecs.tf
-│   ├── rds.tf
-│   └── modules/
+├── frontend/                           # React frontend
+│   ├── src/
+│   │   ├── components/                 # React components
+│   │   ├── pages/                      # Page components
+│   │   ├── services/                   # API clients
+│   │   ├── store/                      # Zustand state
+│   │   ├── App.jsx                     # Root component
+│   │   └── main.jsx                    # Entry point
+│   ├── public/                         # Static assets
+│   ├── package.json                    # NPM dependencies
+│   ├── vite.config.js                  # Vite configuration
+│   └── tailwind.config.js              # Tailwind CSS
+│
+├── terraform/                          # Infrastructure as Code
+│   ├── environments/                   # Environment configs
+│   │   ├── development/
+│   │   ├── staging/
+│   │   └── production/
+│   └── modules/                        # Terraform modules
 │       ├── networking/
 │       ├── compute/
 │       └── storage/
 │
-├── tests/                      # Tests
-│   ├── unit/
-│   │   ├── test_student_service.py
-│   │   ├── test_activity_service.py
-│   │   └── test_ml_models.py
-│   ├── integration/
-│   │   ├── test_api_students.py
-│   │   └── test_api_activities.py
-│   └── fixtures/
-│       ├── __init__.py
-│       └── sample_data.py
+├── docs/                               # Documentation
+│   ├── API.md
+│   ├── ARCHITECTURE.md
+│   └── DEPLOYMENT.md
 │
-├── .env.example                # Environment variables template
-├── .gitignore
-├── .pre-commit-config.yaml     # Pre-commit hooks
-├── alembic.ini                 # Database migrations config
-├── docker-compose.yml          # Local development
-├── Dockerfile.api              # API container
-├── Dockerfile.web              # Web UI container
-├── pyproject.toml              # Poetry config
-├── requirements.txt            # Python dependencies
-├── requirements-dev.txt        # Dev dependencies
-├── pytest.ini                  # Pytest configuration
-├── README.md                   # Project README
-└── CLAUDE.md                   # This file
+├── scripts/                            # Automation scripts
+│   ├── validate_structure.sh           # Structure validation
+│   └── check_structure.py              # Python validator
+│
+├── .gitignore                          # Git ignore rules
+├── docker-compose.yml                  # Local development
+├── alembic.ini                         # Alembic configuration
+├── README.md                           # Project README
+└── CLAUDE.md                           # This file
 ```
+
+**NOTAS IMPORTANTES SOBRE CAMINHOS:**
+- O código real está em `backend/app/` NÃO em `src/`
+- Os testes estão em `backend/tests/` NÃO em `tests/`
+- O ponto de entrada principal é `backend/app/main.py`
+- As migrações Alembic estão em `backend/alembic/`
 
 ### 3.2 Módulos Principais
 
-#### 3.2.1 API Routes
+#### 3.2.1 API Routes (Estrutura Real)
 ```python
-# src/api/routes/students.py
+# backend/app/api/routes/students.py
 """
 Student management endpoints
 """
@@ -428,10 +579,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from src.api.dependencies.database import get_db
-from src.api.dependencies.auth import get_current_user
-from src.schemas.student import StudentCreate, StudentUpdate, StudentResponse
-from src.services.student_service import StudentService
+from app.api.dependencies.auth import get_current_user
+from app.core.database import get_db
+from app.schemas.student import StudentCreate, StudentUpdate, StudentResponse
+from app.services.student_service import StudentService
 
 router = APIRouter(prefix="/api/v1/students", tags=["students"])
 
@@ -2063,41 +2214,229 @@ breakpoint()
 
 ## 10. Referências Rápidas
 
-### 10.1 Comandos Essenciais
+### 10.1 Comandos Essenciais (CORRETOS)
+
+**CRÍTICO: Todos os caminhos usam `backend/app/` NÃO `src/`!**
+
 ```bash
-# Desenvolvimento
-uvicorn src.api.main:app --reload              # Iniciar API
-streamlit run src/web/app.py                   # Iniciar Web UI
-pytest tests/ -v                               # Rodar testes
-black src/ tests/                              # Formatar código
-flake8 src/ tests/                             # Linter
-mypy src/                                      # Type checking
+# ============================================================
+# DESENVOLVIMENTO LOCAL
+# ============================================================
 
-# Database
-alembic revision --autogenerate -m "message"   # Criar migration
-alembic upgrade head                           # Aplicar migrations
-alembic downgrade -1                           # Reverter migration
-psql $DATABASE_URL                             # Conectar ao banco
+# Setup inicial (primeira vez)
+cd backend
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# ou: venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
 
-# Docker
-docker-compose up -d                           # Iniciar serviços
-docker-compose logs -f api                     # Ver logs
-docker-compose down                            # Parar serviços
-docker-compose exec postgres psql -U user      # Acessar PostgreSQL
+# Iniciar API (várias opções)
+cd backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# ou usar main_simple.py para versão mínima
+uvicorn app.main_simple:app --reload --host 0.0.0.0 --port 8000
 
-# Git
-git checkout -b feature/nome                   # Criar branch
-git add .                                      # Add changes
-git commit -m "feat: description"              # Commit
-git push origin feature/nome                   # Push
+# ============================================================
+# TESTES
+# ============================================================
 
-# AWS
-aws ecs update-service --force-new-deployment  # Forçar redeploy
-aws logs tail /ecs/eduautismo-production       # Ver logs
-aws rds describe-db-instances                  # Ver databases
+# Executar todos os testes
+cd backend
+pytest
+
+# Testes com verbose
+pytest -v
+
+# Testes com coverage
+pytest --cov=app --cov-report=html --cov-report=term
+
+# Testes específicos
+pytest tests/unit/
+pytest tests/integration/
+pytest tests/integration/test_students_api.py -v
+
+# Testes com output completo
+pytest -vv -s
+
+# Ver relatório de coverage no navegador
+# Arquivo gerado em: backend/htmlcov/index.html
+
+# ============================================================
+# QUALIDADE DE CÓDIGO
+# ============================================================
+
+cd backend
+
+# Black (formatador) - comprimento de linha 120
+black app/ tests/ --line-length=120
+
+# isort (ordenação de imports)
+isort app/ tests/
+
+# Flake8 (linter)
+flake8 app/ tests/ --max-line-length=120
+
+# MyPy (verificação de tipos)
+mypy app/ --ignore-missing-imports
+
+# ============================================================
+# BANCO DE DADOS (Alembic)
+# ============================================================
+
+cd backend
+
+# Criar nova migration
+alembic revision --autogenerate -m "descrição da mudança"
+
+# Aplicar todas migrations pendentes
+alembic upgrade head
+
+# Aplicar migration específica
+alembic upgrade +1
+
+# Reverter última migration
+alembic downgrade -1
+
+# Ver histórico de migrations
+alembic history
+
+# Ver migration atual
+alembic current
+
+# ============================================================
+# DOCKER (Desenvolvimento Local)
+# ============================================================
+
+# Iniciar todos os serviços
+docker-compose up -d
+
+# Ver logs em tempo real
+docker-compose logs -f
+docker-compose logs -f api
+docker-compose logs -f postgres
+
+# Parar todos os serviços
+docker-compose down
+
+# Rebuild e restart
+docker-compose up -d --build
+
+# Acessar banco de dados PostgreSQL
+docker-compose exec postgres psql -U eduautismo_user -d eduautismo_db
+
+# Acessar MongoDB
+docker-compose exec mongodb mongosh
+
+# Limpar volumes (⚠️ CUIDADO: apaga dados)
+docker-compose down -v
+
+# ============================================================
+# FLUXO DE TRABALHO GIT
+# ============================================================
+
+# Criar feature branch
+git checkout -b feature/nome-da-feature
+
+# Ver status
+git status
+
+# Adicionar mudanças
+git add .
+
+# Commit (seguir Conventional Commits)
+git commit -m "feat: adicionar endpoint de atividades"
+# Tipos: feat, fix, docs, style, refactor, test, chore
+
+# Push da branch
+git push origin feature/nome-da-feature
+
+# Atualizar branch com main
+git fetch origin
+git rebase origin/main
+
+# ============================================================
+# DEPURAÇÃO
+# ============================================================
+
+# Ver logs da aplicação
+cd backend
+tail -f logs/app.log
+
+# Modo debug (adicionar no código)
+import pdb; pdb.set_trace()
+
+# Ver variáveis de ambiente
+cd backend
+cat .env
+
+# Testar conexão com banco
+cd backend
+python -c "from app.core.database import engine; print(engine)"
+
+# ============================================================
+# VERIFICAÇÕES DE SAÚDE
+# ============================================================
+
+# Health check básico
+curl http://localhost:8000/health
+
+# Health check detalhado
+curl http://localhost:8000/health/detailed
+
+# Ver docs da API
+# http://localhost:8000/docs
+# http://localhost:8000/redoc
+
+# ============================================================
+# LIMPEZA
+# ============================================================
+
+# Limpar cache Python
+find . -type d -name "__pycache__" -exec rm -rf {} +
+find . -type f -name "*.pyc" -delete
+
+# Limpar arquivos de coverage
+cd backend
+rm -rf .coverage htmlcov/ .pytest_cache/
+
+# ============================================================
+# PRODUÇÃO / AWS
+# ============================================================
+
+# Login ECR
+aws ecr get-login-password --region us-east-1 | \
+    docker login --username AWS --password-stdin \
+    <account>.dkr.ecr.us-east-1.amazonaws.com
+
+# Build imagem
+docker build -t eduautismo-api:latest -f Dockerfile .
+
+# Push para ECR
+docker tag eduautismo-api:latest <account>.dkr.ecr.us-east-1.amazonaws.com/eduautismo-api:latest
+docker push <account>.dkr.ecr.us-east-1.amazonaws.com/eduautismo-api:latest
+
+# Forçar novo deploy (ECS)
+aws ecs update-service \
+    --cluster eduautismo-cluster \
+    --service eduautismo-service \
+    --force-new-deployment
+
+# Ver logs (CloudWatch)
+aws logs tail /ecs/eduautismo-api --follow
 ```
 
-### 10.2 URLs Importantes
+### 10.2 Atalhos e Dicas
+
+```bash
+# Alias úteis para .bashrc ou .zshrc
+alias eduapi="cd ~/eduautismo-ia-mvp/backend && source venv/bin/activate"
+alias edutest="cd ~/eduautismo-ia-mvp/backend && pytest -v"
+alias educov="cd ~/eduautismo-ia-mvp/backend && pytest --cov=app --cov-report=html"
+alias eduformat="cd ~/eduautismo-ia-mvp/backend && black app/ tests/ && isort app/ tests/"
+```
+
+### 10.3 URLs Importantes
 ```yaml
 Desenvolvimento:
   API: http://localhost:8000

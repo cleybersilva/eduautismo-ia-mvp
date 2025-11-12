@@ -711,28 +711,324 @@ Services dependem de:
 - ✅ Constants (Enums)
 - ✅ NLP Service (OpenAI)
 
+### 5. AWSService (`aws_service.py`)
+
+**Responsabilidade**: Gerenciamento de arquivos no AWS S3 e criptografia KMS
+
+#### Métodos Principais
+
+##### `upload_file(file_obj, filename, prefix, content_type=None, metadata=None, encrypt=True) -> Tuple[str, str]`
+
+Faz upload de arquivo para S3.
+
+- **Gera nome único** com UUID
+- **Valida tipo** de arquivo baseado no prefixo
+- **Valida tamanho** (10MB imagens, 20MB documentos, 50MB geral)
+- **Criptografia KMS** opcional
+- **Metadados customizados**
+
+**Retorna**: `(s3_key, url)` - Chave S3 e URL pública
+
+**Exemplo**:
+```python
+from app.services.aws_service import get_aws_service
+
+aws_service = get_aws_service()
+
+# Upload com criptografia
+s3_key, url = await aws_service.upload_file(
+    file_obj=file,
+    filename="document.pdf",
+    prefix="students/documents",
+    metadata={"student_id": str(student_id)},
+    encrypt=True
+)
+```
+
+##### `download_file(s3_key) -> Tuple[bytes, Dict]`
+
+Baixa arquivo do S3.
+
+- **Retorna conteúdo** + metadados
+- **Lança FileNotFoundError** se não encontrado
+
+##### `delete_file(s3_key) -> bool`
+
+Deleta arquivo do S3.
+
+##### `generate_presigned_url(s3_key, expiration=3600, download=False) -> str`
+
+Gera URL presignada para acesso temporário.
+
+- **Expiration** em segundos (padrão: 1 hora)
+- **Forçar download** via ResponseContentDisposition
+
+**Exemplo**:
+```python
+# URL temporária para visualização
+view_url = await aws_service.generate_presigned_url(
+    s3_key="students/images/abc123.jpg",
+    expiration=7200  # 2 horas
+)
+
+# URL para forçar download
+download_url = await aws_service.generate_presigned_url(
+    s3_key="students/documents/report.pdf",
+    download=True
+)
+```
+
+##### `list_files(prefix, max_keys=100) -> List[Dict]`
+
+Lista arquivos em um prefixo (diretório).
+
+**Retorna**:
+```python
+[
+    {
+        "key": "students/documents/abc123.pdf",
+        "size": 102400,
+        "last_modified": datetime(...),
+        "etag": "..."
+    }
+]
+```
+
+##### Métodos de Conveniência
+
+- `upload_student_document(file_obj, filename, student_id, metadata=None)`
+- `upload_student_image(file_obj, filename, student_id, metadata=None)`
+- `upload_activity_material(file_obj, filename, activity_id, metadata=None)`
+- `upload_assessment_file(file_obj, filename, assessment_id, metadata=None)`
+
+**Exemplo**:
+```python
+# Upload simplificado de foto do aluno
+s3_key, url = await aws_service.upload_student_image(
+    file_obj=photo,
+    filename="profile.jpg",
+    student_id=str(student.id)
+)
+```
+
+#### Validações
+
+**Tipos de Arquivo Permitidos**:
+- **Imagens**: JPEG, PNG, GIF, WebP
+- **Documentos**: PDF, DOC, DOCX, XLS, XLSX
+- **Áudio**: MP3, WAV, OGG
+
+**Limites de Tamanho**:
+- Imagens: 10MB
+- Documentos: 20MB
+- Geral: 50MB
+
+---
+
+### 6. MLService (`ml_service.py`)
+
+**Responsabilidade**: Machine Learning para classificação comportamental e predições
+
+#### Métodos Principais
+
+##### `predict_risk_level(student, assessments=None) -> Dict`
+
+Classifica nível de risco comportamental do aluno.
+
+- **4 níveis**: baixo, médio, alto, muito_alto
+- **Usa modelo ML** se disponível, senão usa regras heurísticas
+- **Baseado em**: perfil cognitivo, sensorial, histórico de avaliações
+
+**Retorna**:
+```python
+{
+    "risk_level": "medio",
+    "confidence": 0.78,
+    "probabilities": {
+        "baixo": 0.15,
+        "medio": 0.78,
+        "alto": 0.05,
+        "muito_alto": 0.02
+    },
+    "method": "ml_model"  # ou "rule_based"
+}
+```
+
+**Exemplo**:
+```python
+from app.services.ml_service import get_ml_service
+
+ml_service = get_ml_service()
+
+# Carregar modelo treinado (opcional)
+ml_service.load_behavioral_model(version="production")
+
+# Predizer risco
+result = ml_service.predict_risk_level(
+    student=student,
+    assessments=student.assessments
+)
+
+if result["risk_level"] in ["alto", "muito_alto"]:
+    # Ação: acionar suporte adicional
+    pass
+```
+
+##### `predict_activity_success(student, activity_data, assessments=None) -> Dict`
+
+Prediz probabilidade de sucesso de uma atividade.
+
+- **Combina** features do aluno + features da atividade
+- **Gera recomendações** personalizadas
+- **Identifica** possíveis problemas
+
+**Retorna**:
+```python
+{
+    "success_probability": 0.75,
+    "confidence": "high",
+    "recommendations": [
+        "✅ Atividade bem alinhada com perfil do aluno",
+        "Adicione suportes visuais para facilitar compreensão"
+    ]
+}
+```
+
+**Exemplo**:
+```python
+activity_data = {
+    "difficulty": 6,
+    "duration_minutes": 45,
+    "activity_type": "cognitive",
+    "has_adaptations": True,
+    "has_visual_supports": False
+}
+
+result = ml_service.predict_activity_success(
+    student=student,
+    activity_data=activity_data,
+    assessments=recent_assessments
+)
+
+if result["success_probability"] < 0.5:
+    # Sugerir ajustes antes de aplicar atividade
+    print("\n".join(result["recommendations"]))
+```
+
+##### `analyze_student_progress(student, assessments, time_window_days=30) -> Dict`
+
+Analisa progresso do aluno ao longo do tempo.
+
+- **Calcula tendências** de engajamento
+- **Identifica progressão** de independência
+- **Gera insights** acionáveis
+
+**Retorna**:
+```python
+{
+    "total_assessments": 20,
+    "completion_rate": 0.85,
+    "success_rate": 0.70,
+    "avg_engagement": 3.2,
+    "engagement_trend": "improving",  # ou "declining", "stable"
+    "trend_slope": 0.15,
+    "avg_recent_independence": 3.0,
+    "insights": [
+        "✅ Excelente taxa de conclusão de atividades",
+        "🎯 Engajamento crescente nas últimas semanas"
+    ]
+}
+```
+
+**Exemplo**:
+```python
+# Análise dos últimos 30 dias
+analysis = ml_service.analyze_student_progress(
+    student=student,
+    assessments=student.assessments,
+    time_window_days=30
+)
+
+# Exibir insights
+for insight in analysis["insights"]:
+    print(insight)
+
+# Detectar problemas
+if analysis["engagement_trend"] == "declining":
+    # Ação: revisar estratégias pedagógicas
+    pass
+```
+
+##### `extract_student_features(student, assessments=None) -> Dict[str, float]`
+
+Extrai features do perfil do aluno para ML.
+
+**Features Extraídas** (20+):
+- Idade, nível TEA
+- Perfil de aprendizagem (visual, auditivo, cinestésico, etc)
+- Attention span, sensibilidade sensorial
+- Taxa de conclusão, engajamento médio
+- Nível de independência, taxa de sucesso
+- Tendências recentes
+
+##### `get_feature_importance() -> Dict[str, float]`
+
+Retorna importância das features no modelo treinado.
+
+**Exemplo**:
+```python
+importance = ml_service.get_feature_importance()
+
+# Top 5 features mais importantes
+for feature, score in list(importance.items())[:5]:
+    print(f"{feature}: {score:.3f}")
+```
+
+#### Carregamento de Modelos
+
+##### `load_behavioral_model(version="production") -> bool`
+
+Carrega modelo de classificação comportamental treinado.
+
+- **Busca em**: `{ML_MODEL_PATH}/behavioral_classifier/{version}/`
+- **Arquivos**: model.pkl, scaler.pkl, metadata.json
+- **Fallback**: Usa classificação baseada em regras se modelo não disponível
+
+```python
+# Carregar modelo de produção
+ml_service.load_behavioral_model(version="production")
+
+# Ou versão de staging
+ml_service.load_behavioral_model(version="staging")
+```
+
+---
+
 ## Status
 
 ✅ StudentService - Completo (9 métodos)
 ✅ ActivityService - Completo (7 métodos)
 ✅ AssessmentService - Completo (7 métodos)
 ✅ NLPService - Completo (4 métodos)
+✅ **AWSService - Completo (13 métodos)** ⭐ NOVO
+✅ **MLService - Completo (9 métodos)** ⭐ NOVO
 ✅ Tratamento de erros - Implementado
 ✅ Logging - Implementado
 ✅ Permissões - Implementado
 ✅ Transações - Implementadas
 ✅ Documentação - Completa
 
-⏳ Unit tests - Pendente
+✅ **AWS Service Unit Tests - Completo (25+ testes)** ⭐ NOVO
+✅ **ML Service Unit Tests - Completo (30+ testes)** ⭐ NOVO
 ⏳ Integration tests - Pendente
 
 ## Próximos Passos
 
-1. **Routes Implementation** - Usar services nas routes
-2. **Unit Tests** - Testar cada método
-3. **Integration Tests** - Testar fluxos completos
-4. **Caching** - Adicionar cache em leituras
-5. **Background Tasks** - Análises assíncronas
+1. **Routes Implementation** - Integrar AWS Service e ML Service nas routes
+2. **Integration Tests** - Testar fluxos completos end-to-end
+3. **Caching** - Adicionar cache em leituras e predições ML
+4. **Background Tasks** - Análises assíncronas e treino de modelos
+5. **ML Model Training** - Pipeline para treinar modelos periodicamente
 
 ## Recursos Adicionais
 
