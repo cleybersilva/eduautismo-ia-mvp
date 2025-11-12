@@ -162,6 +162,13 @@ class AssessmentNotFoundError(ResourceNotFoundError):
         super().__init__(resource_type="Avaliação", resource_id=assessment_id)
 
 
+class FileNotFoundError(ResourceNotFoundError):
+    """File not found in storage."""
+
+    def __init__(self, file_path: Optional[str] = None):
+        super().__init__(resource_type="Arquivo", resource_id=file_path)
+
+
 # ============================================================================
 # Validation Exceptions
 # ============================================================================

@@ -1,8 +1,8 @@
 """
 AWS Service - EduAutismo IA
 
-ServiÁo para integraÁ„o com AWS S3 e KMS.
-Gerencia upload, download, deleÁ„o de arquivos e criptografia.
+Servi√ßo para integra√ß√£o com AWS S3 e KMS.
+Gerencia upload, download, dele√ß√£o de arquivos e criptografia.
 """
 
 import mimetypes
@@ -21,9 +21,9 @@ logger = get_logger(__name__)
 
 
 class AWSService:
-    """ServiÁo para operaÁıes com AWS S3 e KMS."""
+    """Servi√ßo para opera√ß√µes com AWS S3 e KMS."""
 
-    # Tamanhos m·ximos permitidos (em bytes)
+    # Tamanhos m√°ximos permitidos (em bytes)
     MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
     MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10MB
     MAX_DOCUMENT_SIZE = 20 * 1024 * 1024  # 20MB
@@ -39,14 +39,14 @@ class AWSService:
     }
     ALLOWED_AUDIO_TYPES = {"audio/mpeg", "audio/wav", "audio/ogg"}
 
-    # Prefixos de diretÛrios no S3
+    # Prefixos de diret√≥rios no S3
     STUDENT_DOCS_PREFIX = "students/documents"
     STUDENT_IMAGES_PREFIX = "students/images"
     ACTIVITY_MATERIALS_PREFIX = "activities/materials"
     ASSESSMENT_FILES_PREFIX = "assessments/files"
 
     def __init__(self):
-        """Inicializa o serviÁo AWS."""
+        """Inicializa o servi√ßo AWS."""
         self.session = aioboto3.Session(
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
@@ -69,7 +69,7 @@ class AWSService:
         Args:
             file_obj: Objeto arquivo (file-like object)
             filename: Nome do arquivo
-            prefix: Prefixo do caminho (diretÛrio)
+            prefix: Prefixo do caminho (diret√≥rio)
             content_type: Tipo MIME do arquivo
             metadata: Metadados customizados
             encrypt: Se deve criptografar com KMS
@@ -78,16 +78,16 @@ class AWSService:
             Tupla (s3_key, url) - Chave S3 e URL do arquivo
 
         Raises:
-            ValidationError: Se arquivo inv·lido
+            ValidationError: Se arquivo inv√°lido
             AWSError: Se erro ao fazer upload
         """
         try:
-            # Gerar nome ˙nico para o arquivo
+            # Gerar nome √∫nico para o arquivo
             file_extension = filename.split(".")[-1] if "." in filename else ""
             unique_filename = f"{uuid4()}.{file_extension}" if file_extension else str(uuid4())
             s3_key = f"{prefix}/{unique_filename}"
 
-            # Detectar content type se n„o fornecido
+            # Detectar content type se n√£o fornecido
             if not content_type:
                 content_type, _ = mimetypes.guess_type(filename)
                 if not content_type:
@@ -96,7 +96,7 @@ class AWSService:
             # Validar tipo de arquivo
             await self._validate_file_type(content_type, prefix)
 
-            # Ler conte˙do do arquivo
+            # Ler conte√∫do do arquivo
             file_content = file_obj.read()
 
             # Validar tamanho
@@ -134,7 +134,7 @@ class AWSService:
                 f"File uploaded successfully: {s3_key}",
                 extra={
                     "s3_key": s3_key,
-                    "filename": filename,
+                    "file_name": filename,
                     "size": file_size,
                     "content_type": content_type,
                 },
@@ -160,17 +160,17 @@ class AWSService:
             s3_key: Chave do arquivo no S3
 
         Returns:
-            Tupla (file_content, metadata) - Conte˙do e metadados
+            Tupla (file_content, metadata) - Conte√∫do e metadados
 
         Raises:
-            CustomFileNotFoundError: Se arquivo n„o encontrado
+            CustomFileNotFoundError: Se arquivo n√£o encontrado
             AWSError: Se erro ao baixar
         """
         try:
             async with self.session.client("s3") as s3_client:
                 response = await s3_client.get_object(Bucket=self.bucket_name, Key=s3_key)
 
-                # Ler conte˙do do arquivo
+                # Ler conte√∫do do arquivo
                 async with response["Body"] as stream:
                     file_content = await stream.read()
 
@@ -225,12 +225,12 @@ class AWSService:
         self, s3_key: str, expiration: int = 3600, download: bool = False
     ) -> str:
         """
-        Gera URL presignada para acesso tempor·rio ao arquivo.
+        Gera URL presignada para acesso tempor√°rio ao arquivo.
 
         Args:
             s3_key: Chave do arquivo no S3
-            expiration: Tempo de expiraÁ„o em segundos (padr„o: 1 hora)
-            download: Se deve forÁar download (attachment)
+            expiration: Tempo de expira√ß√£o em segundos (padr√£o: 1 hora)
+            download: Se deve for√ßar download (attachment)
 
         Returns:
             URL presignada
@@ -241,7 +241,7 @@ class AWSService:
         try:
             params = {"Bucket": self.bucket_name, "Key": s3_key}
 
-            # ForÁar download se solicitado
+            # For√ßar download se solicitado
             if download:
                 params["ResponseContentDisposition"] = "attachment"
 
@@ -266,14 +266,14 @@ class AWSService:
 
     async def list_files(self, prefix: str, max_keys: int = 100) -> List[Dict[str, any]]:
         """
-        Lista arquivos em um prefixo (diretÛrio).
+        Lista arquivos em um prefixo (diret√≥rio).
 
         Args:
             prefix: Prefixo para filtrar arquivos
-            max_keys: M·ximo de arquivos a retornar
+            max_keys: M√°ximo de arquivos a retornar
 
         Returns:
-            Lista de dicion·rios com informaÁıes dos arquivos
+            Lista de dicion√°rios com informa√ß√µes dos arquivos
 
         Raises:
             AWSError: Se erro ao listar
@@ -342,16 +342,16 @@ class AWSService:
 
     async def get_file_metadata(self, s3_key: str) -> Dict[str, any]:
         """
-        ObtÈm metadados de um arquivo.
+        Obt√©m metadados de um arquivo.
 
         Args:
             s3_key: Chave do arquivo no S3
 
         Returns:
-            Dicion·rio com metadados do arquivo
+            Dicion√°rio com metadados do arquivo
 
         Raises:
-            CustomFileNotFoundError: Se arquivo n„o encontrado
+            CustomFileNotFoundError: Se arquivo n√£o encontrado
             AWSError: Se erro ao obter metadados
         """
         try:
@@ -378,7 +378,7 @@ class AWSService:
             logger.error(f"Unexpected error getting file metadata: {e}")
             raise AWSError(f"Unexpected error getting file metadata: {str(e)}") from e
 
-    # ========== MÈtodos de ValidaÁ„o ==========
+    # ========== M√©todos de Valida√ß√£o ==========
 
     async def _validate_file_type(self, content_type: str, prefix: str) -> None:
         """Valida tipo de arquivo baseado no prefixo."""
@@ -416,7 +416,7 @@ class AWSService:
         if file_size == 0:
             raise ValidationError("File is empty")
 
-    # ========== MÈtodos de ConveniÍncia ==========
+    # ========== M√©todos de Conveni√™ncia ==========
 
     async def upload_student_document(
         self, file_obj: BinaryIO, filename: str, student_id: str, metadata: Optional[Dict] = None
@@ -451,7 +451,7 @@ class AWSService:
     async def upload_assessment_file(
         self, file_obj: BinaryIO, filename: str, assessment_id: str, metadata: Optional[Dict] = None
     ) -> Tuple[str, str]:
-        """Upload arquivo de avaliaÁ„o."""
+        """Upload arquivo de avalia√ß√£o."""
         prefix = f"{self.ASSESSMENT_FILES_PREFIX}/{assessment_id}"
         if metadata is None:
             metadata = {}
@@ -465,10 +465,10 @@ _aws_service = None
 
 def get_aws_service() -> AWSService:
     """
-    Retorna inst‚ncia singleton do AWSService.
+    Retorna inst√¢ncia singleton do AWSService.
 
     Returns:
-        Inst‚ncia de AWSService
+        Inst√¢ncia de AWSService
     """
     global _aws_service
     if _aws_service is None:

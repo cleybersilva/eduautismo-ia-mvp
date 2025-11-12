@@ -522,8 +522,8 @@ class MLService:
         avg_independence = student_features.get("avg_independence", 2.0)
 
         # Difficulty alignment
-        if activity_difficulty > 7 and avg_independence < 2:
-            base_prob -= 0.15  # Too hard
+        if activity_difficulty > 7 and avg_independence <= 2:
+            base_prob -= 0.30  # Too hard
         elif activity_difficulty < 3 and avg_independence > 3:
             base_prob += 0.05  # May be too easy but likely to complete
 
@@ -541,25 +541,25 @@ class MLService:
         recommendations = []
 
         if success_prob < 0.4:
-            recommendations.append("  Atividade pode ser desafiadora - considere simplificar")
+            recommendations.append("âš ï¸ Atividade pode ser desafiadora - considere simplificar")
 
             # Check difficulty
             if features.get("activity_difficulty", 5) > 6:
-                recommendations.append("Reduza o nível de dificuldade da atividade")
+                recommendations.append("Reduza o nÃ­vel de dificuldade da atividade")
 
             # Check supports
             if not features.get("has_visual_supports"):
-                recommendations.append("Adicione suportes visuais para facilitar compreensão")
+                recommendations.append("Adicione suportes visuais para facilitar compreensÃ£o")
 
             if not features.get("has_adaptations"):
-                recommendations.append("Inclua adaptações baseadas no perfil do aluno")
+                recommendations.append("Inclua adaptaÃ§Ãµes baseadas no perfil do aluno")
 
             # Check student performance
             if features.get("avg_engagement", 2) < 2:
                 recommendations.append("Incorpore interesses especiais do aluno para aumentar engajamento")
 
         elif success_prob > 0.7:
-            recommendations.append(" Atividade bem alinhada com perfil do aluno")
+            recommendations.append("âœ“ Atividade bem alinhada com perfil do aluno")
 
             # Check if may be too easy
             if features.get("avg_independence", 2) > 3 and features.get("activity_difficulty", 5) < 4:
@@ -573,7 +573,7 @@ class MLService:
         attention_span = features.get("attention_span", 5)
 
         if duration > 45 and attention_span < 3:
-            recommendations.append("Considere dividir atividade em sessões menores")
+            recommendations.append("Considere dividir atividade em sessÃƒÂµes menores")
 
         return recommendations
 
@@ -596,7 +596,7 @@ class MLService:
         if not assessments:
             return {
                 "status": "insufficient_data",
-                "message": "Não há avaliações suficientes para análise",
+                "message": "NÃƒÂ£o hÃƒÂ¡ avaliaÃƒÂ§ÃƒÂµes suficientes para anÃƒÂ¡lise",
             }
 
         # Sort by date
@@ -658,16 +658,16 @@ class MLService:
         insights = []
 
         if not assessments:
-            return ["Não há dados suficientes para gerar insights"]
+            return ["NÃƒÂ£o hÃƒÂ¡ dados suficientes para gerar insights"]
 
         # Check completion rate
         completed = sum(1 for a in assessments if a.completion_status == CompletionStatus.COMPLETED)
         completion_rate = completed / len(assessments)
 
         if completion_rate > 0.8:
-            insights.append(" Excelente taxa de conclusão de atividades")
+            insights.append("âœ“ Excelente taxa de conclusÃ£o de atividades")
         elif completion_rate < 0.4:
-            insights.append("  Baixa taxa de conclusão - considere ajustar dificuldade")
+            insights.append("âš ï¸ Baixa taxa de conclusÃ£o - considere ajustar dificuldade")
 
         # Check difficulty appropriateness
         difficulty_issues = sum(
@@ -676,16 +676,16 @@ class MLService:
             if a.difficulty_rating in [DifficultyRating.TOO_EASY, DifficultyRating.TOO_HARD]
         )
         if difficulty_issues > len(assessments) * 0.4:
-            insights.append("  Muitas atividades com dificuldade inadequada - revisar seleção")
+            insights.append("âš ï¸ Muitas atividades com dificuldade inadequada - revisar seleÃ§Ã£o")
 
         # Recent performance
         recent = assessments[-5:] if len(assessments) >= 5 else assessments
         recent_completed = sum(1 for a in recent if a.completion_status == CompletionStatus.COMPLETED)
 
         if recent_completed == len(recent):
-            insights.append("<¯ Todas as atividades recentes foram concluídas")
+            insights.append("âœ“ Todas as atividades recentes foram concluÃ­das")
         elif recent_completed == 0:
-            insights.append("  Nenhuma atividade recente foi concluída - necessário suporte adicional")
+            insights.append("âš ï¸ Nenhuma atividade recente foi concluÃ­da - necessÃ¡rio suporte adicional")
 
         return insights if insights else ["Progresso dentro do esperado"]
 

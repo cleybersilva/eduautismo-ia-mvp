@@ -34,7 +34,13 @@
       "Bash(tests/unit/__init__.py)",
       "Bash(echo:*)",
       "Bash(pytest:*)",
-      "Bash(source:*)"
+      "Bash(source:*)",
+      "Bash(iconv:*)",
+      "Bash(app/services/aws_service.py.utf8)",
+      "Bash(mv:*)",
+      "Bash(app/services/ml_service.py.utf8)",
+      "Bash(requirements.txt)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
