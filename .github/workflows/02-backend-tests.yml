@@ -110,6 +110,17 @@ jobs:
           pip install -r backend/requirements.txt
           pip install -r backend/requirements-dev.txt
       
+      - name: Verify Alembic installation
+        run: |
+          echo "Checking Alembic installation..."
+          python -c "import alembic; print(f'✅ Alembic {alembic.__version__} installed')" || {
+            echo "⚠️ Alembic not found, installing..."
+            pip install alembic==1.12.1
+            python -c "import alembic; print(f'✅ Alembic {alembic.__version__} installed')"
+          }
+          which alembic
+          alembic --version
+      
       - name: Validate Alembic migrations
         env:
           DATABASE_URL: postgresql://postgres:testpass123@localhost:5432/eduautismo_test
