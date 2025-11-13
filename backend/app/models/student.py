@@ -10,10 +10,10 @@ from typing import TYPE_CHECKING, Any, Dict, List
 from sqlalchemy import Boolean, Date
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import ForeignKey, Integer, String
-from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import BaseModel
+from app.db.types import GUID, PortableJSON, StringArray
 from app.utils.constants import TEALevel
 
 if TYPE_CHECKING:
@@ -32,11 +32,11 @@ class Student(BaseModel):
     age: Mapped[int] = mapped_column(Integer, nullable=False)
     diagnosis: Mapped[str] = mapped_column(String(500), nullable=False)
     tea_level: Mapped[TEALevel | None] = mapped_column(SQLEnum(TEALevel, name="tea_level"), nullable=True)
-    interests: Mapped[List[str]] = mapped_column(ARRAY(String), default=[], nullable=False)
-    learning_profile: Mapped[Dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    interests: Mapped[List[str]] = mapped_column(StringArray, default=[], nullable=False)
+    learning_profile: Mapped[Dict[str, Any] | None] = mapped_column(PortableJSON, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    teacher_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    teacher_id: Mapped[GUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
 
     teacher: Mapped["User"] = relationship("User", back_populates="students", lazy="selectin")
     activities: Mapped[List["Activity"]] = relationship(

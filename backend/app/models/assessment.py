@@ -8,10 +8,10 @@ from typing import TYPE_CHECKING, Any, Dict
 
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import BaseModel
+from app.db.types import GUID, PortableJSON
 from app.utils.constants import CompletionStatus, DifficultyRating, EngagementLevel
 
 if TYPE_CHECKING:
@@ -63,11 +63,11 @@ class Assessment(BaseModel):
 
     # Structured Data
     skills_demonstrated: Mapped[Dict[str, Any] | None] = mapped_column(
-        JSONB, nullable=True, comment="Skills checklist or rubric results"
+        PortableJSON, nullable=True, comment="Skills checklist or rubric results"
     )
 
     behavioral_notes: Mapped[Dict[str, Any] | None] = mapped_column(
-        JSONB, nullable=True, comment="Behavioral observations (focus, cooperation, etc.)"
+        PortableJSON, nullable=True, comment="Behavioral observations (focus, cooperation, etc.)"
     )
 
     # Progress Indicators
@@ -86,17 +86,17 @@ class Assessment(BaseModel):
 
     # Success Metrics
     objectives_met: Mapped[Dict[str, bool] | None] = mapped_column(
-        JSONB, nullable=True, comment="Which objectives were achieved"
+        PortableJSON, nullable=True, comment="Which objectives were achieved"
     )
 
     # Foreign Keys
-    activity_id: Mapped[UUID] = mapped_column(
+    activity_id: Mapped[GUID] = mapped_column(
         ForeignKey("activities.id", ondelete="CASCADE"), nullable=False, index=True
     )
 
-    student_id: Mapped[UUID] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"), nullable=False, index=True)
+    student_id: Mapped[GUID] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    assessed_by_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
+    assessed_by_id: Mapped[GUID] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
 
     # Relationships
     activity: Mapped["Activity"] = relationship("Activity", back_populates="assessments", lazy="selectin")

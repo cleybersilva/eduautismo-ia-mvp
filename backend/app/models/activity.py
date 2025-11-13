@@ -9,10 +9,10 @@ from typing import TYPE_CHECKING, Any, Dict, List
 from sqlalchemy import Boolean
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import BaseModel
+from app.db.types import GUID, PortableJSON, StringArray
 from app.utils.constants import ActivityType, DifficultyLevel
 
 if TYPE_CHECKING:
@@ -48,37 +48,37 @@ class Activity(BaseModel):
     duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
 
     # Content
-    objectives: Mapped[List[str]] = mapped_column(ARRAY(String), nullable=False)
-    materials: Mapped[List[str]] = mapped_column(ARRAY(String), nullable=False)
-    instructions: Mapped[List[str]] = mapped_column(ARRAY(String), nullable=False)
+    objectives: Mapped[List[str]] = mapped_column(StringArray, nullable=False)
+    materials: Mapped[List[str]] = mapped_column(StringArray, nullable=False)
+    instructions: Mapped[List[str]] = mapped_column(StringArray, nullable=False)
 
     # Adaptations and Supports
-    adaptations: Mapped[List[str] | None] = mapped_column(ARRAY(String), nullable=True)
-    visual_supports: Mapped[List[str] | None] = mapped_column(ARRAY(String), nullable=True)
-    success_criteria: Mapped[List[str] | None] = mapped_column(ARRAY(String), nullable=True)
+    adaptations: Mapped[List[str] | None] = mapped_column(StringArray, nullable=True)
+    visual_supports: Mapped[List[str] | None] = mapped_column(StringArray, nullable=True)
+    success_criteria: Mapped[List[str] | None] = mapped_column(StringArray, nullable=True)
 
     # Theme/Topic
     theme: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    tags: Mapped[List[str] | None] = mapped_column(ARRAY(String), nullable=True, index=True)
+    tags: Mapped[List[str] | None] = mapped_column(StringArray, nullable=True, index=True)
 
     # Generation Metadata
     generated_by_ai: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     generation_metadata: Mapped[Dict[str, Any] | None] = mapped_column(
-        JSONB, nullable=True, comment="AI generation parameters and metadata"
+        PortableJSON, nullable=True, comment="AI generation parameters and metadata"
     )
 
     # Resources
-    resources_urls: Mapped[List[str] | None] = mapped_column(ARRAY(String), nullable=True)
-    attachments: Mapped[List[str] | None] = mapped_column(ARRAY(String), nullable=True)
+    resources_urls: Mapped[List[str] | None] = mapped_column(StringArray, nullable=True)
+    attachments: Mapped[List[str] | None] = mapped_column(StringArray, nullable=True)
 
     # Status
     is_published: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_template: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     # Foreign Keys
-    student_id: Mapped[UUID] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"), nullable=False, index=True)
+    student_id: Mapped[GUID] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"), nullable=False, index=True)
 
-    created_by_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
+    created_by_id: Mapped[GUID] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
 
     # Relationships
     student: Mapped["Student"] = relationship("Student", back_populates="activities", lazy="selectin")

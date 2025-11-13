@@ -26,6 +26,25 @@ docs/
 4. [Documentação da API](./guides/api-docs.md)
 5. [Arquitetura](./guides/architecture.md)
 
+## 🧪 Documentação de Testes
+
+### Testes Manuais e API
+- [TESTING.md](./TESTING.md) - Guia completo de testes manuais
+  - Testes com cURL
+  - Testes com Postman
+  - Endpoints da API
+  - Autenticação
+
+### Testes Automatizados (NOVO!)
+- [TESTING_AUTOMATED.md](./TESTING_AUTOMATED.md) - **Guia completo de testes automatizados**
+  - ✅ **82.25% de cobertura de código**
+  - ✅ **306 testes** (280 unit + 26 integration)
+  - ✅ Configuração SQLite in-memory
+  - ✅ Tipos portáveis (GUID, StringArray, PortableJSON)
+  - ✅ Fixtures e utilitários
+  - ✅ Boas práticas
+  - ✅ Troubleshooting
+
 ## Convenções
 
 ### Formatação

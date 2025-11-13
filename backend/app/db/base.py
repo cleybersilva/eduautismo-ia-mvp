@@ -9,9 +9,10 @@ from datetime import datetime
 from typing import Any
 
 from sqlalchemy import DateTime
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import Mapped, mapped_column
+
+from app.db.types import GUID
 
 # Create declarative base
 Base = declarative_base()
@@ -38,7 +39,7 @@ class UUIDMixin:
     """Mixin to add UUID primary key to models."""
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        GUID,
         primary_key=True,
         default=uuid.uuid4,
         nullable=False,

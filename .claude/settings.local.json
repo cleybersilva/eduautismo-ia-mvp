@@ -40,7 +40,9 @@
       "Bash(mv:*)",
       "Bash(app/services/ml_service.py.utf8)",
       "Bash(requirements.txt)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfix: corrigir encoding UTF-8 e testes de AWS/ML services\n\n- Converter aws_service.py e ml_service.py para UTF-8\n- Adicionar exceção FileNotFoundError\n- Corrigir lógica de predição de sucesso\n- Atualizar aioboto3 para 15.5.0\n- Corrigir emojis em insights e recomendações\n\n✅ 47/47 testes passando\nEOF\n)\")",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

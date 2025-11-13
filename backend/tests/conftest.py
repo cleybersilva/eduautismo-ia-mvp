@@ -12,29 +12,59 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from app.core.database import get_db
 from app.core.security import get_password_hash
 from app.db.base import Base  # Use the correct Base
-from app.main import app
 from app.models.student import Student
 from app.models.user import User
 
 # Test database URL - use separate test database
 # Use 'postgres' hostname when running inside Docker, 'localhost' otherwise
 DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
-SQLALCHEMY_TEST_DATABASE_URL = os.getenv(
-    "TEST_DATABASE_URL", f"postgresql://eduautismo:eduautismo_dev_pass@{DB_HOST}:5432/eduautismo_test"
-)
+
+# Try PostgreSQL first, fallback to SQLite for local development
+USE_SQLITE = os.getenv("USE_SQLITE_TESTS", "true").lower() == "true"
+
+if USE_SQLITE:
+    SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///:memory:"
+    # Set DATABASE_URL for app initialization
+    os.environ["DATABASE_URL"] = SQLALCHEMY_TEST_DATABASE_URL
+else:
+    SQLALCHEMY_TEST_DATABASE_URL = os.getenv(
+        "TEST_DATABASE_URL", f"postgresql://eduautismo:eduautismo_dev_pass@{DB_HOST}:5432/eduautismo_test"
+    )
+    os.environ["DATABASE_URL"] = SQLALCHEMY_TEST_DATABASE_URL
+
+# Import app AFTER setting DATABASE_URL
+from app.main import app
 
 
 @pytest.fixture(scope="session")
 def engine():
     """Create test database engine."""
-    engine = create_engine(SQLALCHEMY_TEST_DATABASE_URL, pool_pre_ping=True)
+    if USE_SQLITE:
+        # For SQLite :memory:, use StaticPool to ensure all connections use the same database
+        engine = create_engine(
+            SQLALCHEMY_TEST_DATABASE_URL,
+            connect_args={"check_same_thread": False},
+            poolclass=StaticPool
+        )
+    else:
+        # For PostgreSQL, use normal pool with pre-ping
+        engine = create_engine(
+            SQLALCHEMY_TEST_DATABASE_URL,
+            pool_pre_ping=True
+        )
 
-    # Import all models to ensure they're registered
-    from app.models import activity, assessment, student, user  # noqa
+    # Import all models to ensure they're registered with Base.metadata
+    from app.models.user import User
+    from app.models.student import Student
+    from app.models.activity import Activity
+    from app.models.assessment import Assessment
+    # noqa on unused imports
+    _ = (User, Student, Activity, Assessment)
 
     # Drop all tables and recreate for fresh test environment
     Base.metadata.drop_all(bind=engine)
@@ -53,17 +83,21 @@ def db_session(engine) -> Generator[Session, None, None]:
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     session = TestingSessionLocal()
 
-    # Clean up all data before each test
-    from app.models.activity import Activity
-    from app.models.assessment import Assessment
-    from app.models.student import Student
-    from app.models.user import User
+    # Clean up all data before each test (wrapped in try-except for SQLite)
+    try:
+        from app.models.activity import Activity
+        from app.models.assessment import Assessment
+        from app.models.student import Student
+        from app.models.user import User
 
-    session.query(Assessment).delete()
-    session.query(Activity).delete()
-    session.query(Student).delete()
-    session.query(User).delete()
-    session.commit()
+        session.query(Assessment).delete()
+        session.query(Activity).delete()
+        session.query(Student).delete()
+        session.query(User).delete()
+        session.commit()
+    except Exception:
+        # If deletion fails (e.g., tables don't exist yet), just rollback
+        session.rollback()
 
     yield session
 

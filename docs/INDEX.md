@@ -12,7 +12,15 @@ Bem-vindo à documentação centralizada do projeto EduAutismo IA MVP. Este índ
 
 - [Validação de Estrutura](./structure-validation.md) - Documentação sobre a estrutura do projeto
 - [Documentação Docker](./DOCKER.md) - Guia de containerização do projeto
-- [Documentação de Testes](./TESTING.md) - Guia completo de testes
+
+## 🧪 Testes
+
+- [Documentação de Testes Manuais](./TESTING.md) - Guia completo de testes manuais e API
+- [Documentação de Testes Automatizados](./TESTING_AUTOMATED.md) - Guia completo de testes automatizados (Unit + Integration)
+  - 82.25% de cobertura de código
+  - 306 testes (280 unit + 26 integration)
+  - Configuração SQLite in-memory
+  - Tipos portáveis de banco de dados
 
 ## 🔧 Infraestrutura
 
