@@ -9,34 +9,50 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
 
-# Sync PostgreSQL (for compatibility)
-engine = create_engine(
-    (
-        settings.DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://")
-        if not settings.DATABASE_URL.startswith("postgresql+psycopg2")
-        else settings.DATABASE_URL
-    ),
-    pool_size=settings.DATABASE_POOL_SIZE,
-    max_overflow=settings.DATABASE_MAX_OVERFLOW,
-    echo=settings.DEBUG,
-    pool_pre_ping=True,
-)
+# Detectar se estamos usando SQLite
+is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+
+# Sync engine (SQLite ou PostgreSQL)
+if is_sqlite:
+    # SQLite não precisa de pool_size e max_overflow
+    engine = create_engine(
+        settings.DATABASE_URL,
+        connect_args={"check_same_thread": False},  # Necessário para SQLite
+        echo=settings.DEBUG,
+    )
+else:
+    # PostgreSQL
+    engine = create_engine(
+        (
+            settings.DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://")
+            if not settings.DATABASE_URL.startswith("postgresql+psycopg2")
+            else settings.DATABASE_URL
+        ),
+        pool_size=settings.DATABASE_POOL_SIZE,
+        max_overflow=settings.DATABASE_MAX_OVERFLOW,
+        echo=settings.DEBUG,
+        pool_pre_ping=True,
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Async PostgreSQL
-async_database_url = (
-    settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
-    if not settings.DATABASE_URL.startswith("postgresql+asyncpg")
-    else settings.DATABASE_URL
-)
-async_engine = create_async_engine(
-    async_database_url,
-    pool_size=settings.DATABASE_POOL_SIZE,
-    max_overflow=settings.DATABASE_MAX_OVERFLOW,
-    echo=settings.DEBUG,
-    pool_pre_ping=True,
-)
+# Async engine (apenas para PostgreSQL)
+if not is_sqlite:
+    async_database_url = (
+        settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+        if not settings.DATABASE_URL.startswith("postgresql+asyncpg")
+        else settings.DATABASE_URL
+    )
+    async_engine = create_async_engine(
+        async_database_url,
+        pool_size=settings.DATABASE_POOL_SIZE,
+        max_overflow=settings.DATABASE_MAX_OVERFLOW,
+        echo=settings.DEBUG,
+        pool_pre_ping=True,
+    )
+else:
+    # Para SQLite, usar engine síncrono também para async
+    async_engine = engine
 
 AsyncSessionLocal = async_sessionmaker(
     async_engine, class_=AsyncSession, expire_on_commit=False, autocommit=False, autoflush=False
