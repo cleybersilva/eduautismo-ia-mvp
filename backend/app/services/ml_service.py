@@ -7,7 +7,7 @@ Provides risk assessment, activity success prediction, and progress analysis.
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import joblib
 import numpy as np

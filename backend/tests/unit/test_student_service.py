@@ -75,7 +75,6 @@ class TestStudentServiceCreate:
         # Arrange - Student born 10 years ago, but birthday is next month
         today = date.today()
         next_month = today.month + 1 if today.month < 12 else 1
-        next_year = today.year if today.month < 12 else today.year + 1
         birth_date = date(today.year - 10, next_month, today.day)
 
         student_data = StudentCreate(
@@ -97,7 +96,6 @@ class TestStudentServiceCreate:
         # Arrange - Student born 10 years ago, birthday was last month
         today = date.today()
         last_month = today.month - 1 if today.month > 1 else 12
-        last_year = today.year if today.month > 1 else today.year - 1
         birth_date = date(today.year - 10, last_month, min(today.day, 28))
 
         student_data = StudentCreate(

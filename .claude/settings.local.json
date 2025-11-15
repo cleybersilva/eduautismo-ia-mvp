@@ -56,7 +56,8 @@
       "Bash(npx serve:*)",
       "Bash(black:*)",
       "Bash(isort:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(flake8:*)"
     ],
     "deny": [],
     "ask": []

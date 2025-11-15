@@ -4,12 +4,7 @@ Unit tests for common schemas.
 Tests Pydantic validation for common/shared schemas.
 """
 
-from datetime import datetime
-from uuid import uuid4
-
-import pytest
-
-from app.schemas.common import BaseResponseSchema, PaginatedResponse
+from app.schemas.common import PaginatedResponse
 
 
 class TestPaginatedResponse:

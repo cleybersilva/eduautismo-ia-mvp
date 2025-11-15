@@ -591,7 +591,7 @@ class TestActivityServiceUpdateActivity:
         db_session.execute.side_effect = execute_side_effect
 
         # Act
-        result = await ActivityService.update_activity(
+        _result = await ActivityService.update_activity(  # noqa: F841
             db=db_session,
             activity_id=activity_id,
             activity_data=update_data,

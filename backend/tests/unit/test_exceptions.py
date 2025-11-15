@@ -4,10 +4,12 @@ Unit tests for custom exceptions.
 Tests all custom exception classes and the handle_exception helper.
 """
 
-import pytest
 from fastapi import HTTPException, status
 
-from app.core.exceptions import (  # Base exception; Authentication & Authorization; Resource Not Found; Validation; Business Logic; External Services; File Upload; Rate Limiting; Data Integrity; Configuration; Helper function
+# Import custom exceptions:
+# Base exception; Authentication & Authorization; Resource Not Found; Validation;
+# Business Logic; External Services; File Upload; Rate Limiting; Data Integrity; Configuration; Helper function
+from app.core.exceptions import (
     ActivityNotFoundError,
     AssessmentNotFoundError,
     AuthenticationError,

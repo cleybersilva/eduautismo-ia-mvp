@@ -38,7 +38,7 @@ else:
     os.environ["DATABASE_URL"] = SQLALCHEMY_TEST_DATABASE_URL
 
 # Import app AFTER setting DATABASE_URL
-from app.main import app
+from app.main import app  # noqa: E402
 
 
 @pytest.fixture(scope="session")

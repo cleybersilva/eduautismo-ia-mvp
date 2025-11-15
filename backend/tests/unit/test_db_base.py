@@ -6,12 +6,11 @@ Tests SQLAlchemy base model, mixins, and utility methods.
 
 import uuid
 from datetime import datetime
-from unittest.mock import Mock, PropertyMock
+from unittest.mock import Mock
 
-import pytest
 from sqlalchemy import Column, String
 
-from app.db.base import Base, BaseModel
+from app.db.base import BaseModel
 
 
 # Create test models for tablename generation testing

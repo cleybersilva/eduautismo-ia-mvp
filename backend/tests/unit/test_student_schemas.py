@@ -80,8 +80,6 @@ class TestStudentCreateSchema:
     def test_student_create_minimum_age_boundary(self):
         """Test student at exact minimum age."""
         # Create date of birth exactly MIN_STUDENT_AGE years ago (accounting for leap years)
-        from datetime import datetime
-
         today = date.today()
         dob = date(today.year - MIN_STUDENT_AGE, today.month, today.day)
 

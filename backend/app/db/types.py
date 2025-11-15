@@ -6,7 +6,6 @@ Provides types that work across different database backends (PostgreSQL, SQLite,
 
 import json
 import uuid
-from typing import Any, List
 
 from sqlalchemy import String, Text, TypeDecorator
 from sqlalchemy.dialects.postgresql import ARRAY as PostgreSQL_ARRAY

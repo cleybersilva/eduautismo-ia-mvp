@@ -6,7 +6,7 @@ Gerencia upload, download, deleção de arquivos e criptografia.
 """
 
 import mimetypes
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import BinaryIO, Dict, List, Optional, Tuple
 from uuid import uuid4
 

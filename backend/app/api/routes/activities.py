@@ -85,8 +85,11 @@ def generate_activity(
     activity = Activity(
         student_id=activity_data.student_id,
         title=f"Atividade {type_name}{theme_text}",
-        description=f"Atividade {type_name.lower()} personalizada para {student.name}, com nível de dificuldade {difficulty_name.lower()}. "
-        f"Esta atividade foi criada considerando o perfil de aprendizagem do aluno: {student.diagnosis}.",
+        description=(
+            f"Atividade {type_name.lower()} personalizada para {student.name}, "
+            f"com nível de dificuldade {difficulty_name.lower()}. "
+            f"Esta atividade foi criada considerando o perfil de aprendizagem do aluno: {student.diagnosis}."
+        ),
         activity_type=activity_data.activity_type,
         difficulty=activity_data.difficulty,
         duration_minutes=activity_data.duration_minutes,

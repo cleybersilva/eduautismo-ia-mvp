@@ -7,7 +7,7 @@ Tests Pydantic validation and serialization for auth-related schemas.
 import pytest
 from pydantic import ValidationError
 
-from app.schemas.auth import PasswordReset, PasswordResetConfirm, Token, TokenRefresh, UserLogin
+from app.schemas.auth import PasswordReset, PasswordResetConfirm, Token, UserLogin
 
 
 class TestTokenSchema:

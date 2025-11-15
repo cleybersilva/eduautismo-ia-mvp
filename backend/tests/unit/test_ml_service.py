@@ -4,8 +4,8 @@ Unit tests for ML Service.
 Tests behavioral classification, feature extraction, and predictions.
 """
 
-from datetime import date, datetime
-from unittest.mock import MagicMock, Mock, patch
+from datetime import datetime
+from unittest.mock import MagicMock, Mock
 from uuid import uuid4
 
 import numpy as np

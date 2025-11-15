@@ -5,7 +5,6 @@ Tests OpenAI integration for activity generation and analysis.
 """
 
 from unittest.mock import AsyncMock, Mock, patch
-from uuid import uuid4
 
 import pytest
 

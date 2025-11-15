@@ -4,7 +4,7 @@ Unit tests for activity and assessment schemas.
 Tests Pydantic validation for activity and assessment schemas.
 """
 
-from datetime import date, timedelta
+from datetime import date
 from uuid import uuid4
 
 import pytest
