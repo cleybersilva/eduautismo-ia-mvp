@@ -124,10 +124,15 @@ jobs:
       - name: Check Python licenses
         run: |
           pip install pip-licenses
-          pip install -q -r backend/requirements.txt || true
+          echo "Installing backend dependencies..."
+          cd backend
+          pip install -r requirements.txt --no-deps || echo "Warning: Some dependencies failed to install"
+          cd ..
+          echo "Generating license reports..."
           pip-licenses --format=json --output-file=python-licenses.json || true
           pip-licenses --format=markdown > python-licenses.md || true
         continue-on-error: true
+        timeout-minutes: 10
       
       - name: Check Node licenses
         run: |
