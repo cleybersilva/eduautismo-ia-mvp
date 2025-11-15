@@ -14,12 +14,7 @@ import pytest
 from app.models.assessment import Assessment
 from app.models.student import Student
 from app.services.ml_service import MLService, get_ml_service
-from app.utils.constants import (
-    CompletionStatus,
-    DifficultyRating,
-    EngagementLevel,
-    TEALevel,
-)
+from app.utils.constants import CompletionStatus, DifficultyRating, EngagementLevel, TEALevel
 
 
 class TestMLServiceInit:
