@@ -38,7 +38,7 @@ Professores da rede pública enfrentam desafios significativos:
 ### 💡 Solução
 
 Uma plataforma que:
-- ✨ Gera atividades pedagógicas personalizadas usando **GPT-5**
+- ✨ Gera atividades pedagógicas personalizadas usando **GPT-4**
 - 📊 Realiza avaliações comportamentais baseadas em instrumentos validados (CARS, AQ, etc.)
 - 🤖 Classifica perfis comportamentais com **Machine Learning**
 - 📈 Acompanha evolução do aluno com dashboards e relatórios
@@ -88,7 +88,7 @@ Uma plataforma que:
 │                    PRESENTATION LAYER                       │
 │  ┌──────────────┐          ┌──────────────┐                │
 │  │  Web UI      │          │  Mobile      │                │
-│  │  (Streamlit) │          │  (Future)    │                │
+│  │ (React/Vite) │          │  (Future)    │                │
 │  └──────────────┘          └──────────────┘                │
 └────────────────────────┬────────────────────────────────────┘
                          │ HTTPS/TLS
@@ -134,6 +134,14 @@ Uma plataforma que:
 - **Validation**: Pydantic V2
 - **Authentication**: JWT (python-jose)
 
+#### Frontend
+- **Framework**: React 18+
+- **Build Tool**: Vite 5+
+- **State Management**: Zustand
+- **Styling**: Tailwind CSS
+- **HTTP Client**: Axios
+- **Routing**: React Router v6
+
 #### Database
 - **Relational**: PostgreSQL 15.4 (AWS RDS)
 - **Document**: MongoDB 5.0 (AWS DocumentDB)
@@ -171,8 +179,8 @@ Uma plataforma que:
 
 #### 1. Clone o repositório
 ```bash
-git clone https://github.com/your-org/eduautismo-ia.git
-cd eduautismo-ia
+git clone https://github.com/cleybersilva/eduautismo-ia-mvp.git
+cd eduautismo-ia-mvp
 ```
 
 #### 2. Crie e ative ambiente virtual
@@ -188,6 +196,7 @@ venv\Scripts\activate
 
 #### 3. Instale dependências
 ```bash
+cd backend
 pip install -r requirements.txt
 pip install -r requirements-dev.txt  # Para desenvolvimento
 ```
@@ -223,19 +232,25 @@ python scripts/seed_database.py
 ```
 
 #### 8. Inicie aplicação
-```bash
-# API
-uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8000
 
-# Web Interface (outro terminal)
-streamlit run src/web/app.py
+**Backend (API):**
+```bash
+cd backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Frontend (Web Interface - outro terminal):**
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
 #### 9. Acesse aplicação
 
 - **API**: http://localhost:8000
 - **Docs**: http://localhost:8000/docs
-- **Web UI**: http://localhost:8501
+- **Frontend**: http://localhost:5173
 
 ### Instalação com Docker (Recomendado)
 ```bash
@@ -250,8 +265,8 @@ docker-compose down
 ```
 
 Serviços disponíveis:
-- **API**: http://localhost:8000
-- **Web**: http://localhost:8501
+- **API (Backend)**: http://localhost:8000
+- **Frontend (React)**: http://localhost:5173
 - **PostgreSQL**: localhost:5432
 - **MongoDB**: localhost:27017
 - **Redis**: localhost:6379
@@ -351,17 +366,33 @@ print(f"Conteúdo: {activity['content']}")
 ## 🧪 Testes
 
 ### Executar todos os testes
+
+**Backend:**
 ```bash
+cd backend
 pytest
 ```
 
-### Testes com coverage
+**Frontend:**
 ```bash
-pytest --cov=src --cov-report=html
+cd frontend
+npm test
+```
+
+### Testes com coverage
+
+**Backend:**
+```bash
+cd backend
+pytest --cov=app --cov-report=html --cov-report=term
 ```
 
 ### Testes específicos
+
+**Backend:**
 ```bash
+cd backend
+
 # Testes unitários
 pytest tests/unit/
 
@@ -369,76 +400,137 @@ pytest tests/unit/
 pytest tests/integration/
 
 # Teste específico
-pytest tests/unit/test_student_service.py
+pytest tests/unit/test_student_service.py -v
 ```
 
 ### Linting e formatação
+
+**Backend:**
 ```bash
+cd backend
+
 # Black (formatter)
-black src/ tests/
+black app/ tests/ --line-length=120
 
 # Flake8 (linter)
-flake8 src/ tests/
+flake8 app/ tests/ --max-line-length=120
 
 # MyPy (type checker)
-mypy src/
+mypy app/ --ignore-missing-imports
 
 # isort (import sorter)
-isort src/ tests/
+isort app/ tests/ --profile black
+```
+
+**Frontend:**
+```bash
+cd frontend
+
+# ESLint
+npm run lint
+
+# ESLint fix
+npm run lint:fix
 ```
 
 ---
 
 ## 📊 Estrutura do Projeto
 ```
-eduautismo-ia/
+eduautismo-ia-mvp/
 ├── .github/
 │   └── workflows/          # GitHub Actions CI/CD
-├── docs/                   # Documentação detalhada
-├── ml_models/              # Modelos ML treinados
-│   ├── behavioral_classifier/
-│   └── recommender/
-├── scripts/                # Scripts de automação
-│   ├── train_models.py
-│   ├── deploy.sh
-│   ├── backup.sh
-│   └── seed_database.py
-├── src/
-│   ├── api/                # FastAPI application
-│   │   ├── routes/         # Endpoints
-│   │   ├── dependencies/   # Dependencies
-│   │   └── main.py
-│   ├── core/               # Core functionality
-│   │   ├── config.py
-│   │   ├── database.py
-│   │   └── security.py
-│   ├── models/             # ML models
-│   │   ├── behavioral_classifier.py
-│   │   └── activity_recommender.py
-│   ├── schemas/            # Pydantic schemas
-│   ├── services/           # Business logic
-│   │   ├── student_service.py
-│   │   ├── activity_service.py
-│   │   └── assessment_service.py
-│   ├── utils/              # Utilities
-│   └── web/                # Streamlit web interface
+│       ├── 00-orchestrator.yml
+│       ├── 01-security-scan.yml
+│       ├── 02-backend-tests.yml
+│       ├── 03-frontend-tests.yml
+│       └── ...
+├── backend/                # Backend Application
+│   ├── alembic/            # Database migrations
+│   │   └── versions/
+│   ├── app/                # FastAPI application
+│   │   ├── api/            # API layer
+│   │   │   ├── routes/     # Endpoints organizados
+│   │   │   │   ├── students.py
+│   │   │   │   ├── activities.py
+│   │   │   │   ├── assessments.py
+│   │   │   │   └── auth.py
+│   │   │   └── dependencies/ # Dependencies
+│   │   ├── core/           # Core functionality
+│   │   │   ├── config.py
+│   │   │   ├── database.py
+│   │   │   ├── security.py
+│   │   │   └── exceptions.py
+│   │   ├── db/             # Database utilities
+│   │   │   ├── base.py
+│   │   │   └── types.py
+│   │   ├── models/         # SQLAlchemy ORM models
+│   │   │   ├── student.py
+│   │   │   ├── activity.py
+│   │   │   ├── assessment.py
+│   │   │   └── user.py
+│   │   ├── schemas/        # Pydantic schemas
+│   │   │   ├── student.py
+│   │   │   ├── activity.py
+│   │   │   └── auth.py
+│   │   ├── services/       # Business logic
+│   │   │   ├── student_service.py
+│   │   │   ├── activity_service.py
+│   │   │   ├── assessment_service.py
+│   │   │   ├── nlp_service.py
+│   │   │   ├── ml_service.py
+│   │   │   └── aws_service.py
+│   │   ├── utils/          # Utilities
+│   │   │   ├── logger.py
+│   │   │   └── constants.py
+│   │   ├── main.py         # FastAPI app entry point
+│   │   └── main_simple.py  # Minimal app for testing
+│   ├── ml_models/          # ML models directory
+│   │   ├── behavioral_classifier/
+│   │   └── recommender/
+│   ├── tests/              # Backend tests
+│   │   ├── unit/
+│   │   ├── integration/
+│   │   ├── conftest.py
+│   │   └── __init__.py
+│   ├── .env.example
+│   ├── requirements.txt
+│   ├── requirements-dev.txt
+│   ├── pytest.ini
+│   └── alembic.ini
+├── frontend/               # Frontend Application
+│   ├── public/             # Static assets
+│   ├── src/
+│   │   ├── assets/         # Images, fonts, etc
+│   │   ├── components/     # React components
+│   │   ├── pages/          # Page components
+│   │   │   ├── auth/
+│   │   │   ├── dashboard/
+│   │   │   └── students/
+│   │   ├── services/       # API clients
+│   │   ├── store/          # Zustand state
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── tailwind.config.js
+│   └── .eslintrc.cjs
 ├── terraform/              # Infrastructure as Code
-│   ├── main.tf
-│   ├── variables.tf
-│   └── outputs.tf
-├── tests/
-│   ├── unit/
-│   ├── integration/
-│   └── fixtures/
-├── .env.example            # Environment variables template
+│   ├── environments/
+│   │   ├── development/
+│   │   ├── staging/
+│   │   └── production/
+│   └── modules/
+├── docs/                   # Documentation
+│   ├── API.md
+│   ├── ARCHITECTURE.md
+│   └── DEPLOYMENT.md
+├── scripts/                # Automation scripts
+│   ├── validate_structure.sh
+│   └── check_structure.py
 ├── .gitignore
 ├── docker-compose.yml
-├── Dockerfile.api
-├── Dockerfile.web
-├── requirements.txt
-├── requirements-dev.txt
-├── alembic.ini             # Database migrations
-├── pytest.ini
+├── CLAUDE.md               # AI assistant instructions
 └── README.md
 ```
 
@@ -614,10 +706,10 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 ### Projeto
 
-- 🌐 Website: [eduautismo-ia.com.br](https://eduautismo-ia.com.br)
-- 📖 Documentação: [docs.eduautismo-ia.com.br](https://docs.eduautismo-ia.com.br)
-- 🐛 Issues: [github.com/cleybersilva/eduautismo-ia/issues](https://github.com/cleybersilva/eduautismo-ia/issues)
-- 💬 Discussões: [github.com/cleybersilva/eduautismo-ia/discussions](https://github.com/cleybersilva/eduautismo-ia/discussions)
+- 🌐 Website: [eduautismo-ia.com.br](https://eduautismo-ia.com.br) (em desenvolvimento)
+- 📖 Documentação: Ver arquivo [CLAUDE.md](CLAUDE.md)
+- 🐛 Issues: [github.com/cleybersilva/eduautismo-ia-mvp/issues](https://github.com/cleybersilva/eduautismo-ia-mvp/issues)
+- 💬 Discussões: [github.com/cleybersilva/eduautismo-ia-mvp/discussions](https://github.com/cleybersilva/eduautismo-ia-mvp/discussions)
 
 ### Instituição
 
@@ -651,10 +743,10 @@ Agradecimentos especiais aos mantenedores de:
 
 ## 📊 Status do Projeto
 
-![GitHub last commit](https://img.shields.io/github/last-commit/your-org/eduautismo-ia)
-![GitHub issues](https://img.shields.io/github/issues/your-org/eduautismo-ia)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/your-org/eduautismo-ia)
-![GitHub stars](https://img.shields.io/github/stars/your-org/eduautismo-ia?style=social)
+![GitHub last commit](https://img.shields.io/github/last-commit/cleybersilva/eduautismo-ia-mvp)
+![GitHub issues](https://img.shields.io/github/issues/cleybersilva/eduautismo-ia-mvp)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/cleybersilva/eduautismo-ia-mvp)
+![GitHub stars](https://img.shields.io/github/stars/cleybersilva/eduautismo-ia-mvp?style=social)
 
 ### Métricas de Desenvolvimento
 
