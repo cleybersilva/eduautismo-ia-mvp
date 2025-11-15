@@ -1,10 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./login.css";
 
 export default function LoginPage() {
   const [highContrast, setHighContrast] = useState(false);
   const [fontSize, setFontSize] = useState("normal");
   const [showPassword, setShowPassword] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Array com todas as imagens para o slideshow
+  const heroImages = [
+    "https://images.pexels.com/photos/8364026/pexels-photo-8364026.jpeg?auto=compress&cs=tinysrgb&w=1200", // Criança feliz na escola
+    "https://images.pexels.com/photos/8612990/pexels-photo-8612990.jpeg?auto=compress&cs=tinysrgb&w=1200", // Blocos coloridos
+    "https://images.pexels.com/photos/8613089/pexels-photo-8613089.jpeg?auto=compress&cs=tinysrgb&w=1200", // Criança concentrada
+  ];
+
+  // Efeito para trocar imagem automaticamente a cada 5 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) =>
+        prevIndex === heroImages.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 5000); // Troca a cada 5 segundos
+
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
 
   const rootClasses = [
     "login-page",
@@ -16,7 +35,10 @@ export default function LoginPage() {
     <div className={rootClasses}>
       <div className="login-layout">
         {/* ÁREA VISUAL / IMAGEM */}
-        <div className="login-hero">
+        <div
+          className="login-hero"
+          style={{ backgroundImage: `url(${heroImages[currentImageIndex]})` }}
+        >
           <div className="login-hero-overlay">
             <h1 className="login-hero-title">
               Aprendizagem inclusiva com tecnologia que entende você

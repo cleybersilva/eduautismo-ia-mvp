@@ -50,7 +50,10 @@
       "Bash(xargs kill:*)",
       "Bash(lsof:*)",
       "Bash(netstat:*)",
-      "Bash(ss:*)"
+      "Bash(ss:*)",
+      "Bash(PORT=5174 npm run dev:*)",
+      "Bash(PORT=5175 npm run dev:*)",
+      "Bash(npx serve:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,12 @@
+{
+  "name": "eduautismo-ia-mvp",
+  "version": "1.0.0",
+  "description": "Plataforma Inteligente de Apoio Pedagógico para Alunos com TEA",
+  "private": true,
+  "scripts": {
+    "test": "echo \"No Node.js tests configured\""
+  },
+  "keywords": ["education", "autism", "ai"],
+  "author": "Cleyber Silva",
+  "license": "MIT"
+}
