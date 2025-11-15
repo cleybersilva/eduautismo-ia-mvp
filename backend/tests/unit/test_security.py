@@ -103,6 +103,7 @@ class TestAccessToken:
         assert token is not None
         # Verify token contains expiry
         from app.core.config import settings
+
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         assert "exp" in payload
 
@@ -114,6 +115,7 @@ class TestAccessToken:
 
         # Decode and verify
         from app.core.config import settings
+
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
 
         assert payload["sub"] == "teacher@escola.com"
@@ -127,6 +129,7 @@ class TestAccessToken:
         token = create_access_token(data)
 
         from app.core.config import settings
+
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
 
         assert "exp" in payload
@@ -162,6 +165,7 @@ class TestRefreshToken:
         token = create_refresh_token(data)
 
         from app.core.config import settings
+
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
 
         assert payload.get("type") == "refresh"
@@ -173,6 +177,7 @@ class TestRefreshToken:
         token = create_refresh_token(data)
 
         from app.core.config import settings
+
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
 
         assert payload["sub"] == "user@example.com"

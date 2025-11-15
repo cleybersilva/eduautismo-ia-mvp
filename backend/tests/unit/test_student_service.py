@@ -47,17 +47,13 @@ class TestStudentServiceCreate:
                 "visual": 8,
                 "auditory": 6,
                 "kinesthetic": 7,
-            }
+            },
         )
 
     def test_create_student_success(self, db_session, student_data, teacher_id):
         """Test successful student creation."""
         # Act
-        student = StudentService.create_student(
-            db=db_session,
-            student_data=student_data,
-            teacher_id=teacher_id
-        )
+        student = StudentService.create_student(db=db_session, student_data=student_data, teacher_id=teacher_id)
 
         # Assert
         assert student.name == "João da Silva"
@@ -91,11 +87,7 @@ class TestStudentServiceCreate:
         )
 
         # Act
-        student = StudentService.create_student(
-            db=db_session,
-            student_data=student_data,
-            teacher_id=teacher_id
-        )
+        student = StudentService.create_student(db=db_session, student_data=student_data, teacher_id=teacher_id)
 
         # Assert - Should be 9 years old (birthday not yet this year)
         assert student.age == 9
@@ -117,11 +109,7 @@ class TestStudentServiceCreate:
         )
 
         # Act
-        student = StudentService.create_student(
-            db=db_session,
-            student_data=student_data,
-            teacher_id=teacher_id
-        )
+        student = StudentService.create_student(db=db_session, student_data=student_data, teacher_id=teacher_id)
 
         # Assert - Should be 10 years old (birthday already happened)
         assert student.age == 10
@@ -141,11 +129,7 @@ class TestStudentServiceCreate:
         )
 
         # Act
-        student = StudentService.create_student(
-            db=db_session,
-            student_data=student_data,
-            teacher_id=teacher_id
-        )
+        student = StudentService.create_student(db=db_session, student_data=student_data, teacher_id=teacher_id)
 
         # Assert
         assert student.name == "Ana Silva"
@@ -184,11 +168,7 @@ class TestStudentServiceCreate:
         )
 
         # Act
-        student = StudentService.create_student(
-            db=db_session,
-            student_data=student_data,
-            teacher_id=teacher_id
-        )
+        student = StudentService.create_student(db=db_session, student_data=student_data, teacher_id=teacher_id)
 
         # Assert
         assert student.learning_profile == learning_profile
@@ -202,11 +182,7 @@ class TestStudentServiceCreate:
 
         # Act & Assert
         with pytest.raises(Exception, match="Database connection error"):
-            StudentService.create_student(
-                db=db_session,
-                student_data=student_data,
-                teacher_id=teacher_id
-            )
+            StudentService.create_student(db=db_session, student_data=student_data, teacher_id=teacher_id)
 
         # Verify rollback was called
         db_session.rollback.assert_called_once()
@@ -218,14 +194,10 @@ class TestStudentServiceCreate:
         mock_student.id = uuid4()
 
         # Mock the Student class to return our mock
-        with patch('app.services.student_service.Student', return_value=mock_student):
-            with patch('app.services.student_service.logger') as mock_logger:
+        with patch("app.services.student_service.Student", return_value=mock_student):
+            with patch("app.services.student_service.logger") as mock_logger:
                 # Act
-                StudentService.create_student(
-                    db=db_session,
-                    student_data=student_data,
-                    teacher_id=teacher_id
-                )
+                StudentService.create_student(db=db_session, student_data=student_data, teacher_id=teacher_id)
 
                 # Assert - Verify info log was called
                 mock_logger.info.assert_called_once()
@@ -241,13 +213,9 @@ class TestStudentServiceCreate:
         db_session.add.side_effect = ValueError(error_message)
 
         # Act & Assert
-        with patch('app.services.student_service.logger') as mock_logger:
+        with patch("app.services.student_service.logger") as mock_logger:
             with pytest.raises(ValueError):
-                StudentService.create_student(
-                    db=db_session,
-                    student_data=student_data,
-                    teacher_id=teacher_id
-                )
+                StudentService.create_student(db=db_session, student_data=student_data, teacher_id=teacher_id)
 
             # Verify error log was called
             mock_logger.error.assert_called_once()
@@ -269,11 +237,7 @@ class TestStudentServiceCreate:
         )
 
         # Act
-        student = StudentService.create_student(
-            db=db_session,
-            student_data=student_data,
-            teacher_id=teacher_id
-        )
+        student = StudentService.create_student(db=db_session, student_data=student_data, teacher_id=teacher_id)
 
         # Assert - Should be exactly 10 years old
         assert student.age == 10
@@ -297,15 +261,11 @@ class TestStudentServiceCreate:
                 "logical": 7,
                 "social": 3,
                 "emotional": 5,
-            }
+            },
         )
 
         # Act
-        student = StudentService.create_student(
-            db=db_session,
-            student_data=student_data,
-            teacher_id=teacher_id
-        )
+        student = StudentService.create_student(db=db_session, student_data=student_data, teacher_id=teacher_id)
 
         # Assert all fields
         assert student.name == "Complete Test Student"

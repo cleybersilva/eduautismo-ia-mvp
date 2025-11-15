@@ -7,53 +7,42 @@ Tests all custom exception classes and the handle_exception helper.
 import pytest
 from fastapi import HTTPException, status
 
-from app.core.exceptions import (
-    # Base exception
-    EduAutismoException,
-    # Authentication & Authorization
-    AuthenticationError,
-    ExpiredTokenError,
-    InactiveUserError,
-    InvalidCredentialsError,
-    InvalidTokenError,
-    PermissionDeniedError,
-    # Resource Not Found
+from app.core.exceptions import (  # Base exception; Authentication & Authorization; Resource Not Found; Validation; Business Logic; External Services; File Upload; Rate Limiting; Data Integrity; Configuration; Helper function
     ActivityNotFoundError,
     AssessmentNotFoundError,
+    AuthenticationError,
+    AWSError,
+    CacheError,
+    ConfigurationError,
+    DatabaseError,
+    DataIntegrityError,
+    DuplicateResourceError,
+    EduAutismoException,
+    EmailAlreadyExistsError,
+    EmailServiceError,
+    ExpiredTokenError,
+    ExternalServiceError,
     FileNotFoundError,
+    FileTooLargeError,
+    FileUploadError,
+    ForeignKeyViolationError,
+    InactiveUserError,
+    InvalidAgeError,
+    InvalidCredentialsError,
+    InvalidDurationError,
+    InvalidEmailError,
+    InvalidFileTypeError,
+    InvalidTokenError,
+    MissingConfigurationError,
+    OpenAIError,
+    PermissionDeniedError,
+    RateLimitExceededError,
+    ResourceLimitExceededError,
     ResourceNotFoundError,
     StudentNotFoundError,
     UserNotFoundError,
-    # Validation
-    InvalidAgeError,
-    InvalidDurationError,
-    InvalidEmailError,
     ValidationError,
     WeakPasswordError,
-    # Business Logic
-    DuplicateResourceError,
-    EmailAlreadyExistsError,
-    ResourceLimitExceededError,
-    # External Services
-    AWSError,
-    CacheError,
-    DatabaseError,
-    EmailServiceError,
-    ExternalServiceError,
-    OpenAIError,
-    # File Upload
-    FileTooLargeError,
-    FileUploadError,
-    InvalidFileTypeError,
-    # Rate Limiting
-    RateLimitExceededError,
-    # Data Integrity
-    DataIntegrityError,
-    ForeignKeyViolationError,
-    # Configuration
-    ConfigurationError,
-    MissingConfigurationError,
-    # Helper function
     handle_exception,
 )
 
@@ -72,9 +61,7 @@ class TestBaseException:
 
     def test_base_exception_with_custom_status_code(self):
         """Test base exception with custom status code."""
-        exc = EduAutismoException(
-            "Custom error", status_code=status.HTTP_400_BAD_REQUEST
-        )
+        exc = EduAutismoException("Custom error", status_code=status.HTTP_400_BAD_REQUEST)
 
         assert exc.status_code == status.HTTP_400_BAD_REQUEST
 
@@ -155,10 +142,7 @@ class TestAuthenticationExceptions:
         """Test InactiveUserError."""
         exc = InactiveUserError()
 
-        assert (
-            exc.message
-            == "Conta de usuário inativa. Entre em contato com o administrador"
-        )
+        assert exc.message == "Conta de usuário inativa. Entre em contato com o administrador"
         assert exc.status_code == status.HTTP_401_UNAUTHORIZED
         assert exc.details["error_code"] == "USER_INACTIVE"
 
@@ -173,9 +157,7 @@ class TestAuthenticationExceptions:
 
     def test_permission_denied_error_with_resource(self):
         """Test PermissionDeniedError with resource specified."""
-        exc = PermissionDeniedError(
-            message="Você não pode acessar este recurso", resource="student"
-        )
+        exc = PermissionDeniedError(message="Você não pode acessar este recurso", resource="student")
 
         assert exc.message == "Você não pode acessar este recurso"
         assert exc.details["resource"] == "student"
@@ -459,9 +441,7 @@ class TestDataIntegrityExceptions:
 
     def test_foreign_key_violation_error(self):
         """Test ForeignKeyViolationError."""
-        exc = ForeignKeyViolationError(
-            parent_resource="professor", child_resource="alunos"
-        )
+        exc = ForeignKeyViolationError(parent_resource="professor", child_resource="alunos")
 
         assert "Não é possível deletar professor" in exc.message
         assert "existem alunos associados" in exc.message

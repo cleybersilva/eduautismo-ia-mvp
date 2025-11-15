@@ -47,11 +47,13 @@ class TestActivityServiceGenerateActivity:
         student = MagicMock()
         student.id = student_id
         student.teacher_id = teacher_id
-        student.to_profile_dict = Mock(return_value={
-            "age": 10,
-            "tea_level": "level_1",
-            "learning_profile": {"visual": 8},
-        })
+        student.to_profile_dict = Mock(
+            return_value={
+                "age": 10,
+                "tea_level": "level_1",
+                "learning_profile": {"visual": 8},
+            }
+        )
         return student
 
     @pytest.fixture
@@ -70,9 +72,7 @@ class TestActivityServiceGenerateActivity:
         return generated
 
     @pytest.mark.asyncio
-    async def test_generate_activity_success(
-        self, activity_data, teacher_id, mock_student, mock_generated_activity
-    ):
+    async def test_generate_activity_success(self, activity_data, teacher_id, mock_student, mock_generated_activity):
         """Test successful activity generation with AI."""
         # Arrange
         db_session = AsyncMock()
@@ -116,9 +116,7 @@ class TestActivityServiceGenerateActivity:
 
         # Act & Assert
         with pytest.raises(StudentNotFoundError):
-            await ActivityService.generate_activity(
-                db=db_session, activity_data=activity_data, teacher_id=teacher_id
-            )
+            await ActivityService.generate_activity(db=db_session, activity_data=activity_data, teacher_id=teacher_id)
 
     @pytest.mark.asyncio
     async def test_generate_activity_permission_denied(self, activity_data, mock_student):
@@ -141,9 +139,7 @@ class TestActivityServiceGenerateActivity:
         assert "não tem permissão" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_generate_activity_ai_error(
-        self, activity_data, teacher_id, mock_student
-    ):
+    async def test_generate_activity_ai_error(self, activity_data, teacher_id, mock_student):
         """Test that OpenAI error is properly raised."""
         # Arrange
         db_session = AsyncMock()
@@ -155,9 +151,7 @@ class TestActivityServiceGenerateActivity:
         # Mock NLP service to raise error
         with patch("app.services.activity_service.get_nlp_service") as mock_get_nlp:
             mock_nlp_service = Mock()
-            mock_nlp_service.generate_activity = AsyncMock(
-                side_effect=OpenAIError("AI service unavailable")
-            )
+            mock_nlp_service.generate_activity = AsyncMock(side_effect=OpenAIError("AI service unavailable"))
             mock_get_nlp.return_value = mock_nlp_service
 
             # Act & Assert
@@ -235,9 +229,7 @@ class TestActivityServiceCreateActivity:
         return student
 
     @pytest.mark.asyncio
-    async def test_create_activity_success(
-        self, activity_data, teacher_id, mock_student
-    ):
+    async def test_create_activity_success(self, activity_data, teacher_id, mock_student):
         """Test successful manual activity creation."""
         # Arrange
         db_session = AsyncMock()
@@ -273,9 +265,7 @@ class TestActivityServiceCreateActivity:
 
         # Act & Assert
         with pytest.raises(StudentNotFoundError):
-            await ActivityService.create_activity(
-                db=db_session, activity_data=activity_data, teacher_id=teacher_id
-            )
+            await ActivityService.create_activity(db=db_session, activity_data=activity_data, teacher_id=teacher_id)
 
     @pytest.mark.asyncio
     async def test_create_activity_permission_denied(self, activity_data, mock_student):
@@ -334,9 +324,7 @@ class TestActivityServiceGetActivity:
         assert result == mock_activity
 
     @pytest.mark.asyncio
-    async def test_get_activity_success_with_teacher_id(
-        self, activity_id, teacher_id, mock_activity
-    ):
+    async def test_get_activity_success_with_teacher_id(self, activity_id, teacher_id, mock_activity):
         """Test get activity with teacher permission check."""
         # Arrange
         db_session = AsyncMock()
@@ -347,7 +335,7 @@ class TestActivityServiceGetActivity:
         async def execute_side_effect(query):
             mock_result = Mock()
             # First call returns activity, second call returns student
-            if not hasattr(execute_side_effect, 'call_count'):
+            if not hasattr(execute_side_effect, "call_count"):
                 execute_side_effect.call_count = 0
 
             if execute_side_effect.call_count == 0:
@@ -361,9 +349,7 @@ class TestActivityServiceGetActivity:
         db_session.execute.side_effect = execute_side_effect
 
         # Act
-        result = await ActivityService.get_activity(
-            db=db_session, activity_id=activity_id, teacher_id=teacher_id
-        )
+        result = await ActivityService.get_activity(db=db_session, activity_id=activity_id, teacher_id=teacher_id)
 
         # Assert
         assert result == mock_activity
@@ -394,7 +380,7 @@ class TestActivityServiceGetActivity:
 
         async def execute_side_effect(query):
             mock_result = Mock()
-            if not hasattr(execute_side_effect, 'call_count'):
+            if not hasattr(execute_side_effect, "call_count"):
                 execute_side_effect.call_count = 0
 
             if execute_side_effect.call_count == 0:
@@ -409,9 +395,7 @@ class TestActivityServiceGetActivity:
 
         # Act & Assert
         with pytest.raises(PermissionDeniedError):
-            await ActivityService.get_activity(
-                db=db_session, activity_id=activity_id, teacher_id=wrong_teacher_id
-            )
+            await ActivityService.get_activity(db=db_session, activity_id=activity_id, teacher_id=wrong_teacher_id)
 
 
 class TestActivityServiceListActivities:
@@ -442,7 +426,7 @@ class TestActivityServiceListActivities:
         list_result.scalars().all.return_value = mock_activities
 
         async def execute_side_effect(query):
-            if not hasattr(execute_side_effect, 'call_count'):
+            if not hasattr(execute_side_effect, "call_count"):
                 execute_side_effect.call_count = 0
 
             result = count_result if execute_side_effect.call_count == 0 else list_result
@@ -472,7 +456,7 @@ class TestActivityServiceListActivities:
         list_result.scalars().all.return_value = mock_activities[:3]
 
         async def execute_side_effect(query):
-            if not hasattr(execute_side_effect, 'call_count'):
+            if not hasattr(execute_side_effect, "call_count"):
                 execute_side_effect.call_count = 0
 
             result = count_result if execute_side_effect.call_count == 0 else list_result
@@ -482,9 +466,7 @@ class TestActivityServiceListActivities:
         db_session.execute.side_effect = execute_side_effect
 
         # Act
-        activities, total = await ActivityService.list_activities(
-            db=db_session, student_id=student_id
-        )
+        activities, total = await ActivityService.list_activities(db=db_session, student_id=student_id)
 
         # Assert
         assert len(activities) == 3
@@ -503,7 +485,7 @@ class TestActivityServiceListActivities:
         list_result.scalars().all.return_value = mock_activities[:2]
 
         async def execute_side_effect(query):
-            if not hasattr(execute_side_effect, 'call_count'):
+            if not hasattr(execute_side_effect, "call_count"):
                 execute_side_effect.call_count = 0
 
             result = count_result if execute_side_effect.call_count == 0 else list_result
@@ -536,7 +518,7 @@ class TestActivityServiceListActivities:
         list_result.scalars().all.return_value = [Mock(spec=Activity) for _ in range(2)]
 
         async def execute_side_effect(query):
-            if not hasattr(execute_side_effect, 'call_count'):
+            if not hasattr(execute_side_effect, "call_count"):
                 execute_side_effect.call_count = 0
 
             result = count_result if execute_side_effect.call_count == 0 else list_result
@@ -546,9 +528,7 @@ class TestActivityServiceListActivities:
         db_session.execute.side_effect = execute_side_effect
 
         # Act
-        activities, total = await ActivityService.list_activities(
-            db=db_session, skip=5, limit=2
-        )
+        activities, total = await ActivityService.list_activities(db=db_session, skip=5, limit=2)
 
         # Assert
         assert len(activities) == 2
@@ -587,9 +567,7 @@ class TestActivityServiceUpdateActivity:
         return activity
 
     @pytest.mark.asyncio
-    async def test_update_activity_success(
-        self, activity_id, teacher_id, update_data, mock_activity
-    ):
+    async def test_update_activity_success(self, activity_id, teacher_id, update_data, mock_activity):
         """Test successful activity update."""
         # Arrange
         db_session = AsyncMock()
@@ -599,7 +577,7 @@ class TestActivityServiceUpdateActivity:
 
         async def execute_side_effect(query):
             mock_result = Mock()
-            if not hasattr(execute_side_effect, 'call_count'):
+            if not hasattr(execute_side_effect, "call_count"):
                 execute_side_effect.call_count = 0
 
             if execute_side_effect.call_count == 0:
@@ -677,7 +655,7 @@ class TestActivityServiceDeleteActivity:
 
         async def execute_side_effect(query):
             mock_result = Mock()
-            if not hasattr(execute_side_effect, 'call_count'):
+            if not hasattr(execute_side_effect, "call_count"):
                 execute_side_effect.call_count = 0
 
             if execute_side_effect.call_count == 0:
@@ -691,9 +669,7 @@ class TestActivityServiceDeleteActivity:
         db_session.execute.side_effect = execute_side_effect
 
         # Act
-        await ActivityService.delete_activity(
-            db=db_session, activity_id=activity_id, teacher_id=teacher_id
-        )
+        await ActivityService.delete_activity(db=db_session, activity_id=activity_id, teacher_id=teacher_id)
 
         # Assert
         assert mock_activity.is_published is False
@@ -727,7 +703,7 @@ class TestActivityServiceGetActivitiesByTheme:
         list_result.scalars().all.return_value = mock_activities
 
         async def execute_side_effect(query):
-            if not hasattr(execute_side_effect, 'call_count'):
+            if not hasattr(execute_side_effect, "call_count"):
                 execute_side_effect.call_count = 0
 
             result = count_result if execute_side_effect.call_count == 0 else list_result
@@ -737,9 +713,7 @@ class TestActivityServiceGetActivitiesByTheme:
         db_session.execute.side_effect = execute_side_effect
 
         # Act
-        activities, total = await ActivityService.get_activities_by_theme(
-            db=db_session, theme="Matemática"
-        )
+        activities, total = await ActivityService.get_activities_by_theme(db=db_session, theme="Matemática")
 
         # Assert
         assert len(activities) == 3
@@ -760,7 +734,7 @@ class TestActivityServiceGetActivitiesByTheme:
         list_result.scalars().all.return_value = mock_activities[:2]
 
         async def execute_side_effect(query):
-            if not hasattr(execute_side_effect, 'call_count'):
+            if not hasattr(execute_side_effect, "call_count"):
                 execute_side_effect.call_count = 0
 
             result = count_result if execute_side_effect.call_count == 0 else list_result
@@ -791,7 +765,7 @@ class TestActivityServiceGetActivitiesByTheme:
         list_result.scalars().all.return_value = []
 
         async def execute_side_effect(query):
-            if not hasattr(execute_side_effect, 'call_count'):
+            if not hasattr(execute_side_effect, "call_count"):
                 execute_side_effect.call_count = 0
 
             result = count_result if execute_side_effect.call_count == 0 else list_result
@@ -801,9 +775,7 @@ class TestActivityServiceGetActivitiesByTheme:
         db_session.execute.side_effect = execute_side_effect
 
         # Act
-        activities, total = await ActivityService.get_activities_by_theme(
-            db=db_session, theme="História"
-        )
+        activities, total = await ActivityService.get_activities_by_theme(db=db_session, theme="História")
 
         # Assert
         assert len(activities) == 0

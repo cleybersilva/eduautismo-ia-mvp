@@ -118,10 +118,7 @@ class TestAssessmentSchemas:
             )
 
         errors = exc_info.value.errors()
-        assert any(
-            f"Texto não pode exceder {MAX_NOTES_LENGTH}" in str(error)
-            for error in errors
-        )
+        assert any(f"Texto não pode exceder {MAX_NOTES_LENGTH}" in str(error) for error in errors)
 
     def test_assessment_create_strengths_too_long_raises_error(self):
         """Test that strengths exceeding MAX_NOTES_LENGTH raise validation error."""
@@ -138,10 +135,7 @@ class TestAssessmentSchemas:
             )
 
         errors = exc_info.value.errors()
-        assert any(
-            f"Texto não pode exceder {MAX_NOTES_LENGTH}" in str(error)
-            for error in errors
-        )
+        assert any(f"Texto não pode exceder {MAX_NOTES_LENGTH}" in str(error) for error in errors)
 
     def test_assessment_create_recommendations_too_long_raises_error(self):
         """Test that recommendations exceeding MAX_NOTES_LENGTH raise validation error."""
@@ -158,10 +152,7 @@ class TestAssessmentSchemas:
             )
 
         errors = exc_info.value.errors()
-        assert any(
-            f"Texto não pode exceder {MAX_NOTES_LENGTH}" in str(error)
-            for error in errors
-        )
+        assert any(f"Texto não pode exceder {MAX_NOTES_LENGTH}" in str(error) for error in errors)
 
     def test_assessment_create_valid(self):
         """Test valid assessment creation."""

@@ -147,7 +147,9 @@ class MLService:
 
     # ========== Feature Extraction ==========
 
-    def extract_student_features(self, student: Student, assessments: Optional[List[Assessment]] = None) -> Dict[str, float]:
+    def extract_student_features(
+        self, student: Student, assessments: Optional[List[Assessment]] = None
+    ) -> Dict[str, float]:
         """
         Extract features from student profile and assessment history.
 
@@ -243,7 +245,9 @@ class MLService:
             # Recent trend (last 5 assessments)
             recent_assessments = sorted(assessments, key=lambda a: a.created_at, reverse=True)[:5]
             if len(recent_assessments) > 0:
-                recent_completed = sum(1 for a in recent_assessments if a.completion_status == CompletionStatus.COMPLETED)
+                recent_completed = sum(
+                    1 for a in recent_assessments if a.completion_status == CompletionStatus.COMPLETED
+                )
                 features["recent_completion_rate"] = recent_completed / len(recent_assessments)
             else:
                 features["recent_completion_rate"] = 0.0
@@ -505,7 +509,9 @@ class MLService:
                 "recommendations": ["Monitorar engajamento durante a atividade"],
             }
 
-    def _estimate_success_probability(self, student_features: Dict[str, float], activity_features: Dict[str, float]) -> float:
+    def _estimate_success_probability(
+        self, student_features: Dict[str, float], activity_features: Dict[str, float]
+    ) -> float:
         """Estimate success probability using rules."""
         base_prob = 0.5
 
@@ -671,9 +677,7 @@ class MLService:
 
         # Check difficulty appropriateness
         difficulty_issues = sum(
-            1
-            for a in assessments
-            if a.difficulty_rating in [DifficultyRating.TOO_EASY, DifficultyRating.TOO_HARD]
+            1 for a in assessments if a.difficulty_rating in [DifficultyRating.TOO_EASY, DifficultyRating.TOO_HARD]
         )
         if difficulty_issues > len(assessments) * 0.4:
             insights.append("⚠️ Muitas atividades com dificuldade inadequada - revisar seleção")

@@ -10,7 +10,7 @@ import pytest
 from pydantic import ValidationError
 
 from app.schemas.student import StudentCreate, StudentUpdate
-from app.utils.constants import MIN_STUDENT_AGE, MAX_STUDENT_AGE
+from app.utils.constants import MAX_STUDENT_AGE, MIN_STUDENT_AGE
 
 
 class TestStudentCreateSchema:
@@ -43,10 +43,7 @@ class TestStudentCreateSchema:
             )
 
         errors = exc_info.value.errors()
-        assert any(
-            f"Idade deve ser pelo menos {MIN_STUDENT_AGE}" in str(error)
-            for error in errors
-        )
+        assert any(f"Idade deve ser pelo menos {MIN_STUDENT_AGE}" in str(error) for error in errors)
 
     def test_student_create_date_of_birth_too_old(self):
         """Test that student older than maximum age raises error."""
@@ -61,10 +58,7 @@ class TestStudentCreateSchema:
             )
 
         errors = exc_info.value.errors()
-        assert any(
-            f"Idade deve ser no máximo {MAX_STUDENT_AGE}" in str(error)
-            for error in errors
-        )
+        assert any(f"Idade deve ser no máximo {MAX_STUDENT_AGE}" in str(error) for error in errors)
 
     def test_student_create_future_date_of_birth(self):
         """Test that future date of birth raises error."""
@@ -126,10 +120,7 @@ class TestStudentCreateSchema:
 
         # Should fail minimum age validation
         errors = exc_info.value.errors()
-        assert any(
-            f"Idade deve ser pelo menos {MIN_STUDENT_AGE}" in str(error)
-            for error in errors
-        )
+        assert any(f"Idade deve ser pelo menos {MIN_STUDENT_AGE}" in str(error) for error in errors)
 
 
 class TestStudentUpdateSchema:

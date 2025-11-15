@@ -4,11 +4,12 @@ Unit tests for common schemas.
 Tests Pydantic validation for common/shared schemas.
 """
 
-import pytest
 from datetime import datetime
 from uuid import uuid4
 
-from app.schemas.common import PaginatedResponse, BaseResponseSchema
+import pytest
+
+from app.schemas.common import BaseResponseSchema, PaginatedResponse
 
 
 class TestPaginatedResponse:
@@ -21,9 +22,7 @@ class TestPaginatedResponse:
         skip = 0
         limit = 2
 
-        response = PaginatedResponse.create(
-            items=items, total=total, skip=skip, limit=limit
-        )
+        response = PaginatedResponse.create(items=items, total=total, skip=skip, limit=limit)
 
         assert response.items == items
         assert response.total == total
@@ -38,9 +37,7 @@ class TestPaginatedResponse:
         skip = 0
         limit = 10
 
-        response = PaginatedResponse.create(
-            items=items, total=total, skip=skip, limit=limit
-        )
+        response = PaginatedResponse.create(items=items, total=total, skip=skip, limit=limit)
 
         assert response.has_more is False  # skip + len(items) = 2 >= 2
 
@@ -51,9 +48,7 @@ class TestPaginatedResponse:
         skip = 2
         limit = 2
 
-        response = PaginatedResponse.create(
-            items=items, total=total, skip=skip, limit=limit
-        )
+        response = PaginatedResponse.create(items=items, total=total, skip=skip, limit=limit)
 
         assert response.skip == 2
         assert response.has_more is True  # skip + len(items) = 4 < 10

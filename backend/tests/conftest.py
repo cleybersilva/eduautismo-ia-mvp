@@ -47,22 +47,18 @@ def engine():
     if USE_SQLITE:
         # For SQLite :memory:, use StaticPool to ensure all connections use the same database
         engine = create_engine(
-            SQLALCHEMY_TEST_DATABASE_URL,
-            connect_args={"check_same_thread": False},
-            poolclass=StaticPool
+            SQLALCHEMY_TEST_DATABASE_URL, connect_args={"check_same_thread": False}, poolclass=StaticPool
         )
     else:
         # For PostgreSQL, use normal pool with pre-ping
-        engine = create_engine(
-            SQLALCHEMY_TEST_DATABASE_URL,
-            pool_pre_ping=True
-        )
+        engine = create_engine(SQLALCHEMY_TEST_DATABASE_URL, pool_pre_ping=True)
 
     # Import all models to ensure they're registered with Base.metadata
-    from app.models.user import User
-    from app.models.student import Student
     from app.models.activity import Activity
     from app.models.assessment import Assessment
+    from app.models.student import Student
+    from app.models.user import User
+
     # noqa on unused imports
     _ = (User, Student, Activity, Assessment)
 

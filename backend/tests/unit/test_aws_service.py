@@ -107,9 +107,7 @@ class TestFileUpload:
         mock_s3_client.put_object = AsyncMock()
 
         with patch.object(aws_service.session, "client", return_value=mock_s3_client):
-            await aws_service.upload_file(
-                file_obj=sample_file, filename="test.pdf", prefix="documents", encrypt=True
-            )
+            await aws_service.upload_file(file_obj=sample_file, filename="test.pdf", prefix="documents", encrypt=True)
 
         # Verify encryption enabled
         call_kwargs = mock_s3_client.put_object.call_args[1]
@@ -124,9 +122,7 @@ class TestFileUpload:
         mock_s3_client.put_object = AsyncMock()
 
         with patch.object(aws_service.session, "client", return_value=mock_s3_client):
-            await aws_service.upload_file(
-                file_obj=sample_file, filename="test.pdf", prefix="documents", encrypt=False
-            )
+            await aws_service.upload_file(file_obj=sample_file, filename="test.pdf", prefix="documents", encrypt=False)
 
         # Verify encryption not in kwargs
         call_kwargs = mock_s3_client.put_object.call_args[1]

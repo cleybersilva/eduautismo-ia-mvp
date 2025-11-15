@@ -76,10 +76,9 @@ class TestAssessmentServiceCreate:
         student.teacher_id = teacher_id
         return student
 
-    def test_create_assessment_success(
-        self, db_session, assessment_data, teacher_id, mock_activity, mock_student
-    ):
+    def test_create_assessment_success(self, db_session, assessment_data, teacher_id, mock_activity, mock_student):
         """Test successful assessment creation."""
+
         # Arrange
         def query_side_effect(model):
             mock_query = Mock()
@@ -118,14 +117,11 @@ class TestAssessmentServiceCreate:
 
         # Act & Assert
         with pytest.raises(ActivityNotFoundError):
-            AssessmentService.create_assessment(
-                db=db_session, assessment_data=assessment_data, teacher_id=teacher_id
-            )
+            AssessmentService.create_assessment(db=db_session, assessment_data=assessment_data, teacher_id=teacher_id)
 
-    def test_create_assessment_student_not_found(
-        self, db_session, assessment_data, teacher_id, mock_activity
-    ):
+    def test_create_assessment_student_not_found(self, db_session, assessment_data, teacher_id, mock_activity):
         """Test that student not found raises error."""
+
         # Arrange
         def query_side_effect(model):
             mock_query = Mock()
@@ -139,13 +135,9 @@ class TestAssessmentServiceCreate:
 
         # Act & Assert
         with pytest.raises(StudentNotFoundError):
-            AssessmentService.create_assessment(
-                db=db_session, assessment_data=assessment_data, teacher_id=teacher_id
-            )
+            AssessmentService.create_assessment(db=db_session, assessment_data=assessment_data, teacher_id=teacher_id)
 
-    def test_create_assessment_permission_denied(
-        self, db_session, assessment_data, mock_activity, mock_student
-    ):
+    def test_create_assessment_permission_denied(self, db_session, assessment_data, mock_activity, mock_student):
         """Test that permission is denied for wrong teacher."""
         # Arrange
         wrong_teacher_id = uuid4()
@@ -169,9 +161,7 @@ class TestAssessmentServiceCreate:
 
         assert "não tem permissão" in str(exc_info.value)
 
-    def test_create_assessment_logging(
-        self, db_session, assessment_data, teacher_id, mock_activity, mock_student
-    ):
+    def test_create_assessment_logging(self, db_session, assessment_data, teacher_id, mock_activity, mock_student):
         """Test that assessment creation is logged."""
         # Arrange
         mock_assessment = Mock(spec=Assessment)
@@ -240,9 +230,7 @@ class TestAssessmentServiceGet:
         # Assert
         assert result == mock_assessment
 
-    def test_get_assessment_success_with_teacher_id(
-        self, db_session, assessment_id, teacher_id, mock_assessment
-    ):
+    def test_get_assessment_success_with_teacher_id(self, db_session, assessment_id, teacher_id, mock_assessment):
         """Test successful get with teacher_id permission check."""
         # Arrange
         mock_student = Mock(spec=Student)
@@ -259,9 +247,7 @@ class TestAssessmentServiceGet:
         db_session.query.side_effect = query_side_effect
 
         # Act
-        result = AssessmentService.get_assessment(
-            db=db_session, assessment_id=assessment_id, teacher_id=teacher_id
-        )
+        result = AssessmentService.get_assessment(db=db_session, assessment_id=assessment_id, teacher_id=teacher_id)
 
         # Assert
         assert result == mock_assessment
@@ -298,9 +284,7 @@ class TestAssessmentServiceGet:
 
         # Act & Assert
         with pytest.raises(PermissionDeniedError):
-            AssessmentService.get_assessment(
-                db=db_session, assessment_id=assessment_id, teacher_id=wrong_teacher_id
-            )
+            AssessmentService.get_assessment(db=db_session, assessment_id=assessment_id, teacher_id=wrong_teacher_id)
 
 
 class TestAssessmentServiceList:
@@ -455,9 +439,7 @@ class TestAssessmentServiceUpdate:
         assessment.notes = "Nota inicial"
         return assessment
 
-    def test_update_assessment_success(
-        self, db_session, assessment_id, teacher_id, update_data, mock_assessment
-    ):
+    def test_update_assessment_success(self, db_session, assessment_id, teacher_id, update_data, mock_assessment):
         """Test successful assessment update."""
         # Arrange
         mock_student = Mock(spec=Student)
@@ -496,9 +478,7 @@ class TestAssessmentServiceUpdate:
                 db=db_session, assessment_id=assessment_id, assessment_data=update_data, teacher_id=teacher_id
             )
 
-    def test_update_assessment_permission_denied(
-        self, db_session, assessment_id, update_data, mock_assessment
-    ):
+    def test_update_assessment_permission_denied(self, db_session, assessment_id, update_data, mock_assessment):
         """Test permission denied for wrong teacher."""
         # Arrange
         wrong_teacher_id = uuid4()
@@ -526,9 +506,7 @@ class TestAssessmentServiceUpdate:
                 teacher_id=wrong_teacher_id,
             )
 
-    def test_update_assessment_partial_update(
-        self, db_session, assessment_id, teacher_id, mock_assessment
-    ):
+    def test_update_assessment_partial_update(self, db_session, assessment_id, teacher_id, mock_assessment):
         """Test partial update of assessment."""
         # Arrange
         partial_update = AssessmentUpdate(notes="Apenas atualizando a nota")
@@ -557,9 +535,7 @@ class TestAssessmentServiceUpdate:
         # Assert
         assert result == mock_assessment
 
-    def test_update_assessment_logging(
-        self, db_session, assessment_id, teacher_id, update_data, mock_assessment
-    ):
+    def test_update_assessment_logging(self, db_session, assessment_id, teacher_id, update_data, mock_assessment):
         """Test that assessment update is logged."""
         # Arrange
         mock_student = Mock(spec=Student)
@@ -633,9 +609,7 @@ class TestAssessmentServiceDelete:
         db_session.query.side_effect = query_side_effect
 
         # Act
-        result = AssessmentService.delete_assessment(
-            db=db_session, assessment_id=assessment_id, teacher_id=teacher_id
-        )
+        result = AssessmentService.delete_assessment(db=db_session, assessment_id=assessment_id, teacher_id=teacher_id)
 
         # Assert
         assert result is True
@@ -651,9 +625,7 @@ class TestAssessmentServiceDelete:
 
         # Act & Assert
         with pytest.raises(AssessmentNotFoundError):
-            AssessmentService.delete_assessment(
-                db=db_session, assessment_id=assessment_id, teacher_id=teacher_id
-            )
+            AssessmentService.delete_assessment(db=db_session, assessment_id=assessment_id, teacher_id=teacher_id)
 
     def test_delete_assessment_permission_denied(self, db_session, assessment_id, mock_assessment):
         """Test permission denied for wrong teacher."""
@@ -676,9 +648,7 @@ class TestAssessmentServiceDelete:
 
         # Act & Assert
         with pytest.raises(PermissionDeniedError):
-            AssessmentService.delete_assessment(
-                db=db_session, assessment_id=assessment_id, teacher_id=wrong_teacher_id
-            )
+            AssessmentService.delete_assessment(db=db_session, assessment_id=assessment_id, teacher_id=wrong_teacher_id)
 
     def test_delete_assessment_logging(self, db_session, assessment_id, teacher_id, mock_assessment):
         """Test that assessment deletion is logged."""
@@ -698,9 +668,7 @@ class TestAssessmentServiceDelete:
 
         with patch("app.services.assessment_service.logger") as mock_logger:
             # Act
-            AssessmentService.delete_assessment(
-                db=db_session, assessment_id=assessment_id, teacher_id=teacher_id
-            )
+            AssessmentService.delete_assessment(db=db_session, assessment_id=assessment_id, teacher_id=teacher_id)
 
             # Assert
             mock_logger.info.assert_called_once()

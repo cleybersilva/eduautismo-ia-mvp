@@ -6,10 +6,12 @@ Provides types that work across different database backends (PostgreSQL, SQLite,
 
 import json
 import uuid
-from typing import List, Any
+from typing import Any, List
 
 from sqlalchemy import String, Text, TypeDecorator
-from sqlalchemy.dialects.postgresql import ARRAY as PostgreSQL_ARRAY, UUID as PostgreSQL_UUID, JSONB as PostgreSQL_JSONB
+from sqlalchemy.dialects.postgresql import ARRAY as PostgreSQL_ARRAY
+from sqlalchemy.dialects.postgresql import JSONB as PostgreSQL_JSONB
+from sqlalchemy.dialects.postgresql import UUID as PostgreSQL_UUID
 from sqlalchemy.types import JSON
 
 

@@ -141,9 +141,7 @@ class TestNLPServiceGenerateActivity:
         return mock_response
 
     @pytest.mark.asyncio
-    async def test_generate_activity_success(
-        self, nlp_service, student_profile, mock_openai_response
-    ):
+    async def test_generate_activity_success(self, nlp_service, student_profile, mock_openai_response):
         """Test successful activity generation."""
         # Arrange
         nlp_service.client.chat.completions.create = AsyncMock(return_value=mock_openai_response)
@@ -169,9 +167,7 @@ class TestNLPServiceGenerateActivity:
         # Arrange
         from openai import OpenAIError as OpenAIAPIError
 
-        nlp_service.client.chat.completions.create = AsyncMock(
-            side_effect=OpenAIAPIError("API error")
-        )
+        nlp_service.client.chat.completions.create = AsyncMock(side_effect=OpenAIAPIError("API error"))
 
         # Act & Assert
         with pytest.raises(OpenAIError):
@@ -204,9 +200,7 @@ class TestNLPServiceGenerateActivity:
         assert "Resposta inválida" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_generate_activity_with_theme(
-        self, nlp_service, student_profile, mock_openai_response
-    ):
+    async def test_generate_activity_with_theme(self, nlp_service, student_profile, mock_openai_response):
         """Test activity generation with specific theme."""
         # Arrange
         nlp_service.client.chat.completions.create = AsyncMock(return_value=mock_openai_response)
@@ -281,14 +275,10 @@ class TestNLPServiceAnalyzeProgress:
         return mock_response
 
     @pytest.mark.asyncio
-    async def test_analyze_progress_success(
-        self, nlp_service, student_profile, assessments, mock_analysis_response
-    ):
+    async def test_analyze_progress_success(self, nlp_service, student_profile, assessments, mock_analysis_response):
         """Test successful progress analysis."""
         # Arrange
-        nlp_service.client.chat.completions.create = AsyncMock(
-            return_value=mock_analysis_response
-        )
+        nlp_service.client.chat.completions.create = AsyncMock(return_value=mock_analysis_response)
 
         # Act
         analysis = await nlp_service.analyze_progress(
@@ -307,15 +297,11 @@ class TestNLPServiceAnalyzeProgress:
         # Arrange
         from openai import OpenAIError as OpenAIAPIError
 
-        nlp_service.client.chat.completions.create = AsyncMock(
-            side_effect=OpenAIAPIError("API error")
-        )
+        nlp_service.client.chat.completions.create = AsyncMock(side_effect=OpenAIAPIError("API error"))
 
         # Act & Assert
         with pytest.raises(OpenAIError):
-            await nlp_service.analyze_progress(
-                student_profile=student_profile, assessments=assessments
-            )
+            await nlp_service.analyze_progress(student_profile=student_profile, assessments=assessments)
 
     @pytest.mark.asyncio
     async def test_analyze_progress_invalid_json(self, nlp_service, student_profile, assessments):
@@ -329,23 +315,17 @@ class TestNLPServiceAnalyzeProgress:
 
         # Act & Assert
         with pytest.raises(OpenAIError):
-            await nlp_service.analyze_progress(
-                student_profile=student_profile, assessments=assessments
-            )
+            await nlp_service.analyze_progress(student_profile=student_profile, assessments=assessments)
 
     @pytest.mark.asyncio
     async def test_analyze_progress_generic_error(self, nlp_service, student_profile, assessments):
         """Test handling of generic errors in progress analysis."""
         # Arrange
-        nlp_service.client.chat.completions.create = AsyncMock(
-            side_effect=Exception("Unexpected error")
-        )
+        nlp_service.client.chat.completions.create = AsyncMock(side_effect=Exception("Unexpected error"))
 
         # Act & Assert
         with pytest.raises(OpenAIError):
-            await nlp_service.analyze_progress(
-                student_profile=student_profile, assessments=assessments
-            )
+            await nlp_service.analyze_progress(student_profile=student_profile, assessments=assessments)
 
 
 class TestNLPServiceGenerateRecommendations:
@@ -400,9 +380,7 @@ class TestNLPServiceGenerateRecommendations:
     ):
         """Test successful recommendations generation."""
         # Arrange
-        nlp_service.client.chat.completions.create = AsyncMock(
-            return_value=mock_recommendations_response
-        )
+        nlp_service.client.chat.completions.create = AsyncMock(return_value=mock_recommendations_response)
 
         # Act
         recommendations = await nlp_service.generate_recommendations(
@@ -422,9 +400,7 @@ class TestNLPServiceGenerateRecommendations:
     ):
         """Test recommendations with progress summary."""
         # Arrange
-        nlp_service.client.chat.completions.create = AsyncMock(
-            return_value=mock_recommendations_response
-        )
+        nlp_service.client.chat.completions.create = AsyncMock(return_value=mock_recommendations_response)
 
         progress_summary = {"strengths": ["Boa concentração"], "areas_for_improvement": ["Social"]}
 
@@ -440,16 +416,12 @@ class TestNLPServiceGenerateRecommendations:
         nlp_service.client.chat.completions.create.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_generate_recommendations_openai_error(
-        self, nlp_service, student_profile, recent_activities
-    ):
+    async def test_generate_recommendations_openai_error(self, nlp_service, student_profile, recent_activities):
         """Test that OpenAI API errors are handled."""
         # Arrange
         from openai import OpenAIError as OpenAIAPIError
 
-        nlp_service.client.chat.completions.create = AsyncMock(
-            side_effect=OpenAIAPIError("API error")
-        )
+        nlp_service.client.chat.completions.create = AsyncMock(side_effect=OpenAIAPIError("API error"))
 
         # Act & Assert
         with pytest.raises(OpenAIError):
@@ -458,9 +430,7 @@ class TestNLPServiceGenerateRecommendations:
             )
 
     @pytest.mark.asyncio
-    async def test_generate_recommendations_invalid_json(
-        self, nlp_service, student_profile, recent_activities
-    ):
+    async def test_generate_recommendations_invalid_json(self, nlp_service, student_profile, recent_activities):
         """Test handling of invalid JSON in recommendations response."""
         # Arrange
         mock_response = Mock()
@@ -476,14 +446,10 @@ class TestNLPServiceGenerateRecommendations:
             )
 
     @pytest.mark.asyncio
-    async def test_generate_recommendations_generic_error(
-        self, nlp_service, student_profile, recent_activities
-    ):
+    async def test_generate_recommendations_generic_error(self, nlp_service, student_profile, recent_activities):
         """Test handling of generic errors in recommendations."""
         # Arrange
-        nlp_service.client.chat.completions.create = AsyncMock(
-            side_effect=Exception("Unexpected error")
-        )
+        nlp_service.client.chat.completions.create = AsyncMock(side_effect=Exception("Unexpected error"))
 
         # Act & Assert
         with pytest.raises(OpenAIError) as exc_info:
@@ -580,9 +546,7 @@ class TestNLPServiceBuildPrompts:
             {"completion_status": "in_progress", "engagement_level": "low"},
         ]
 
-        prompt = nlp_service._build_progress_prompt(
-            student_profile=student_profile, assessments=assessments
-        )
+        prompt = nlp_service._build_progress_prompt(student_profile=student_profile, assessments=assessments)
 
         assert prompt is not None
         assert len(assessments) > 0

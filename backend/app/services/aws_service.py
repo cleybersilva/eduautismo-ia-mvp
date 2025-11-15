@@ -14,7 +14,9 @@ import aioboto3
 from botocore.exceptions import BotoCoreError, ClientError
 
 from app.core.config import settings
-from app.core.exceptions import AWSError, FileNotFoundError as CustomFileNotFoundError, ValidationError
+from app.core.exceptions import AWSError
+from app.core.exceptions import FileNotFoundError as CustomFileNotFoundError
+from app.core.exceptions import ValidationError
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -126,9 +128,7 @@ class AWSService:
 
             # Upload para S3
             async with self.session.client("s3") as s3_client:
-                await s3_client.put_object(
-                    Bucket=self.bucket_name, Key=s3_key, Body=file_content, **extra_args
-                )
+                await s3_client.put_object(Bucket=self.bucket_name, Key=s3_key, Body=file_content, **extra_args)
 
             logger.info(
                 f"File uploaded successfully: {s3_key}",
@@ -221,9 +221,7 @@ class AWSService:
             logger.error(f"Unexpected error deleting file: {e}")
             raise AWSError(f"Unexpected error deleting file: {str(e)}") from e
 
-    async def generate_presigned_url(
-        self, s3_key: str, expiration: int = 3600, download: bool = False
-    ) -> str:
+    async def generate_presigned_url(self, s3_key: str, expiration: int = 3600, download: bool = False) -> str:
         """
         Gera URL presignada para acesso temporário ao arquivo.
 
@@ -246,9 +244,7 @@ class AWSService:
                 params["ResponseContentDisposition"] = "attachment"
 
             async with self.session.client("s3") as s3_client:
-                url = await s3_client.generate_presigned_url(
-                    "get_object", Params=params, ExpiresIn=expiration
-                )
+                url = await s3_client.generate_presigned_url("get_object", Params=params, ExpiresIn=expiration)
 
             logger.info(
                 f"Presigned URL generated: {s3_key}",
@@ -280,9 +276,7 @@ class AWSService:
         """
         try:
             async with self.session.client("s3") as s3_client:
-                response = await s3_client.list_objects_v2(
-                    Bucket=self.bucket_name, Prefix=prefix, MaxKeys=max_keys
-                )
+                response = await s3_client.list_objects_v2(Bucket=self.bucket_name, Prefix=prefix, MaxKeys=max_keys)
 
             files = []
             for obj in response.get("Contents", []):
@@ -323,9 +317,7 @@ class AWSService:
             copy_source = {"Bucket": self.bucket_name, "Key": source_key}
 
             async with self.session.client("s3") as s3_client:
-                await s3_client.copy_object(
-                    CopySource=copy_source, Bucket=self.bucket_name, Key=destination_key
-                )
+                await s3_client.copy_object(CopySource=copy_source, Bucket=self.bucket_name, Key=destination_key)
 
             logger.info(
                 f"File copied: {source_key} -> {destination_key}",
@@ -395,10 +387,7 @@ class AWSService:
             allowed_types = self.ALLOWED_AUDIO_TYPES
 
         if allowed_types and content_type not in allowed_types:
-            raise ValidationError(
-                f"Invalid file type: {content_type}. "
-                f"Allowed types: {', '.join(allowed_types)}"
-            )
+            raise ValidationError(f"Invalid file type: {content_type}. " f"Allowed types: {', '.join(allowed_types)}")
 
     async def _validate_file_size(self, file_size: int, content_type: str) -> None:
         """Valida tamanho do arquivo."""
