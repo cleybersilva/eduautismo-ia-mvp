@@ -568,6 +568,20 @@ eduautismo-ia-mvp/
 
 ### 3.2 Módulos Principais
 
+> **⚠️ IMPORTANTE**: Os exemplos de código abaixo podem conter comentários de path usando `src/` (ex: `# src/services/...`).
+> Estes são exemplos conceituais da documentação antiga. **A estrutura REAL do projeto usa `backend/app/`**.
+>
+> **Paths Corretos:**
+> - `backend/app/api/routes/`
+> - `backend/app/services/`
+> - `backend/app/models/`
+> - `backend/app/schemas/`
+>
+> **Imports Corretos:**
+> - `from app.services.student_service import StudentService`
+> - `from app.models.student import Student`
+> - `from app.core.config import settings`
+
 #### 3.2.1 API Routes (Estrutura Real)
 ```python
 # backend/app/api/routes/students.py
@@ -1133,8 +1147,8 @@ Testing:
   - [ ] Escrever testes de integração
   - [ ] Testar casos edge
   - [ ] Testar error scenarios
-  - [ ] Executar: pytest tests/ -v
-  - [ ] Verificar coverage: pytest --cov=src
+  - [ ] Executar: cd backend && pytest tests/ -v
+  - [ ] Verificar coverage: cd backend && pytest --cov=app --cov-report=html
 
 Documentation:
   - [ ] Docstrings em todas funções
@@ -1143,10 +1157,10 @@ Documentation:
   - [ ] Comentários em código complexo
 
 Quality:
-  - [ ] black src/ tests/
-  - [ ] flake8 src/ tests/
-  - [ ] mypy src/
-  - [ ] isort src/ tests/
+  - [ ] cd backend && black app/ tests/ --line-length=120
+  - [ ] cd backend && flake8 app/ tests/ --max-line-length=120
+  - [ ] cd backend && mypy app/ --ignore-missing-imports
+  - [ ] cd backend && isort app/ tests/ --profile black
 
 Pre_Commit:
   - [ ] Revisar diff
@@ -2083,10 +2097,13 @@ alembic upgrade head
 python scripts/seed_database.py
 
 # 8. Iniciar API
-uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8000
+cd backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-# 9. Iniciar Web UI (outro terminal)
-streamlit run src/web/app.py
+# 9. Iniciar Frontend (outro terminal)
+cd frontend
+npm install
+npm run dev
 ```
 
 ### 8.2 Docker Build e Run
@@ -2153,7 +2170,7 @@ echo $DATABASE_URL
 psql -h localhost -U eduautismo_user -d eduautismo_db
 
 # 4. Verificar configuração no código
-# src/core/config.py
+# backend/app/core/config.py
 DATABASE_URL: str = "postgresql://user:pass@localhost:5432/dbname"
 ```
 
@@ -2441,7 +2458,7 @@ alias eduformat="cd ~/eduautismo-ia-mvp/backend && black app/ tests/ && isort ap
 Desenvolvimento:
   API: http://localhost:8000
   API_Docs: http://localhost:8000/docs
-  Web_UI: http://localhost:8501
+  Frontend: http://localhost:5173
 
 Staging:
   API: https://api-staging.eduautismo.example.com
@@ -2453,9 +2470,8 @@ Production:
   Monitoring: https://app.datadoghq.com
 
 Documentação:
-  GitHub: https://github.com/your-org/eduautismo-ia
-  Confluence: https://your-org.atlassian.net/wiki
-  API_Docs: https://docs.eduautismo.example.com
+  GitHub: https://github.com/cleybersilva/eduautismo-ia-mvp
+  API_Docs: https://docs.eduautismo.example.com (em desenvolvimento)
 ```
 
 ### 10.3 Contatos
@@ -2499,9 +2515,9 @@ Quando ajudar no desenvolvimento, sempre:
 
 ---
 
-**Versão**: 1.0.0  
-**Última Atualização**: 2025-01-15  
-**Mantenedor**: Cleyber Silva  
+**Versão**: 1.1.0
+**Última Atualização**: 2025-01-16
+**Mantenedor**: Cleyber Silva
 **Contato**: cleyber.silva@live.com
 
 ---
