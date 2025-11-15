@@ -2,8 +2,8 @@
 
 Este arquivo fornece orientações para o Claude Code (claude.ai/code) ao trabalhar com código neste repositório.
 
-> **Versão**: 1.1.0
-> **Última Atualização**: 2025-01-12
+> **Versão**: 1.1.1
+> **Última Atualização**: 2025-11-15
 > **Autor**: Cleyber Silva
 > **Projeto**: TCC MBA IA & Big Data - USP
 
@@ -2071,8 +2071,8 @@ ptw
 ### 8.1 Ambiente de Desenvolvimento
 ```bash
 # 1. Clone e setup
-git clone https://github.com/your-org/eduautismo-ia.git
-cd eduautismo-ia
+git clone https://github.com/cleybersilva/eduautismo-ia-mvp.git
+cd eduautismo-ia-mvp
 
 # 2. Criar ambiente virtual
 python -m venv venv
@@ -2483,7 +2483,7 @@ Desenvolvimento:
 
 Operações:
   On_Call: oncall@example.com
-  PagerDuty: https://your-org.pagerduty.com
+  PagerDuty: https://eduautismo.pagerduty.com
   Slack: #eduautismo-alerts
 
 Negócio:
@@ -2515,8 +2515,8 @@ Quando ajudar no desenvolvimento, sempre:
 
 ---
 
-**Versão**: 1.1.0
-**Última Atualização**: 2025-01-16
+**Versão**: 1.1.1
+**Última Atualização**: 2025-11-15
 **Mantenedor**: Cleyber Silva
 **Contato**: cleyber.silva@live.com
 
