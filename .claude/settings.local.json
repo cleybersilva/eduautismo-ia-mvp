@@ -53,7 +53,10 @@
       "Bash(ss:*)",
       "Bash(PORT=5174 npm run dev:*)",
       "Bash(PORT=5175 npm run dev:*)",
-      "Bash(npx serve:*)"
+      "Bash(npx serve:*)",
+      "Bash(black:*)",
+      "Bash(isort:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
