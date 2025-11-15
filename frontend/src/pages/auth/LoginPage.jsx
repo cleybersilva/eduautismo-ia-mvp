@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./login.css";
 
 export default function LoginPage() {
@@ -155,8 +155,8 @@ export default function LoginPage() {
           </div>
 
           <p className="login-bottom-quote">
-            "Tecnologia a serviço de uma educação mais humana, acessível e
-            acolhedora para pessoas no espectro autista."
+            &ldquo;Tecnologia a serviço de uma educação mais humana, acessível e
+            acolhedora para pessoas no espectro autista.&rdquo;
           </p>
         </div>
       </div>
