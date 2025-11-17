@@ -70,6 +70,59 @@ from app.schemas.user import (
     UserUpdate,
 )
 
+# Professional schemas
+from app.schemas.professional import (
+    ProfessionalCreate,
+    ProfessionalFilter,
+    ProfessionalListResponse,
+    ProfessionalResponse,
+    ProfessionalStatistics,
+    ProfessionalSummary,
+    ProfessionalUpdate,
+)
+
+# Observation schemas
+from app.schemas.observation import (
+    ObservationFilter,
+    ObservationSummary,
+    ObservationTimeline,
+    ProfessionalObservationCreate,
+    ProfessionalObservationListResponse,
+    ProfessionalObservationResponse,
+    ProfessionalObservationUpdate,
+    ProfessionalObservationWithDetails,
+)
+
+# Intervention Plan schemas
+from app.schemas.intervention_plan import (
+    InterventionPlanCreate,
+    InterventionPlanEffectiveness,
+    InterventionPlanFilter,
+    InterventionPlanListResponse,
+    InterventionPlanResponse,
+    InterventionPlanStatistics,
+    InterventionPlanSummary,
+    InterventionPlanUpdate,
+    InterventionPlanWithDetails,
+    ProgressNoteCreate,
+)
+
+# Social Emotional Indicator schemas
+from app.schemas.socioemotional_indicator import (
+    BulkIndicatorCreate,
+    BulkIndicatorResponse,
+    IndicatorComparison,
+    IndicatorCorrelation,
+    IndicatorFilter,
+    IndicatorTrend,
+    SocialEmotionalIndicatorCreate,
+    SocialEmotionalIndicatorListResponse,
+    SocialEmotionalIndicatorResponse,
+    SocialEmotionalIndicatorUpdate,
+    SocialEmotionalIndicatorWithDetails,
+    SocialEmotionalProfile,
+)
+
 __all__ = [
     # Common
     "BaseSchema",
@@ -127,4 +180,45 @@ __all__ = [
     "AssessmentFilterParams",
     "ProgressAnalysisRequest",
     "ProgressAnalysisResponse",
+    # Professional
+    "ProfessionalCreate",
+    "ProfessionalUpdate",
+    "ProfessionalResponse",
+    "ProfessionalListResponse",
+    "ProfessionalSummary",
+    "ProfessionalFilter",
+    "ProfessionalStatistics",
+    # Observation
+    "ProfessionalObservationCreate",
+    "ProfessionalObservationUpdate",
+    "ProfessionalObservationResponse",
+    "ProfessionalObservationWithDetails",
+    "ProfessionalObservationListResponse",
+    "ObservationFilter",
+    "ObservationSummary",
+    "ObservationTimeline",
+    # Intervention Plan
+    "InterventionPlanCreate",
+    "InterventionPlanUpdate",
+    "InterventionPlanResponse",
+    "InterventionPlanWithDetails",
+    "InterventionPlanListResponse",
+    "InterventionPlanSummary",
+    "InterventionPlanFilter",
+    "InterventionPlanStatistics",
+    "InterventionPlanEffectiveness",
+    "ProgressNoteCreate",
+    # Social Emotional Indicator
+    "SocialEmotionalIndicatorCreate",
+    "SocialEmotionalIndicatorUpdate",
+    "SocialEmotionalIndicatorResponse",
+    "SocialEmotionalIndicatorWithDetails",
+    "SocialEmotionalIndicatorListResponse",
+    "IndicatorFilter",
+    "IndicatorTrend",
+    "SocialEmotionalProfile",
+    "IndicatorComparison",
+    "IndicatorCorrelation",
+    "BulkIndicatorCreate",
+    "BulkIndicatorResponse",
 ]
