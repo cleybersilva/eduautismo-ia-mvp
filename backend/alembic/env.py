@@ -29,6 +29,10 @@ from app.models.user import User
 from app.models.student import Student
 from app.models.activity import Activity
 from app.models.assessment import Assessment
+from app.models.professional import Professional
+from app.models.observation import ProfessionalObservation
+from app.models.intervention_plan import InterventionPlan
+from app.models.socioemotional_indicator import SocialEmotionalIndicator
 
 # Alembic Config object
 config = context.config
