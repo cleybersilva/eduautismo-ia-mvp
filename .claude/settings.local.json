@@ -57,7 +57,10 @@
       "Bash(black:*)",
       "Bash(isort:*)",
       "Bash(git commit:*)",
-      "Bash(flake8:*)"
+      "Bash(flake8:*)",
+      "Bash(alembic revision:*)",
+      "Bash(DATABASE_URL=\"postgresql://localhost/eduautismo\" cd:*)",
+      "Bash(export DATABASE_URL=\"postgresql://localhost/eduautismo\")"
     ],
     "deny": [],
     "ask": []
