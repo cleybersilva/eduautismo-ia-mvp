@@ -3,14 +3,6 @@ name: 01 - Check Docs Updated
 on:
   workflow_call:
     # This workflow can be called by other workflows
-  pull_request:
-    types: [opened, synchronize, reopened]
-    paths:
-      - 'backend/**/*.py'
-      - 'frontend/**/*.jsx'
-      - 'frontend/**/*.tsx'
-      - '.github/workflows/**'
-      - 'terraform/**'
 
 jobs:
   check-docs:
