@@ -24,63 +24,45 @@ env:
 
 jobs:
   # ============================================================================
-  # Stage 1: Check Docs Updated
-  # ============================================================================
-  check-docs-updated:
-    name: "📝 Stage 1: Check Docs Updated"
-    uses: ./.github/workflows/01-check-docs-updated.yml
-    secrets: inherit
-
-  # ============================================================================
-  # Stage 2: Update Documentation
-  # ============================================================================
-  update-docs:
-    name: "📚 Stage 2: Update Documentation"
-    needs: check-docs-updated
-    uses: ./.github/workflows/02-update-docs.yml
-    secrets: inherit
-
-  # ============================================================================
-  # Stage 3: Security Scan
+  # Stage 1: Security Scan
   # ============================================================================
   security-scan:
-    name: "🔒 Stage 3: Security Scan"
-    needs: update-docs
+    name: "🔒 Stage 1: Security Scan"
     uses: ./.github/workflows/03-security-scan.yml
     secrets: inherit
 
   # ============================================================================
-  # Stage 4: Backend Tests (only after Security Scan succeeds)
+  # Stage 2: Backend Tests (only after Security Scan succeeds)
   # ============================================================================
   backend-tests:
-    name: "🧪 Stage 4: Backend Tests"
+    name: "🧪 Stage 2: Backend Tests"
     needs: security-scan
     uses: ./.github/workflows/04-backend-tests.yml
     secrets: inherit
 
   # ============================================================================
-  # Stage 5: Frontend Tests (only after Backend Tests succeed)
+  # Stage 3: Frontend Tests (only after Backend Tests succeed)
   # ============================================================================
   frontend-tests:
-    name: "🎨 Stage 5: Frontend Tests"
+    name: "🎨 Stage 3: Frontend Tests"
     needs: backend-tests
     uses: ./.github/workflows/05-frontend-tests.yml
     secrets: inherit
 
   # ============================================================================
-  # Stage 6: Container Scan (only after Frontend Tests succeed)
+  # Stage 4: Container Scan (only after Frontend Tests succeed)
   # ============================================================================
   container-scan:
-    name: "🐳 Stage 6: Container Scan"
+    name: "🐳 Stage 4: Container Scan"
     needs: frontend-tests
     uses: ./.github/workflows/06-container-scan.yml
     secrets: inherit
 
   # ============================================================================
-  # Stage 7: Build & Push (only after Container Scan succeeds and on push)
+  # Stage 5: Build & Push (only after Container Scan succeeds and on push)
   # ============================================================================
   build-and-push:
-    name: "🚀 Stage 7: Build & Push [${{ github.ref == 'refs/heads/main' && 'production' || github.ref == 'refs/heads/staging' && 'staging' || 'dev' }}]"
+    name: "🚀 Stage 5: Build & Push [${{ github.ref == 'refs/heads/main' && 'production' || github.ref == 'refs/heads/staging' && 'staging' || 'dev' }}]"
     if: success() && github.event_name == 'push'
     needs: container-scan
     uses: ./.github/workflows/07-build-and-push.yml
@@ -94,7 +76,7 @@ jobs:
   pipeline-status:
     name: "✅ Pipeline Complete"
     runs-on: ubuntu-latest
-    needs: [check-docs-updated, update-docs, security-scan, backend-tests, frontend-tests, container-scan, build-and-push]
+    needs: [security-scan, backend-tests, frontend-tests, container-scan, build-and-push]
     if: always()
 
     steps:
@@ -106,31 +88,23 @@ jobs:
           echo "Environment: $ENVIRONMENT"
           echo "Branch: ${{ github.ref_name }}"
           echo ""
-          echo "Stage 1: Check Docs Updated"
-          echo "  Status: ${{ needs.check-docs-updated.result }}"
-          [ "${{ needs.check-docs-updated.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
-          echo ""
-          echo "Stage 2: Update Documentation"
-          echo "  Status: ${{ needs.update-docs.result }}"
-          [ "${{ needs.update-docs.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
-          echo ""
-          echo "Stage 3: Security Scan"
+          echo "Stage 1: Security Scan"
           echo "  Status: ${{ needs.security-scan.result }}"
           [ "${{ needs.security-scan.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
           echo ""
-          echo "Stage 4: Backend Tests"
+          echo "Stage 2: Backend Tests"
           echo "  Status: ${{ needs.backend-tests.result }}"
           [ "${{ needs.backend-tests.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
           echo ""
-          echo "Stage 5: Frontend Tests"
+          echo "Stage 3: Frontend Tests"
           echo "  Status: ${{ needs.frontend-tests.result }}"
           [ "${{ needs.frontend-tests.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
           echo ""
-          echo "Stage 6: Container Scan"
+          echo "Stage 4: Container Scan"
           echo "  Status: ${{ needs.container-scan.result }}"
           [ "${{ needs.container-scan.result }}" == "success" ] && echo "  ✅ Passed" || echo "  ❌ Failed"
           echo ""
-          echo "Stage 7: Build & Push [$ENVIRONMENT]"
+          echo "Stage 5: Build & Push [$ENVIRONMENT]"
           echo "  Status: ${{ needs.build-and-push.result }}"
           if [ "${{ needs.build-and-push.result }}" == "success" ]; then
             echo "  ✅ Passed - Ready for $ENVIRONMENT deployment"
