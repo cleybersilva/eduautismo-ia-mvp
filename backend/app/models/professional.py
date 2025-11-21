@@ -4,13 +4,18 @@ Professional model - Profissionais que acompanham estudantes.
 Suporta profissionais de Educação e Saúde em um sistema multiprofissional integrado.
 """
 
-from sqlalchemy import Boolean, Column, DateTime, Enum, String
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.sql import func
 import enum
-import uuid
+from typing import List, TYPE_CHECKING
 
-from app.db.base import Base
+from sqlalchemy import Boolean, String
+from sqlalchemy import Enum as SQLEnum
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.db.base import BaseModel
+
+if TYPE_CHECKING:
+    from app.models.observation import ProfessionalObservation
+    from app.models.socioemotional_indicator import SocialEmotionalIndicator
 
 
 class ProfessionalRole(str, enum.Enum):
@@ -36,7 +41,7 @@ class ProfessionalRole(str, enum.Enum):
     NUTRITIONIST = "nutritionist"
 
 
-class Professional(Base):
+class Professional(BaseModel):
     """
     Profissional que acompanha estudantes no sistema.
 
@@ -46,19 +51,24 @@ class Professional(Base):
 
     __tablename__ = "professionals"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = Column(String(255), nullable=False, index=True)
-    email = Column(String(255), nullable=False, unique=True, index=True)
-    role = Column(Enum(ProfessionalRole), nullable=False, index=True)
-    specialization = Column(String(255), nullable=True)
-    license_number = Column(String(100), nullable=True)
-    organization = Column(String(255), nullable=False)
-    phone = Column(String(20), nullable=True)
-    is_active = Column(Boolean, default=True, nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True, index=True)
+    role: Mapped[ProfessionalRole] = mapped_column(
+        SQLEnum(ProfessionalRole, name="professional_role"), nullable=False, index=True
+    )
+    specialization: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    license_number: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    organization: Mapped[str] = mapped_column(String(255), nullable=False)
+    phone: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, index=True)
 
-    # Timestamps
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    # Relacionamentos
+    observations: Mapped[List["ProfessionalObservation"]] = relationship(
+        "ProfessionalObservation", back_populates="professional", cascade="all, delete-orphan", lazy="selectin"
+    )
+    socioemotional_indicators: Mapped[List["SocialEmotionalIndicator"]] = relationship(
+        "SocialEmotionalIndicator", back_populates="professional", cascade="all, delete-orphan", lazy="selectin"
+    )
 
     def __repr__(self):
         return f"<Professional(id={self.id}, name={self.name}, role={self.role})>"

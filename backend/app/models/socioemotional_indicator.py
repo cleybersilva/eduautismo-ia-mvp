@@ -5,14 +5,20 @@ Permite monitoramento estruturado de aspectos socioemocionais e comportamentais
 fundamentais para estudantes com TEA.
 """
 
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship
 import enum
-import uuid
+from datetime import datetime
+from typing import TYPE_CHECKING
 
-from app.db.base import Base
+from sqlalchemy import Integer, String, Text, ForeignKey
+from sqlalchemy import Enum as SQLEnum
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.db.base import BaseModel
+from app.db.types import GUID
+
+if TYPE_CHECKING:
+    from app.models.student import Student
+    from app.models.professional import Professional
 
 
 class IndicatorType(str, enum.Enum):
@@ -47,7 +53,7 @@ class MeasurementContext(str, enum.Enum):
     OTHER = "other"  # Outro
 
 
-class SocialEmotionalIndicator(Base):
+class SocialEmotionalIndicator(BaseModel):
     """
     Indicador socioemocional medido para estudante.
 
@@ -57,70 +63,63 @@ class SocialEmotionalIndicator(Base):
 
     __tablename__ = "socioemotional_indicators"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-
     # Relacionamentos
-    student_id = Column(UUID(as_uuid=True), ForeignKey("students.id"), nullable=False, index=True)
-    professional_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("professionals.id"),
+    student_id: Mapped[GUID] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"), nullable=False, index=True)
+    professional_id: Mapped[GUID] = mapped_column(
+        ForeignKey("professionals.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
 
     # Tipo e contexto
-    indicator_type = Column(Enum(IndicatorType), nullable=False, index=True)
-    context = Column(Enum(MeasurementContext), nullable=False)
+    indicator_type: Mapped[IndicatorType] = mapped_column(
+        SQLEnum(IndicatorType, name="indicator_type"), nullable=False, index=True
+    )
+    context: Mapped[MeasurementContext] = mapped_column(
+        SQLEnum(MeasurementContext, name="measurement_context"), nullable=False
+    )
 
     # Medição
-    score = Column(
+    score: Mapped[int] = mapped_column(
         Integer,
         nullable=False,
-        comment="Pontuação do indicador: 1 (muito baixo) a 10 (muito alto)",
     )
 
     # Observações qualitativas
-    observations = Column(
+    observations: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,
-        comment="Observações qualitativas sobre a medição",
     )
-    specific_behaviors = Column(
+    specific_behaviors: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,
-        comment="Comportamentos específicos observados",
     )
 
     # Fatores contextuais
-    environmental_factors = Column(
+    environmental_factors: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,
-        comment="Fatores ambientais que influenciaram",
     )
-    triggers = Column(
+    triggers: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,
-        comment="Gatilhos identificados (para indicadores negativos)",
     )
-    supports_used = Column(
+    supports_used: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,
-        comment="Suportes/estratégias utilizados",
     )
 
-    # Timestamps
-    measured_at = Column(
-        DateTime(timezone=True),
+    # Timestamps adicionais
+    measured_at: Mapped[datetime] = mapped_column(
         nullable=False,
         index=True,
-        comment="Data/hora da medição",
     )
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relacionamentos ORM
-    student = relationship("Student", back_populates="socioemotional_indicators")
-    professional = relationship("Professional", back_populates="socioemotional_indicators")
+    student: Mapped["Student"] = relationship("Student", back_populates="socioemotional_indicators", lazy="selectin")
+    professional: Mapped["Professional"] = relationship(
+        "Professional", back_populates="socioemotional_indicators", lazy="selectin"
+    )
 
     def __repr__(self):
         return f"<SocialEmotionalIndicator(id={self.id}, " f"type={self.indicator_type}, score={self.score})>"

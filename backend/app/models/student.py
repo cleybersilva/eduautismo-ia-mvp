@@ -19,6 +19,9 @@ from app.utils.constants import TEALevel
 if TYPE_CHECKING:
     from app.models.activity import Activity
     from app.models.assessment import Assessment
+    from app.models.intervention_plan import InterventionPlan
+    from app.models.observation import ProfessionalObservation
+    from app.models.socioemotional_indicator import SocialEmotionalIndicator
     from app.models.user import User
 
 
@@ -44,4 +47,13 @@ class Student(BaseModel):
     )
     assessments: Mapped[List["Assessment"]] = relationship(
         "Assessment", back_populates="student", cascade="all, delete-orphan", lazy="selectin"
+    )
+    intervention_plans: Mapped[List["InterventionPlan"]] = relationship(
+        "InterventionPlan", back_populates="student", cascade="all, delete-orphan", lazy="selectin"
+    )
+    observations: Mapped[List["ProfessionalObservation"]] = relationship(
+        "ProfessionalObservation", back_populates="student", cascade="all, delete-orphan", lazy="selectin"
+    )
+    socioemotional_indicators: Mapped[List["SocialEmotionalIndicator"]] = relationship(
+        "SocialEmotionalIndicator", back_populates="student", cascade="all, delete-orphan", lazy="selectin"
     )

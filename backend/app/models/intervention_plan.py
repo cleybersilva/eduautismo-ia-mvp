@@ -5,14 +5,20 @@ Permite criação e acompanhamento de planos de intervenção colaborativos
 entre diferentes profissionais.
 """
 
-from sqlalchemy import Column, Date, DateTime, Enum, ForeignKey, Integer, String, Text, Table
-from sqlalchemy.dialects.postgresql import JSON, UUID
-from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship
 import enum
-import uuid
+from datetime import date
+from typing import Any, Dict, List, TYPE_CHECKING
 
-from app.db.base import Base
+from sqlalchemy import Date, Integer, String, Text, Table, Column, ForeignKey
+from sqlalchemy import Enum as SQLEnum
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.db.base import Base, BaseModel
+from app.db.types import GUID, PortableJSON
+
+if TYPE_CHECKING:
+    from app.models.student import Student
+    from app.models.professional import Professional
 
 
 class PlanStatus(str, enum.Enum):
@@ -39,13 +45,12 @@ class ReviewFrequency(str, enum.Enum):
 intervention_plan_professionals = Table(
     "intervention_plan_professionals",
     Base.metadata,
-    Column("intervention_plan_id", UUID(as_uuid=True), ForeignKey("intervention_plans.id")),
-    Column("professional_id", UUID(as_uuid=True), ForeignKey("professionals.id")),
-    Column("joined_at", DateTime(timezone=True), server_default=func.now()),
+    Column("intervention_plan_id", GUID, ForeignKey("intervention_plans.id", ondelete="CASCADE")),
+    Column("professional_id", GUID, ForeignKey("professionals.id", ondelete="CASCADE")),
 )
 
 
-class InterventionPlan(Base):
+class InterventionPlan(BaseModel):
     """
     Plano de intervenção multiprofissional para estudante.
 
@@ -55,83 +60,61 @@ class InterventionPlan(Base):
 
     __tablename__ = "intervention_plans"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-
     # Relacionamentos
-    student_id = Column(UUID(as_uuid=True), ForeignKey("students.id"), nullable=False, index=True)
-    created_by_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("professionals.id"),
+    student_id: Mapped[GUID] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"), nullable=False, index=True)
+    created_by_id: Mapped[GUID] = mapped_column(
+        ForeignKey("professionals.id", ondelete="CASCADE"),
         nullable=False,
-        comment="Profissional que criou o plano",
     )
 
     # Dados do plano
-    title = Column(String(500), nullable=False)
-    objective = Column(Text, nullable=False, comment="Objetivo principal do plano")
-    description = Column(Text, nullable=True, comment="Descrição detalhada")
+    title: Mapped[str] = mapped_column(String(500), nullable=False)
+    objective: Mapped[str] = mapped_column(Text, nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Estratégias e ações
-    strategies = Column(
-        JSON,
-        nullable=False,
-        comment="Lista de estratégias a serem implementadas",
-    )
-    target_behaviors = Column(
-        JSON,
-        nullable=False,
-        comment="Comportamentos-alvo a serem desenvolvidos/modificados",
-    )
-    success_criteria = Column(
-        JSON,
-        nullable=False,
-        comment="Critérios mensuráveis de sucesso",
-    )
+    strategies: Mapped[List[Dict[str, Any]]] = mapped_column(PortableJSON, nullable=False)
+    target_behaviors: Mapped[List[str]] = mapped_column(PortableJSON, nullable=False)
+    success_criteria: Mapped[List[str]] = mapped_column(PortableJSON, nullable=False)
 
     # Período e acompanhamento
-    start_date = Column(Date, nullable=False, index=True)
-    end_date = Column(Date, nullable=False, index=True)
-    review_frequency = Column(
-        Enum(ReviewFrequency),
+    start_date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
+    end_date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
+    review_frequency: Mapped[ReviewFrequency] = mapped_column(
+        SQLEnum(ReviewFrequency, name="review_frequency"),
         nullable=False,
         default=ReviewFrequency.WEEKLY,
     )
 
     # Status e progresso
-    status = Column(
-        Enum(PlanStatus),
+    status: Mapped[PlanStatus] = mapped_column(
+        SQLEnum(PlanStatus, name="plan_status"),
         nullable=False,
         default=PlanStatus.DRAFT,
         index=True,
     )
-    progress_percentage = Column(
+    progress_percentage: Mapped[int] = mapped_column(
         Integer,
         nullable=False,
         default=0,
-        comment="Percentual de progresso (0-100)",
     )
-    progress_notes = Column(
-        JSON,
-        nullable=True,
-        comment="Notas de progresso por data/profissional",
-    )
+    progress_notes: Mapped[Dict[str, Any] | None] = mapped_column(PortableJSON, nullable=True)
 
     # Materiais e recursos
-    required_materials = Column(JSON, nullable=True, comment="Materiais necessários")
-    resources = Column(JSON, nullable=True, comment="Recursos adicionais")
+    required_materials: Mapped[List[str] | None] = mapped_column(PortableJSON, nullable=True)
+    resources: Mapped[Dict[str, Any] | None] = mapped_column(PortableJSON, nullable=True)
 
-    # Timestamps
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    last_reviewed_at = Column(DateTime(timezone=True), nullable=True)
+    # Campo adicional para last_reviewed_at
+    last_reviewed_at: Mapped[date | None] = mapped_column(Date, nullable=True)
 
     # Relacionamentos ORM
-    student = relationship("Student", back_populates="intervention_plans")
-    created_by = relationship("Professional", foreign_keys=[created_by_id])
-    professionals_involved = relationship(
+    student: Mapped["Student"] = relationship("Student", back_populates="intervention_plans", lazy="selectin")
+    created_by: Mapped["Professional"] = relationship("Professional", foreign_keys=[created_by_id], lazy="selectin")
+    professionals_involved: Mapped[List["Professional"]] = relationship(
         "Professional",
         secondary=intervention_plan_professionals,
         backref="intervention_plans",
+        lazy="selectin",
     )
 
     def __repr__(self):
@@ -145,27 +128,16 @@ class InterventionPlan(Base):
     @property
     def days_remaining(self) -> int:
         """Calcula dias restantes até o fim do plano."""
-        from datetime import date
+        from datetime import date as dt_date
 
-        if self.end_date < date.today():
+        today = dt_date.today()
+        if self.end_date < today:
             return 0
-        return (self.end_date - date.today()).days
+        return (self.end_date - today).days
 
     @property
-    def needs_review(self) -> bool:
-        """Determina se plano precisa de revisão baseado na frequência."""
-        from datetime import date, timedelta
+    def is_overdue(self) -> bool:
+        """Verifica se plano está atrasado."""
+        from datetime import date as dt_date
 
-        if not self.last_reviewed_at:
-            return True
-
-        frequency_days = {
-            ReviewFrequency.DAILY: 1,
-            ReviewFrequency.WEEKLY: 7,
-            ReviewFrequency.BIWEEKLY: 14,
-            ReviewFrequency.MONTHLY: 30,
-            ReviewFrequency.QUARTERLY: 90,
-        }
-
-        days_since_review = (date.today() - self.last_reviewed_at.date()).days
-        return days_since_review >= frequency_days.get(self.review_frequency, 7)
+        return self.end_date < dt_date.today() and self.status not in [PlanStatus.COMPLETED, PlanStatus.CANCELLED]
