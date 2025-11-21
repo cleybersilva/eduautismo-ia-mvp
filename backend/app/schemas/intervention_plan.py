@@ -35,9 +35,7 @@ class InterventionPlanCreate(BaseModel):
         min_length=1,
         description="Comportamentos-alvo",
     )
-    success_criteria: dict[str, Any] = Field(
-        ..., description="Critérios mensuráveis de sucesso"
-    )
+    success_criteria: dict[str, Any] = Field(..., description="Critérios mensuráveis de sucesso")
     professionals_involved_ids: list[UUID] = Field(
         default_factory=list,
         description="IDs dos profissionais envolvidos",
@@ -113,9 +111,7 @@ class ProgressNoteCreate(BaseModel):
     """Schema para adicionar nota de progresso ao plano."""
 
     content: str = Field(..., min_length=10, description="Conteúdo da nota de progresso")
-    progress_percentage: Optional[int] = Field(
-        None, ge=0, le=100, description="Atualização do percentual de progresso"
-    )
+    progress_percentage: Optional[int] = Field(None, ge=0, le=100, description="Atualização do percentual de progresso")
     challenges: Optional[str] = Field(None, description="Desafios encontrados")
     successes: Optional[str] = Field(None, description="Sucessos alcançados")
     next_steps: Optional[str] = Field(None, description="Próximos passos")
@@ -202,9 +198,7 @@ class InterventionPlanFilter(BaseModel):
 
     student_id: Optional[UUID] = None
     created_by_id: Optional[UUID] = None
-    professional_id: Optional[UUID] = Field(
-        None, description="Filtrar por profissional envolvido"
-    )
+    professional_id: Optional[UUID] = Field(None, description="Filtrar por profissional envolvido")
     status: Optional[PlanStatus] = None
     review_frequency: Optional[ReviewFrequency] = None
     needs_review: Optional[bool] = None

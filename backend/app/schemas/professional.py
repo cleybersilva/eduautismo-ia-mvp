@@ -24,9 +24,7 @@ class ProfessionalCreate(BaseModel):
     name: str = Field(..., min_length=3, max_length=255, description="Nome completo do profissional")
     email: EmailStr = Field(..., description="Email profissional")
     role: ProfessionalRole = Field(..., description="Função/especialidade profissional")
-    specialization: Optional[str] = Field(
-        None, max_length=255, description="Especialização adicional"
-    )
+    specialization: Optional[str] = Field(None, max_length=255, description="Especialização adicional")
     license_number: Optional[str] = Field(None, max_length=100, description="Número de registro profissional")
     organization: str = Field(..., min_length=3, max_length=255, description="Instituição/organização")
     phone: Optional[str] = Field(None, max_length=20, description="Telefone de contato")

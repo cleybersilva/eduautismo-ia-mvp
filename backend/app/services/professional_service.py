@@ -196,9 +196,7 @@ class ProfessionalService:
         total = query.count()
 
         # Ordenação e paginação
-        professionals = (
-            query.order_by(Professional.name).offset(skip).limit(limit).all()
-        )
+        professionals = query.order_by(Professional.name).offset(skip).limit(limit).all()
 
         return professionals, total
 
@@ -234,22 +232,11 @@ class ProfessionalService:
         """
         # Total de profissionais
         total = self.db.query(Professional).count()
-        total_active = (
-            self.db.query(Professional)
-            .filter(Professional.is_active == True)  # noqa: E712
-            .count()
-        )
+        total_active = self.db.query(Professional).filter(Professional.is_active == True).count()  # noqa: E712
         total_inactive = total - total_active
 
         # Por role
-        by_role_query = (
-            self.db.query(
-                Professional.role,
-                func.count(Professional.id)
-            )
-            .group_by(Professional.role)
-            .all()
-        )
+        by_role_query = self.db.query(Professional.role, func.count(Professional.id)).group_by(Professional.role).all()
         by_role = {str(role): count for role, count in by_role_query}
 
         # Profissionais de educação vs saúde
@@ -269,22 +256,11 @@ class ProfessionalService:
             ProfessionalRole.PHYSIOTHERAPIST,
         ]
 
-        education_count = (
-            self.db.query(Professional)
-            .filter(Professional.role.in_(education_roles))
-            .count()
-        )
-        health_count = (
-            self.db.query(Professional)
-            .filter(Professional.role.in_(health_roles))
-            .count()
-        )
+        education_count = self.db.query(Professional).filter(Professional.role.in_(education_roles)).count()
+        health_count = self.db.query(Professional).filter(Professional.role.in_(health_roles)).count()
 
         # Número de organizações distintas
-        organizations_count = (
-            self.db.query(func.count(func.distinct(Professional.organization)))
-            .scalar()
-        )
+        organizations_count = self.db.query(func.count(func.distinct(Professional.organization))).scalar()
 
         return ProfessionalStatistics(
             total_professionals=total,

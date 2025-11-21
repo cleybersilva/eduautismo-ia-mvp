@@ -31,12 +31,8 @@ class SocialEmotionalIndicatorCreate(BaseModel):
         description="Pontuação: 1 (muito baixo) a 10 (muito alto)",
     )
     observations: Optional[str] = Field(None, description="Observações qualitativas")
-    specific_behaviors: Optional[str] = Field(
-        None, description="Comportamentos específicos observados"
-    )
-    environmental_factors: Optional[str] = Field(
-        None, description="Fatores ambientais que influenciaram"
-    )
+    specific_behaviors: Optional[str] = Field(None, description="Comportamentos específicos observados")
+    environmental_factors: Optional[str] = Field(None, description="Fatores ambientais que influenciaram")
     triggers: Optional[str] = Field(None, description="Gatilhos identificados")
     supports_used: Optional[str] = Field(None, description="Suportes/estratégias utilizados")
     measured_at: datetime = Field(..., description="Data/hora da medição")

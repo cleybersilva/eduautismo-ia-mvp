@@ -58,9 +58,7 @@ class ProfessionalObservation(Base):
 
     # Relacionamentos
     student_id = Column(UUID(as_uuid=True), ForeignKey("students.id"), nullable=False, index=True)
-    professional_id = Column(
-        UUID(as_uuid=True), ForeignKey("professionals.id"), nullable=False, index=True
-    )
+    professional_id = Column(UUID(as_uuid=True), ForeignKey("professionals.id"), nullable=False, index=True)
 
     # Dados da observação
     observation_type = Column(Enum(ObservationType), nullable=False, index=True)
@@ -86,9 +84,7 @@ class ProfessionalObservation(Base):
         default=1,
         comment="Nível de severidade/urgência: 1 (baixo) a 5 (crítico)",
     )
-    requires_intervention = Column(
-        Boolean, default=False, nullable=False, comment="Requer intervenção imediata"
-    )
+    requires_intervention = Column(Boolean, default=False, nullable=False, comment="Requer intervenção imediata")
 
     # Privacidade e acesso
     is_private = Column(
@@ -113,8 +109,7 @@ class ProfessionalObservation(Base):
 
     def __repr__(self):
         return (
-            f"<ProfessionalObservation(id={self.id}, "
-            f"type={self.observation_type}, severity={self.severity_level})>"
+            f"<ProfessionalObservation(id={self.id}, " f"type={self.observation_type}, severity={self.severity_level})>"
         )
 
     @property

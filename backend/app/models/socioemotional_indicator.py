@@ -123,10 +123,7 @@ class SocialEmotionalIndicator(Base):
     professional = relationship("Professional", back_populates="socioemotional_indicators")
 
     def __repr__(self):
-        return (
-            f"<SocialEmotionalIndicator(id={self.id}, "
-            f"type={self.indicator_type}, score={self.score})>"
-        )
+        return f"<SocialEmotionalIndicator(id={self.id}, " f"type={self.indicator_type}, score={self.score})>"
 
     @property
     def score_level(self) -> str:

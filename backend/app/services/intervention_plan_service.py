@@ -134,9 +134,7 @@ class InterventionPlanService:
 
         # Verificar se profissional está envolvido no plano
         if not self._is_professional_involved(plan, professional_id):
-            raise ForbiddenException(
-                "Apenas profissionais envolvidos no plano podem editá-lo"
-            )
+            raise ForbiddenException("Apenas profissionais envolvidos no plano podem editá-lo")
 
         # Validar datas se fornecidas
         new_start = update_data.start_date or plan.start_date
@@ -205,9 +203,7 @@ class InterventionPlanService:
 
         # Verificar se profissional está envolvido
         if not self._is_professional_involved(plan, professional_id):
-            raise ForbiddenException(
-                "Apenas profissionais envolvidos podem adicionar notas de progresso"
-            )
+            raise ForbiddenException("Apenas profissionais envolvidos podem adicionar notas de progresso")
 
         # Criar nota de progresso
         progress_note = {
@@ -269,11 +265,7 @@ class InterventionPlanService:
             raise ForbiddenException("Apenas o criador do plano pode adicionar profissionais")
 
         # Verificar se profissional existe
-        professional = (
-            self.db.query(Professional)
-            .filter(Professional.id == professional_id_to_add)
-            .first()
-        )
+        professional = self.db.query(Professional).filter(Professional.id == professional_id_to_add).first()
         if not professional:
             raise NotFoundException(f"Profissional {professional_id_to_add} não encontrado")
 
@@ -389,12 +381,7 @@ class InterventionPlanService:
         total = query.count()
 
         # Ordenação (mais recentes primeiro) e paginação
-        plans = (
-            query.order_by(InterventionPlan.created_at.desc())
-            .offset(skip)
-            .limit(limit)
-            .all()
-        )
+        plans = query.order_by(InterventionPlan.created_at.desc()).offset(skip).limit(limit).all()
 
         return plans, total
 
@@ -428,35 +415,21 @@ class InterventionPlanService:
         total = self.db.query(InterventionPlan).count()
 
         # Planos ativos
-        active = (
-            self.db.query(InterventionPlan)
-            .filter(InterventionPlan.status == PlanStatus.ACTIVE)
-            .count()
-        )
+        active = self.db.query(InterventionPlan).filter(InterventionPlan.status == PlanStatus.ACTIVE).count()
 
         # Planos concluídos
-        completed = (
-            self.db.query(InterventionPlan)
-            .filter(InterventionPlan.status == PlanStatus.COMPLETED)
-            .count()
-        )
+        completed = self.db.query(InterventionPlan).filter(InterventionPlan.status == PlanStatus.COMPLETED).count()
 
         # Por status
         by_status_query = (
-            self.db.query(
-                InterventionPlan.status,
-                func.count(InterventionPlan.id)
-            )
+            self.db.query(InterventionPlan.status, func.count(InterventionPlan.id))
             .group_by(InterventionPlan.status)
             .all()
         )
         by_status = {str(status): count for status, count in by_status_query}
 
         # Progresso médio
-        avg_progress = (
-            self.db.query(func.avg(InterventionPlan.progress_percentage))
-            .scalar() or 0.0
-        )
+        avg_progress = self.db.query(func.avg(InterventionPlan.progress_percentage)).scalar() or 0.0
 
         # Planos que precisam revisão (simplificado - planos ativos sem revisão recente)
         needs_review = (
@@ -464,7 +437,7 @@ class InterventionPlanService:
             .filter(
                 and_(
                     InterventionPlan.status == PlanStatus.ACTIVE,
-                    InterventionPlan.last_reviewed_at == None  # noqa: E711
+                    InterventionPlan.last_reviewed_at == None,  # noqa: E711
                 )
             )
             .count()
@@ -472,10 +445,7 @@ class InterventionPlanService:
 
         # Por estudante
         by_student_query = (
-            self.db.query(
-                InterventionPlan.student_id,
-                func.count(InterventionPlan.id)
-            )
+            self.db.query(InterventionPlan.student_id, func.count(InterventionPlan.id))
             .group_by(InterventionPlan.student_id)
             .all()
         )
@@ -484,10 +454,7 @@ class InterventionPlanService:
         # Duração média (dias)
         plans_with_dates = self.db.query(InterventionPlan).all()
         if plans_with_dates:
-            total_days = sum(
-                (plan.end_date - plan.start_date).days
-                for plan in plans_with_dates
-            )
+            total_days = sum((plan.end_date - plan.start_date).days for plan in plans_with_dates)
             avg_duration = total_days / len(plans_with_dates)
         else:
             avg_duration = 0.0

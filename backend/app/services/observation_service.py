@@ -89,9 +89,7 @@ class ObservationService:
             ForbiddenException: Se profissional não tem acesso
         """
         observation = (
-            self.db.query(ProfessionalObservation)
-            .filter(ProfessionalObservation.id == observation_id)
-            .first()
+            self.db.query(ProfessionalObservation).filter(ProfessionalObservation.id == observation_id).first()
         )
 
         if not observation:
@@ -100,9 +98,7 @@ class ObservationService:
         # Controle de acesso para observações privadas
         if observation.is_private:
             requesting_professional = (
-                self.db.query(Professional)
-                .filter(Professional.id == requesting_professional_id)
-                .first()
+                self.db.query(Professional).filter(Professional.id == requesting_professional_id).first()
             )
             if not requesting_professional or not requesting_professional.is_health_professional:
                 raise ForbiddenException(
@@ -198,9 +194,7 @@ class ObservationService:
         # Controle de acesso para observações privadas
         if requesting_professional_id:
             requesting_professional = (
-                self.db.query(Professional)
-                .filter(Professional.id == requesting_professional_id)
-                .first()
+                self.db.query(Professional).filter(Professional.id == requesting_professional_id).first()
             )
             if requesting_professional and not requesting_professional.is_health_professional:
                 # Profissionais de educação veem apenas observações não privadas
@@ -227,9 +221,7 @@ class ObservationService:
                 query = query.filter(ProfessionalObservation.severity_level <= filters.severity_level_max)
 
             if filters.requires_intervention is not None:
-                query = query.filter(
-                    ProfessionalObservation.requires_intervention == filters.requires_intervention
-                )
+                query = query.filter(ProfessionalObservation.requires_intervention == filters.requires_intervention)
 
             if filters.is_private is not None:
                 query = query.filter(ProfessionalObservation.is_private == filters.is_private)
@@ -253,12 +245,7 @@ class ObservationService:
         total = query.count()
 
         # Ordenação (mais recentes primeiro) e paginação
-        observations = (
-            query.order_by(ProfessionalObservation.observed_at.desc())
-            .offset(skip)
-            .limit(limit)
-            .all()
-        )
+        observations = query.order_by(ProfessionalObservation.observed_at.desc()).offset(skip).limit(limit).all()
 
         return observations, total
 
@@ -336,9 +323,7 @@ class ObservationService:
             by_severity[sev] = by_severity.get(sev, 0) + 1
 
         # Requer intervenção
-        requires_intervention_count = sum(
-            1 for obs in all_observations if obs.requires_intervention
-        )
+        requires_intervention_count = sum(1 for obs in all_observations if obs.requires_intervention)
 
         # Contextos mais comuns (top 5)
         context_counts = {}

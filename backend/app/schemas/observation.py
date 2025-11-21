@@ -31,20 +31,14 @@ class ProfessionalObservationCreate(BaseModel):
     socioemotional_indicators: Optional[dict[str, Any]] = Field(
         None, description="Indicadores socioemocionais estruturados"
     )
-    severity_level: int = Field(
-        default=1, ge=1, le=5, description="Nível de severidade/urgência (1-5)"
-    )
-    requires_intervention: bool = Field(
-        default=False, description="Requer intervenção imediata"
-    )
+    severity_level: int = Field(default=1, ge=1, le=5, description="Nível de severidade/urgência (1-5)")
+    requires_intervention: bool = Field(default=False, description="Requer intervenção imediata")
     is_private: bool = Field(
         default=False,
         description="Visível apenas para profissionais de saúde autorizados",
     )
     tags: Optional[list[str]] = Field(None, description="Tags para categorização")
-    attachments: Optional[list[dict[str, str]]] = Field(
-        None, description="Anexos (URLs de fotos, vídeos, documentos)"
-    )
+    attachments: Optional[list[dict[str, str]]] = Field(None, description="Anexos (URLs de fotos, vídeos, documentos)")
     observed_at: datetime = Field(..., description="Data/hora da observação")
 
     class Config:

@@ -98,9 +98,7 @@ class SocialEmotionalIndicatorService:
         for indicator_dict in bulk_data.indicators:
             try:
                 indicator_data = SocialEmotionalIndicatorCreate(
-                    student_id=bulk_data.student_id,
-                    measured_at=bulk_data.measured_at,
-                    **indicator_dict
+                    student_id=bulk_data.student_id, measured_at=bulk_data.measured_at, **indicator_dict
                 )
                 indicator = self.create(indicator_data, professional_id)
                 created_ids.append(indicator.id)
@@ -127,11 +125,7 @@ class SocialEmotionalIndicatorService:
         Raises:
             NotFoundException: Se indicador não existe
         """
-        indicator = (
-            self.db.query(SocialEmotionalIndicator)
-            .filter(SocialEmotionalIndicator.id == indicator_id)
-            .first()
-        )
+        indicator = self.db.query(SocialEmotionalIndicator).filter(SocialEmotionalIndicator.id == indicator_id).first()
 
         if not indicator:
             raise NotFoundException(f"Indicador {indicator_id} não encontrado")
@@ -244,12 +238,7 @@ class SocialEmotionalIndicatorService:
                 # Filtrar indicadores preocupantes (precisa lógica complexa)
                 # Simplificado: usar score extremos
                 if filters.is_concerning:
-                    query = query.filter(
-                        or_(
-                            SocialEmotionalIndicator.score <= 3,
-                            SocialEmotionalIndicator.score >= 8
-                        )
-                    )
+                    query = query.filter(or_(SocialEmotionalIndicator.score <= 3, SocialEmotionalIndicator.score >= 8))
 
             if filters.date_from:
                 query = query.filter(SocialEmotionalIndicator.measured_at >= filters.date_from)
@@ -270,12 +259,7 @@ class SocialEmotionalIndicatorService:
         total = query.count()
 
         # Ordenação (mais recentes primeiro) e paginação
-        indicators = (
-            query.order_by(SocialEmotionalIndicator.measured_at.desc())
-            .offset(skip)
-            .limit(limit)
-            .all()
-        )
+        indicators = query.order_by(SocialEmotionalIndicator.measured_at.desc()).offset(skip).limit(limit).all()
 
         return indicators, total
 
@@ -324,9 +308,7 @@ class SocialEmotionalIndicatorService:
         )
 
         if not measurements_query:
-            raise NotFoundException(
-                f"Nenhuma medição encontrada para {indicator_type} nos últimos {days} dias"
-            )
+            raise NotFoundException(f"Nenhuma medição encontrada para {indicator_type} nos últimos {days} dias")
 
         # Preparar dados das medições
         measurements = [
@@ -344,8 +326,8 @@ class SocialEmotionalIndicatorService:
 
         # Determinar direção da tendência
         if len(scores) >= 2:
-            first_half_avg = sum(scores[:len(scores)//2]) / (len(scores)//2)
-            second_half_avg = sum(scores[len(scores)//2:]) / (len(scores) - len(scores)//2)
+            first_half_avg = sum(scores[: len(scores) // 2]) / (len(scores) // 2)
+            second_half_avg = sum(scores[len(scores) // 2 :]) / (len(scores) - len(scores) // 2)
 
             if second_half_avg > first_half_avg + 1:
                 trend_direction = "improving"
@@ -387,16 +369,14 @@ class SocialEmotionalIndicatorService:
 
         # Buscar todos os indicadores do estudante
         all_indicators = (
-            self.db.query(SocialEmotionalIndicator)
-            .filter(SocialEmotionalIndicator.student_id == student_id)
-            .all()
+            self.db.query(SocialEmotionalIndicator).filter(SocialEmotionalIndicator.student_id == student_id).all()
         )
 
         if not all_indicators:
             # Retornar perfil vazio se não há medições
             return SocialEmotionalProfile(
                 student_id=student_id,
-                student_name=getattr(student, 'name', None),
+                student_name=getattr(student, "name", None),
                 total_measurements=0,
                 last_measured_at=None,
                 indicators_summary={},
@@ -415,10 +395,7 @@ class SocialEmotionalIndicatorService:
         # Resumo por tipo de indicador
         indicators_summary = {}
         for indicator_type in IndicatorType:
-            type_indicators = [
-                ind for ind in all_indicators
-                if ind.indicator_type == indicator_type
-            ]
+            type_indicators = [ind for ind in all_indicators if ind.indicator_type == indicator_type]
             if type_indicators:
                 scores = [ind.score for ind in type_indicators]
                 indicators_summary[str(indicator_type)] = {
@@ -429,11 +406,7 @@ class SocialEmotionalIndicatorService:
                 }
 
         # Indicadores preocupantes
-        concerning_indicators = [
-            ind.indicator_display_name
-            for ind in all_indicators
-            if ind.is_concerning
-        ]
+        concerning_indicators = [ind.indicator_display_name for ind in all_indicators if ind.is_concerning]
         concerning_indicators = list(set(concerning_indicators))  # Remover duplicatas
 
         # Pontos fortes (scores altos consistentes em indicadores positivos)
@@ -467,7 +440,7 @@ class SocialEmotionalIndicatorService:
 
         return SocialEmotionalProfile(
             student_id=student_id,
-            student_name=getattr(student, 'name', None),
+            student_name=getattr(student, "name", None),
             total_measurements=total_measurements,
             last_measured_at=last_measured_at,
             indicators_summary=indicators_summary,

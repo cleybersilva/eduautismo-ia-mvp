@@ -374,6 +374,7 @@ def get_indicator_trend(
     """
     try:
         from app.models.socioemotional_indicator import IndicatorType
+
         service = SocialEmotionalIndicatorService(db)
         return service.get_trend(student_id, IndicatorType(indicator_type), days)
     except NotFoundException as e:
@@ -427,6 +428,7 @@ def compare_periods(
     """
     try:
         from app.models.socioemotional_indicator import IndicatorType
+
         service = SocialEmotionalIndicatorService(db)
         return service.compare_periods(
             student_id=student_id,

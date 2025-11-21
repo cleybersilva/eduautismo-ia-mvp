@@ -238,6 +238,7 @@ def change_plan_status(
     """
     try:
         from app.models.intervention_plan import PlanStatus
+
         service = InterventionPlanService(db)
         professional_id = UUID(current_user["user_id"])
         return service.change_status(plan_id, PlanStatus(new_status), professional_id)
