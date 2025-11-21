@@ -5,7 +5,7 @@ Schemas de validação e serialização para indicadores socioemocionais.
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -146,7 +146,7 @@ class IndicatorTrend(BaseModel):
 
     indicator_type: IndicatorType
     indicator_display_name: str
-    measurements: list[dict[str, any]]
+    measurements: list[dict[str, Any]]
     average_score: float
     trend_direction: str  # "improving", "stable", "declining"
     latest_score: int
@@ -161,7 +161,7 @@ class SocialEmotionalProfile(BaseModel):
     student_name: Optional[str] = None
     total_measurements: int
     last_measured_at: Optional[datetime]
-    indicators_summary: dict[str, dict[str, any]]
+    indicators_summary: dict[str, dict[str, Any]]
     concerning_indicators: list[str]
     strengths: list[str]
     areas_for_development: list[str]
@@ -205,7 +205,7 @@ class BulkIndicatorCreate(BaseModel):
 
     student_id: UUID
     measured_at: datetime
-    indicators: list[dict[str, any]] = Field(
+    indicators: list[dict[str, Any]] = Field(
         ...,
         description="Lista de indicadores com type, context, score, etc.",
     )

@@ -492,6 +492,16 @@ class MissingConfigurationError(ConfigurationError):
 
 
 # ============================================================================
+# Aliases for Backward Compatibility
+# ============================================================================
+
+# Aliases para manter compatibilidade com código existente
+NotFoundException = ResourceNotFoundError
+ForbiddenException = PermissionDeniedError
+ValidationException = ValidationError
+
+
+# ============================================================================
 # Helper Functions
 # ============================================================================
 
