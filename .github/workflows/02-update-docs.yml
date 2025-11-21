@@ -1,6 +1,8 @@
-name: 09 - Auto Update Documentation
+name: 02 - Auto Update Documentation
 
 on:
+  workflow_call:
+    # This workflow can be called by other workflows
   push:
     branches:
       - main
