@@ -36,25 +36,34 @@ class ActivityCreate(BaseSchema):
     student_id: UUID = Field(..., description="Student ID")
     title: str = Field(..., min_length=3, max_length=500, description="Activity title")
     description: str = Field(..., min_length=10, description="Activity description")
-    activity_type: ActivityType = Field(..., description="Activity type")
-    difficulty: DifficultyLevel = Field(..., description="Difficulty level")
-    duration_minutes: int = Field(..., ge=MIN_ACTIVITY_DURATION, le=MAX_ACTIVITY_DURATION)
-    objectives: List[str] = Field(..., min_length=1, description="Learning objectives")
-    materials: List[str] = Field(..., min_length=1, description="Required materials")
-    instructions: List[str] = Field(..., min_length=1, description="Step-by-step instructions")
+    activity_type: ActivityType = Field(default=ActivityType.COGNITIVE, description="Activity type")
+    difficulty: DifficultyLevel = Field(default=DifficultyLevel.EASY, description="Difficulty level")
+    duration_minutes: int = Field(
+        default=30, ge=MIN_ACTIVITY_DURATION, le=MAX_ACTIVITY_DURATION, description="Duration in minutes"
+    )
+    objectives: List[str] = Field(..., description="Learning objectives")
+    materials: List[str] = Field(..., description="Required materials")
+    instructions: List[str] = Field(..., description="Step-by-step instructions")
     adaptations: Optional[List[str]] = Field(default=None, description="Adaptations")
     visual_supports: Optional[List[str]] = Field(default=None, description="Visual supports")
     success_criteria: Optional[List[str]] = Field(default=None, description="Success criteria")
     theme: Optional[str] = Field(default=None, max_length=255, description="Theme")
     tags: Optional[List[str]] = Field(default=None, description="Tags")
 
-    @field_validator("objectives", "materials", "instructions")
+    @field_validator("objectives", "materials", "instructions", mode="before")
     @classmethod
     def validate_not_empty_list(cls, value: List[str]) -> List[str]:
-        """Validate lists are not empty."""
-        if not value or all(not item.strip() for item in value):
+        """Validate lists are not empty and contain non-whitespace items."""
+        if not value:
             raise ValueError("Lista não pode estar vazia")
-        return [item.strip() for item in value if item.strip()]
+
+        # Strip whitespace and filter empty strings
+        cleaned = [item.strip() for item in value if isinstance(item, str) and item.strip()]
+
+        if not cleaned:
+            raise ValueError("Lista não pode estar vazia")
+
+        return cleaned
 
 
 class ActivityUpdate(BaseSchema):

@@ -22,27 +22,21 @@ class AssessmentCreate(BaseSchema):
     engagement_level: EngagementLevel = Field(..., description="Engagement level")
     difficulty_rating: DifficultyRating = Field(..., description="Difficulty rating")
     actual_duration_minutes: Optional[int] = Field(default=None, ge=0, description="Actual duration in minutes")
-    notes: Optional[str] = Field(default=None, max_length=MAX_NOTES_LENGTH, description="Teacher's notes")
-    strengths_observed: Optional[str] = Field(
-        default=None, max_length=MAX_NOTES_LENGTH, description="Observed strengths"
-    )
-    challenges_observed: Optional[str] = Field(
-        default=None, max_length=MAX_NOTES_LENGTH, description="Observed challenges"
-    )
-    recommendations: Optional[str] = Field(default=None, max_length=MAX_NOTES_LENGTH, description="Recommendations")
+    notes: Optional[str] = Field(default=None, description="Teacher's notes")
+    strengths_observed: Optional[str] = Field(default=None, description="Observed strengths")
+    challenges_observed: Optional[str] = Field(default=None, description="Observed challenges")
+    recommendations: Optional[str] = Field(default=None, description="Recommendations")
     skills_demonstrated: Optional[Dict[str, Any]] = Field(default=None, description="Skills demonstrated (JSON)")
     behavioral_notes: Optional[Dict[str, Any]] = Field(default=None, description="Behavioral observations (JSON)")
     independence_level: Optional[str] = Field(default=None, max_length=50, description="Independence level")
     assistance_needed: Optional[str] = Field(default=None, max_length=255, description="Assistance needed")
-    modifications_made: Optional[str] = Field(
-        default=None, max_length=MAX_NOTES_LENGTH, description="Modifications made"
-    )
+    modifications_made: Optional[str] = Field(default=None, description="Modifications made")
     objectives_met: Optional[Dict[str, bool]] = Field(default=None, description="Objectives met (JSON)")
 
-    @field_validator("notes", "strengths_observed", "challenges_observed", "recommendations", "modifications_made")
+    @field_validator("notes", "strengths_observed", "challenges_observed", "recommendations", "modifications_made", mode="before")
     @classmethod
     def validate_text_length(cls, value: Optional[str]) -> Optional[str]:
-        """Validate text field length."""
+        """Validate text field length with custom error message."""
         if value and len(value) > MAX_NOTES_LENGTH:
             raise ValueError(f"Texto não pode exceder {MAX_NOTES_LENGTH} caracteres")
         return value
@@ -55,16 +49,24 @@ class AssessmentUpdate(BaseSchema):
     engagement_level: Optional[EngagementLevel] = Field(default=None)
     difficulty_rating: Optional[DifficultyRating] = Field(default=None)
     actual_duration_minutes: Optional[int] = Field(default=None, ge=0)
-    notes: Optional[str] = Field(default=None, max_length=MAX_NOTES_LENGTH)
-    strengths_observed: Optional[str] = Field(default=None, max_length=MAX_NOTES_LENGTH)
-    challenges_observed: Optional[str] = Field(default=None, max_length=MAX_NOTES_LENGTH)
-    recommendations: Optional[str] = Field(default=None, max_length=MAX_NOTES_LENGTH)
+    notes: Optional[str] = Field(default=None)
+    strengths_observed: Optional[str] = Field(default=None)
+    challenges_observed: Optional[str] = Field(default=None)
+    recommendations: Optional[str] = Field(default=None)
     skills_demonstrated: Optional[Dict[str, Any]] = Field(default=None)
     behavioral_notes: Optional[Dict[str, Any]] = Field(default=None)
     independence_level: Optional[str] = Field(default=None, max_length=50)
     assistance_needed: Optional[str] = Field(default=None, max_length=255)
-    modifications_made: Optional[str] = Field(default=None, max_length=MAX_NOTES_LENGTH)
+    modifications_made: Optional[str] = Field(default=None)
     objectives_met: Optional[Dict[str, bool]] = Field(default=None)
+
+    @field_validator("notes", "strengths_observed", "challenges_observed", "recommendations", "modifications_made", mode="before")
+    @classmethod
+    def validate_text_length(cls, value: Optional[str]) -> Optional[str]:
+        """Validate text field length with custom error message."""
+        if value and len(value) > MAX_NOTES_LENGTH:
+            raise ValueError(f"Texto não pode exceder {MAX_NOTES_LENGTH} caracteres")
+        return value
 
 
 class AssessmentResponse(BaseResponseSchema):

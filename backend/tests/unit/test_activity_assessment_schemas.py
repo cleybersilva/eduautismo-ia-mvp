@@ -105,15 +105,17 @@ class TestAssessmentSchemas:
 
     def test_assessment_create_notes_too_long_raises_error(self):
         """Test that notes exceeding MAX_NOTES_LENGTH raise validation error."""
+        from app.utils.constants import CompletionStatus, EngagementLevel, DifficultyRating
+
         long_text = "A" * (MAX_NOTES_LENGTH + 1)
 
         with pytest.raises(ValidationError) as exc_info:
             AssessmentCreate(
                 student_id=uuid4(),
                 activity_id=uuid4(),
-                date=date.today(),
-                performance_level=3,
-                engagement_level=4,
+                completion_status=CompletionStatus.COMPLETED,
+                engagement_level=EngagementLevel.HIGH,
+                difficulty_rating=DifficultyRating.APPROPRIATE,
                 notes=long_text,  # Exceeds MAX_NOTES_LENGTH
             )
 
@@ -122,15 +124,17 @@ class TestAssessmentSchemas:
 
     def test_assessment_create_strengths_too_long_raises_error(self):
         """Test that strengths exceeding MAX_NOTES_LENGTH raise validation error."""
+        from app.utils.constants import CompletionStatus, EngagementLevel, DifficultyRating
+
         long_text = "B" * (MAX_NOTES_LENGTH + 1)
 
         with pytest.raises(ValidationError) as exc_info:
             AssessmentCreate(
                 student_id=uuid4(),
                 activity_id=uuid4(),
-                date=date.today(),
-                performance_level=3,
-                engagement_level=4,
+                completion_status=CompletionStatus.COMPLETED,
+                engagement_level=EngagementLevel.HIGH,
+                difficulty_rating=DifficultyRating.APPROPRIATE,
                 strengths_observed=long_text,  # Exceeds MAX_NOTES_LENGTH
             )
 
@@ -139,15 +143,17 @@ class TestAssessmentSchemas:
 
     def test_assessment_create_recommendations_too_long_raises_error(self):
         """Test that recommendations exceeding MAX_NOTES_LENGTH raise validation error."""
+        from app.utils.constants import CompletionStatus, EngagementLevel, DifficultyRating
+
         long_text = "C" * (MAX_NOTES_LENGTH + 1)
 
         with pytest.raises(ValidationError) as exc_info:
             AssessmentCreate(
                 student_id=uuid4(),
                 activity_id=uuid4(),
-                date=date.today(),
-                performance_level=3,
-                engagement_level=4,
+                completion_status=CompletionStatus.COMPLETED,
+                engagement_level=EngagementLevel.HIGH,
+                difficulty_rating=DifficultyRating.APPROPRIATE,
                 recommendations=long_text,  # Exceeds MAX_NOTES_LENGTH
             )
 
@@ -156,33 +162,37 @@ class TestAssessmentSchemas:
 
     def test_assessment_create_valid(self):
         """Test valid assessment creation."""
+        from app.utils.constants import CompletionStatus, EngagementLevel, DifficultyRating
+
         assessment = AssessmentCreate(
             student_id=uuid4(),
             activity_id=uuid4(),
-            date=date.today(),
-            performance_level=4,
-            engagement_level=5,
+            completion_status=CompletionStatus.COMPLETED,
+            engagement_level=EngagementLevel.HIGH,
+            difficulty_rating=DifficultyRating.APPROPRIATE,
             notes="Notas da avaliação",
             strengths_observed="Pontos fortes observados",
             challenges_observed="Desafios observados",
             recommendations="Recomendações para próximas atividades",
         )
 
-        assert assessment.performance_level == 4
-        assert assessment.engagement_level == 5
+        assert assessment.completion_status == CompletionStatus.COMPLETED
+        assert assessment.engagement_level == EngagementLevel.HIGH
         assert len(assessment.notes) < MAX_NOTES_LENGTH
         assert len(assessment.strengths_observed) < MAX_NOTES_LENGTH
 
     def test_assessment_create_text_at_max_length(self):
         """Test assessment with text exactly at MAX_NOTES_LENGTH."""
+        from app.utils.constants import CompletionStatus, EngagementLevel, DifficultyRating
+
         max_text = "D" * MAX_NOTES_LENGTH
 
         assessment = AssessmentCreate(
             student_id=uuid4(),
             activity_id=uuid4(),
-            date=date.today(),
-            performance_level=3,
-            engagement_level=3,
+            completion_status=CompletionStatus.COMPLETED,
+            engagement_level=EngagementLevel.MEDIUM,
+            difficulty_rating=DifficultyRating.APPROPRIATE,
             notes=max_text,  # Exactly at max length
         )
 
