@@ -10,7 +10,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.api.dependencies.auth import get_current_user
+from app.api.dependencies.auth import get_current_user, get_professional_id
 from app.core.database import get_db
 from app.core.exceptions import ForbiddenException, NotFoundException, ValidationException
 from app.schemas.intervention_plan import (
@@ -32,6 +32,7 @@ def create_intervention_plan(
     plan: InterventionPlanCreate,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Cria novo plano de intervenção multiprofissional.
@@ -65,7 +66,8 @@ def create_intervention_plan(
     """
     try:
         service = InterventionPlanService(db)
-        created_by_id = UUID(current_user["user_id"])
+        # Use professional_id from header if provided, otherwise fallback to user_id from JWT
+        created_by_id = professional_id_param if professional_id_param is not None else UUID(current_user["user_id"])
         return service.create(plan, created_by_id)
     except NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -78,6 +80,7 @@ def get_intervention_plan(
     plan_id: UUID,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Busca plano de intervenção por ID.
@@ -106,6 +109,7 @@ def update_intervention_plan(
     plan_update: InterventionPlanUpdate,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Atualiza plano de intervenção.
@@ -134,7 +138,7 @@ def update_intervention_plan(
     """
     try:
         service = InterventionPlanService(db)
-        professional_id = UUID(current_user["user_id"])
+        professional_id = professional_id_param if professional_id_param is not None else UUID(current_user["user_id"])
         return service.update(plan_id, plan_update, professional_id)
     except NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -149,6 +153,7 @@ def delete_intervention_plan(
     plan_id: UUID,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Remove plano de intervenção.
@@ -161,7 +166,7 @@ def delete_intervention_plan(
     """
     try:
         service = InterventionPlanService(db)
-        professional_id = UUID(current_user["user_id"])
+        professional_id = professional_id_param if professional_id_param is not None else UUID(current_user["user_id"])
         service.delete(plan_id, professional_id)
     except NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -175,6 +180,7 @@ def add_progress_note(
     note: ProgressNoteCreate,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Adiciona nota de progresso ao plano.
@@ -202,7 +208,7 @@ def add_progress_note(
     """
     try:
         service = InterventionPlanService(db)
-        professional_id = UUID(current_user["user_id"])
+        professional_id = professional_id_param if professional_id_param is not None else UUID(current_user["user_id"])
         return service.add_progress_note(plan_id, note, professional_id)
     except NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -216,6 +222,7 @@ def change_plan_status(
     new_status: str = Query(..., description="Novo status: draft, active, paused, completed, cancelled"),
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Altera status do plano de intervenção.
@@ -240,7 +247,7 @@ def change_plan_status(
         from app.models.intervention_plan import PlanStatus
 
         service = InterventionPlanService(db)
-        professional_id = UUID(current_user["user_id"])
+        professional_id = professional_id_param if professional_id_param is not None else UUID(current_user["user_id"])
         return service.change_status(plan_id, PlanStatus(new_status), professional_id)
     except NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -256,6 +263,7 @@ def add_professional_to_plan(
     professional_id: UUID,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Adiciona profissional ao plano de intervenção.
@@ -272,7 +280,7 @@ def add_professional_to_plan(
     """
     try:
         service = InterventionPlanService(db)
-        requesting_professional_id = UUID(current_user["user_id"])
+        requesting_professional_id = professional_id_param if professional_id_param is not None else UUID(current_user["user_id"])
         return service.add_professional(plan_id, professional_id, requesting_professional_id)
     except NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -288,6 +296,7 @@ def remove_professional_from_plan(
     professional_id: UUID,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Remove profissional do plano de intervenção.
@@ -303,7 +312,7 @@ def remove_professional_from_plan(
     """
     try:
         service = InterventionPlanService(db)
-        requesting_professional_id = UUID(current_user["user_id"])
+        requesting_professional_id = professional_id_param if professional_id_param is not None else UUID(current_user["user_id"])
         return service.remove_professional(plan_id, professional_id, requesting_professional_id)
     except NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -322,6 +331,7 @@ def list_intervention_plans(
     search: Optional[str] = Query(None, description="Buscar em título e objetivo"),
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Lista planos de intervenção com filtros e paginação.
@@ -371,6 +381,7 @@ def list_plans_by_student(
     limit: int = Query(100, ge=1, le=1000),
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Lista todos os planos de um estudante específico.
@@ -399,6 +410,7 @@ def list_active_plans(
     limit: int = Query(100, ge=1, le=1000),
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Lista apenas planos ativos.
@@ -428,6 +440,7 @@ def list_active_plans(
 def get_statistics(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Obtém estatísticas agregadas de planos de intervenção.

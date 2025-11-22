@@ -9,7 +9,7 @@ import enum
 from datetime import date
 from typing import Any, Dict, List, TYPE_CHECKING
 
-from sqlalchemy import Date, Integer, String, Text, Table, Column, ForeignKey
+from sqlalchemy import Boolean, Date, Integer, String, Text, Table, Column, ForeignKey
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -99,6 +99,11 @@ class InterventionPlan(BaseModel):
         default=0,
     )
     progress_notes: Mapped[Dict[str, Any] | None] = mapped_column(PortableJSON, nullable=True)
+    needs_review: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+    )
 
     # Materiais e recursos
     required_materials: Mapped[List[str] | None] = mapped_column(PortableJSON, nullable=True)
