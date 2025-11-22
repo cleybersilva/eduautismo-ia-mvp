@@ -81,11 +81,12 @@ def intervention_plan_data(test_student, psychologist):
             "Identificar e nomear emoções próprias",
             "Utilizar estratégias de autorregulação",
         ],
-        "success_criteria": [
-            "Iniciar pelo menos 3 interações sociais por dia",
-            "Nomear corretamente 5 emoções básicas",
-            "Usar técnicas de respiração quando ansioso",
-        ],
+        "success_criteria": {
+            "baseline": "2 interações sociais por dia",
+            "goal": "Pelo menos 3 interações sociais por dia",
+            "emotions": "Nomear corretamente 5 emoções básicas",
+            "self_regulation": "Usar técnicas de respiração quando ansioso",
+        },
         "start_date": start.isoformat(),
         "end_date": end.isoformat(),
         "review_frequency": ReviewFrequency.WEEKLY.value,

@@ -56,11 +56,15 @@ def engine():
     # Import all models to ensure they're registered with Base.metadata
     from app.models.activity import Activity
     from app.models.assessment import Assessment
+    from app.models.intervention_plan import InterventionPlan
+    from app.models.observation import ProfessionalObservation
+    from app.models.professional import Professional
+    from app.models.socioemotional_indicator import SocialEmotionalIndicator
     from app.models.student import Student
     from app.models.user import User
 
     # noqa on unused imports
-    _ = (User, Student, Activity, Assessment)
+    _ = (User, Student, Activity, Assessment, Professional, ProfessionalObservation, InterventionPlan, SocialEmotionalIndicator)
 
     # Drop all tables and recreate for fresh test environment
     Base.metadata.drop_all(bind=engine)
@@ -83,11 +87,21 @@ def db_session(engine) -> Generator[Session, None, None]:
     try:
         from app.models.activity import Activity
         from app.models.assessment import Assessment
+        from app.models.intervention_plan import InterventionPlan
+        from app.models.observation import ProfessionalObservation
+        from app.models.professional import Professional
+        from app.models.socioemotional_indicator import SocialEmotionalIndicator
         from app.models.student import Student
         from app.models.user import User
 
+        # Delete in order to respect foreign key constraints
         session.query(Assessment).delete()
         session.query(Activity).delete()
+        session.query(SocialEmotionalIndicator).delete()
+        session.query(ProfessionalObservation).delete()
+        # Delete intervention plan professionals association first
+        session.execute(InterventionPlan.__table__.delete())
+        session.query(Professional).delete()
         session.query(Student).delete()
         session.query(User).delete()
         session.commit()
@@ -146,47 +160,36 @@ def auth_headers(client, test_user) -> dict:
 
 
 @pytest.fixture
-def test_student(db_session, test_user) -> Student:
-    """Create test student."""
-    from datetime import date
-
-    student = Student(
-        name="Test Student",
-        date_of_birth=date(2015, 6, 15),
-        age=9,
-        diagnosis="Transtorno do Espectro Autista - Nível 1",
-        tea_level="level_1",
-        interests=["matemática", "jogos"],
-        learning_profile={"visual_learner": True},
-        teacher_id=test_user.id,
-        is_active=True,
-    )
-    db_session.add(student)
-    db_session.commit()
-    db_session.refresh(student)
-    return student
+def test_student(client, auth_headers) -> dict:
+    """Create test student via API and return JSON response."""
+    student_data = {
+        "name": "João Silva",
+        "date_of_birth": "2015-03-15",
+        "age": 9,
+        "diagnosis": "TEA Nível 1",
+        "tea_level": "level_1",
+        "interests": ["dinossauros", "lego"],
+    }
+    response = client.post("/api/v1/students/", json=student_data, headers=auth_headers)
+    assert response.status_code == 201, f"Failed to create student: {response.json()}"
+    return response.json()
 
 
 @pytest.fixture
-def test_activity(db_session, test_student, test_user):
-    """Create test activity."""
-    from app.models.activity import Activity
-
-    activity = Activity(
-        student_id=test_student.id,
-        title="Atividade de Teste",
-        description="Descrição da atividade de teste",
-        activity_type="cognitive",
-        difficulty="easy",
-        duration_minutes=30,
-        objectives=["Objetivo 1", "Objetivo 2"],
-        materials=["Material 1", "Material 2"],
-        instructions=["Instruções passo a passo"],  # Must be a list
-        theme="matemática",
-        generated_by_ai=True,
-        created_by_id=test_user.id,  # Fixed: use created_by_id instead of teacher_id
-    )
-    db_session.add(activity)
-    db_session.commit()
-    db_session.refresh(activity)
-    return activity
+def test_activity(client, auth_headers, test_student):
+    """Create test activity via API and return JSON response."""
+    activity_data = {
+        "student_id": test_student["id"],
+        "title": "Atividade de Teste",
+        "description": "Descrição da atividade de teste",
+        "activity_type": "cognitive",
+        "difficulty": "easy",
+        "duration_minutes": 30,
+        "objectives": ["Objetivo 1", "Objetivo 2"],
+        "materials": ["Material 1", "Material 2"],
+        "instructions": ["Instruções passo a passo"],
+        "theme": "matemática",
+    }
+    response = client.post("/api/v1/activities/", json=activity_data, headers=auth_headers)
+    assert response.status_code == 201, f"Failed to create activity: {response.json()}"
+    return response.json()
