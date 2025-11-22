@@ -23,7 +23,7 @@ from app.schemas.professional import (
 )
 from app.services.professional_service import ProfessionalService
 
-router = APIRouter(prefix="/api/v1/professionals", tags=["professionals"])
+router = APIRouter(prefix="/professionals", tags=["professionals"])
 
 
 @router.post("/", response_model=ProfessionalResponse, status_code=status.HTTP_201_CREATED)

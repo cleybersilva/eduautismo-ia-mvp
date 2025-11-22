@@ -23,7 +23,7 @@ from app.schemas.observation import (
 )
 from app.services.observation_service import ObservationService
 
-router = APIRouter(prefix="/api/v1/observations", tags=["observations"])
+router = APIRouter(prefix="/observations", tags=["observations"])
 
 
 @router.post("/", response_model=ProfessionalObservationResponse, status_code=status.HTTP_201_CREATED)

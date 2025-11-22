@@ -28,7 +28,7 @@ from app.schemas.socioemotional_indicator import (
 )
 from app.services.socioemotional_indicator_service import SocialEmotionalIndicatorService
 
-router = APIRouter(prefix="/api/v1/indicators", tags=["socioemotional-indicators"])
+router = APIRouter(prefix="/socioemotional-indicators", tags=["socioemotional-indicators"])
 
 
 @router.post("/", response_model=SocialEmotionalIndicatorResponse, status_code=status.HTTP_201_CREATED)

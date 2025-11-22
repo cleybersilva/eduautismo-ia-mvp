@@ -24,7 +24,7 @@ from app.schemas.intervention_plan import (
 )
 from app.services.intervention_plan_service import InterventionPlanService
 
-router = APIRouter(prefix="/api/v1/intervention-plans", tags=["intervention-plans"])
+router = APIRouter(prefix="/intervention-plans", tags=["intervention-plans"])
 
 
 @router.post("/", response_model=InterventionPlanResponse, status_code=status.HTTP_201_CREATED)
