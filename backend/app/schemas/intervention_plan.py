@@ -8,7 +8,7 @@ from datetime import date, datetime
 from typing import Any, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer
 
 from app.models.intervention_plan import PlanStatus, ReviewFrequency
 
@@ -110,7 +110,7 @@ class InterventionPlanUpdate(BaseModel):
 class ProgressNoteCreate(BaseModel):
     """Schema para adicionar nota de progresso ao plano."""
 
-    content: str = Field(..., min_length=10, description="Conteúdo da nota de progresso")
+    note: str = Field(..., min_length=10, description="Conteúdo da nota de progresso")
     progress_percentage: Optional[int] = Field(None, ge=0, le=100, description="Atualização do percentual de progresso")
     challenges: Optional[str] = Field(None, description="Desafios encontrados")
     successes: Optional[str] = Field(None, description="Sucessos alcançados")
@@ -151,6 +151,10 @@ class InterventionPlanResponse(BaseModel):
 
     class Config:
         from_attributes = True
+        # NOTE: professionals_involved é excluído porque requer serialização complexa
+        # Os relacionamentos many-to-many com Professional precisam de um schema dedicado
+        # TODO: Criar InterventionPlanDetailedResponse com professionals_involved
+        exclude = {"professionals_involved"}
 
 
 class InterventionPlanWithDetails(InterventionPlanResponse):
@@ -212,6 +216,22 @@ class InterventionPlanFilter(BaseModel):
 
 
 # ============================================================================
+# ACTION SCHEMAS
+# ============================================================================
+
+
+class StatusChangeRequest(BaseModel):
+    """Request schema for changing plan status."""
+
+    status: str = Field(..., description="Novo status do plano")
+
+
+class AddProfessionalRequest(BaseModel):
+    """Request schema for adding professional to plan."""
+
+    professional_id: UUID = Field(..., description="ID do profissional a ser adicionado")
+
+
 # ANALYTICS SCHEMAS
 # ============================================================================
 

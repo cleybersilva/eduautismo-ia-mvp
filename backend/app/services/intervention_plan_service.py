@@ -209,7 +209,7 @@ class InterventionPlanService:
         progress_note = {
             "date": datetime.now().isoformat(),
             "professional_id": str(professional_id),
-            "content": note_data.content,
+            "content": note_data.note,
             "challenges": note_data.challenges,
             "successes": note_data.successes,
             "next_steps": note_data.next_steps,

@@ -14,6 +14,7 @@ from app.api.dependencies.auth import get_current_user, get_professional_id
 from app.core.database import get_db
 from app.core.exceptions import ForbiddenException, NotFoundException, ValidationException
 from app.schemas.intervention_plan import (
+    AddProfessionalRequest,
     InterventionPlanCreate,
     InterventionPlanFilter,
     InterventionPlanListResponse,
@@ -21,6 +22,7 @@ from app.schemas.intervention_plan import (
     InterventionPlanStatistics,
     InterventionPlanUpdate,
     ProgressNoteCreate,
+    StatusChangeRequest,
 )
 from app.services.intervention_plan_service import InterventionPlanService
 
@@ -216,10 +218,10 @@ def add_progress_note(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
 
 
-@router.patch("/{plan_id}/status", response_model=InterventionPlanResponse)
+@router.post("/{plan_id}/status", response_model=InterventionPlanResponse)
 def change_plan_status(
     plan_id: UUID,
-    new_status: str = Query(..., description="Novo status: draft, active, paused, completed, cancelled"),
+    status_request: StatusChangeRequest,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
     professional_id_param: Optional[UUID] = Depends(get_professional_id),
@@ -248,7 +250,7 @@ def change_plan_status(
 
         service = InterventionPlanService(db)
         professional_id = professional_id_param if professional_id_param is not None else UUID(current_user["user_id"])
-        return service.change_status(plan_id, PlanStatus(new_status), professional_id)
+        return service.change_status(plan_id, PlanStatus(status_request.status), professional_id)
     except NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except ForbiddenException as e:
@@ -257,10 +259,10 @@ def change_plan_status(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Status inválido")
 
 
-@router.post("/{plan_id}/professionals/{professional_id}", response_model=InterventionPlanResponse)
+@router.post("/{plan_id}/professionals", response_model=InterventionPlanResponse)
 def add_professional_to_plan(
     plan_id: UUID,
-    professional_id: UUID,
+    request: AddProfessionalRequest,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
     professional_id_param: Optional[UUID] = Depends(get_professional_id),
@@ -281,7 +283,7 @@ def add_professional_to_plan(
     try:
         service = InterventionPlanService(db)
         requesting_professional_id = professional_id_param if professional_id_param is not None else UUID(current_user["user_id"])
-        return service.add_professional(plan_id, professional_id, requesting_professional_id)
+        return service.add_professional(plan_id, request.professional_id, requesting_professional_id)
     except NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except ForbiddenException as e:
