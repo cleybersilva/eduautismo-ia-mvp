@@ -106,6 +106,10 @@ class InterventionPlanService:
         if not plan:
             raise NotFoundException(f"Plano de intervenção {plan_id} não encontrado")
 
+        # Atualizar needs_review automaticamente
+        plan.update_needs_review()
+        self.db.commit()
+
         return plan
 
     def update(
@@ -347,8 +351,8 @@ class InterventionPlanService:
                 query = query.filter(InterventionPlan.review_frequency == filters.review_frequency)
 
             if filters.needs_review is not None:
-                # Este filtro requer lógica mais complexa, implementar depois se necessário
-                pass
+                # Filtrar por planos que precisam revisão
+                query = query.filter(InterventionPlan.needs_review == filters.needs_review)
 
             if filters.start_date_from:
                 query = query.filter(InterventionPlan.start_date >= filters.start_date_from)
@@ -382,6 +386,12 @@ class InterventionPlanService:
 
         # Ordenação (mais recentes primeiro) e paginação
         plans = query.order_by(InterventionPlan.created_at.desc()).offset(skip).limit(limit).all()
+
+        # Atualizar needs_review automaticamente para cada plano
+        for plan in plans:
+            plan.update_needs_review()
+        if plans:
+            self.db.commit()
 
         return plans, total
 
