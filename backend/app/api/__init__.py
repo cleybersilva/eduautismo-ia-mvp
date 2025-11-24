@@ -10,8 +10,10 @@ from app.api.routes import (
     activities,
     assessments,
     auth,
+    export,
     health,
     intervention_plans,
+    notifications,
     observations,
     professionals,
     socioemotional_indicators,
@@ -36,5 +38,9 @@ api_router.include_router(professionals.router, tags=["professionals"])
 api_router.include_router(observations.router, tags=["observations"])
 api_router.include_router(intervention_plans.router, tags=["intervention-plans"])
 api_router.include_router(socioemotional_indicators.router, tags=["socioemotional-indicators"])
+
+# Enhanced features routes
+api_router.include_router(notifications.router, tags=["notifications"])
+api_router.include_router(export.router, tags=["export"])
 
 __all__ = ["api_router"]

@@ -7,6 +7,7 @@ Exports all database models for easy importing.
 from app.models.activity import Activity
 from app.models.assessment import Assessment
 from app.models.intervention_plan import InterventionPlan
+from app.models.notification import Notification
 from app.models.observation import ProfessionalObservation
 from app.models.professional import Professional
 from app.models.socioemotional_indicator import SocialEmotionalIndicator
@@ -22,4 +23,5 @@ __all__ = [
     "ProfessionalObservation",
     "InterventionPlan",
     "SocialEmotionalIndicator",
+    "Notification",
 ]
