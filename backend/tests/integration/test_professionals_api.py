@@ -81,7 +81,8 @@ class TestProfessionalCreate:
             "/api/v1/professionals/",
             json=professional_data,
         )
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        # FastAPI HTTPBearer returns 403 when no auth is provided
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
 class TestProfessionalGet:

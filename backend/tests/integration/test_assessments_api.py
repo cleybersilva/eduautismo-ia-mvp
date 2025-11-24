@@ -12,8 +12,8 @@ class TestAssessmentsAPI:
             "/api/v1/assessments/",
             headers=auth_headers,
             json={
-                "activity_id": str(test_activity.id),
-                "student_id": str(test_activity.student_id),
+                "activity_id": test_activity["id"],
+                "student_id": test_activity["student_id"],
                 "completion_status": "completed",
                 "engagement_level": "high",
                 "difficulty_rating": "appropriate",
@@ -29,8 +29,8 @@ class TestAssessmentsAPI:
 
         assert response.status_code == 201
         data = response.json()
-        assert data["activity_id"] == str(test_activity.id)
-        assert data["student_id"] == str(test_activity.student_id)
+        assert data["activity_id"] == test_activity["id"]
+        assert data["student_id"] == test_activity["student_id"]
         assert data["completion_status"] == "completed"
         assert data["engagement_level"] == "high"
         assert data["difficulty_rating"] == "appropriate"
@@ -43,8 +43,8 @@ class TestAssessmentsAPI:
         response = client.post(
             "/api/v1/assessments/",
             json={
-                "activity_id": str(test_activity.id),
-                "student_id": str(test_activity.student_id),
+                "activity_id": test_activity["id"],
+                "student_id": test_activity["student_id"],
                 "completion_status": "completed",
                 "engagement_level": "high",
                 "difficulty_rating": "appropriate",
@@ -65,7 +65,7 @@ class TestAssessmentsAPI:
             headers=auth_headers,
             json={
                 "activity_id": fake_id,
-                "student_id": str(test_activity.student_id),
+                "student_id": test_activity["student_id"],
                 "completion_status": "completed",
                 "engagement_level": "high",
                 "difficulty_rating": "appropriate",
@@ -80,8 +80,8 @@ class TestAssessmentsAPI:
             "/api/v1/assessments/",
             headers=auth_headers,
             json={
-                "activity_id": str(test_activity.id),
-                "student_id": str(test_activity.student_id),
+                "activity_id": test_activity["id"],
+                "student_id": test_activity["student_id"],
                 "completion_status": "completed",
                 "engagement_level": "medium",
                 "difficulty_rating": "appropriate",
@@ -90,7 +90,7 @@ class TestAssessmentsAPI:
 
         assert response.status_code == 201
         data = response.json()
-        assert data["activity_id"] == str(test_activity.id)
+        assert data["activity_id"] == test_activity["id"]
         assert data["completion_status"] == "completed"
 
     def test_get_assessment_by_id(self, client, auth_headers, test_activity):
@@ -100,8 +100,8 @@ class TestAssessmentsAPI:
             "/api/v1/assessments/",
             headers=auth_headers,
             json={
-                "activity_id": str(test_activity.id),
-                "student_id": str(test_activity.student_id),
+                "activity_id": test_activity["id"],
+                "student_id": test_activity["student_id"],
                 "completion_status": "completed",
                 "engagement_level": "high",
                 "difficulty_rating": "appropriate",
@@ -115,7 +115,7 @@ class TestAssessmentsAPI:
         assert response.status_code == 200
         data = response.json()
         assert data["id"] == assessment_id
-        assert data["activity_id"] == str(test_activity.id)
+        assert data["activity_id"] == test_activity["id"]
 
     def test_get_assessment_not_found(self, client, auth_headers):
         """Test getting non-existent assessment."""
@@ -135,8 +135,8 @@ class TestAssessmentsAPI:
                 "/api/v1/assessments/",
                 headers=auth_headers,
                 json={
-                    "activity_id": str(test_activity.id),
-                    "student_id": str(test_activity.student_id),
+                    "activity_id": test_activity["id"],
+                    "student_id": test_activity["student_id"],
                     "completion_status": "completed",
                     "engagement_level": "high",
                     "difficulty_rating": "appropriate",
@@ -145,7 +145,7 @@ class TestAssessmentsAPI:
             )
 
         # List assessments
-        response = client.get(f"/api/v1/assessments/student/{test_activity.student_id}", headers=auth_headers)
+        response = client.get(f"/api/v1/assessments/student/{test_activity["student_id"]}", headers=auth_headers)
 
         assert response.status_code == 200
         data = response.json()
@@ -159,8 +159,8 @@ class TestAssessmentsAPI:
             "/api/v1/assessments/",
             headers=auth_headers,
             json={
-                "activity_id": str(test_activity.id),
-                "student_id": str(test_activity.student_id),
+                "activity_id": test_activity["id"],
+                "student_id": test_activity["student_id"],
                 "completion_status": "in_progress",
                 "engagement_level": "medium",
                 "difficulty_rating": "appropriate",
@@ -191,8 +191,8 @@ class TestAssessmentsAPI:
             "/api/v1/assessments/",
             headers=auth_headers,
             json={
-                "activity_id": str(test_activity.id),
-                "student_id": str(test_activity.student_id),
+                "activity_id": test_activity["id"],
+                "student_id": test_activity["student_id"],
                 "completion_status": "completed",
                 "engagement_level": "very_high",
                 "difficulty_rating": "appropriate",
@@ -218,8 +218,8 @@ class TestAssessmentsAPI:
             "/api/v1/assessments/",
             headers=auth_headers,
             json={
-                "activity_id": str(test_activity.id),
-                "student_id": str(test_activity.student_id),
+                "activity_id": test_activity["id"],
+                "student_id": test_activity["student_id"],
                 "completion_status": "invalid_status",
                 "engagement_level": "high",
                 "difficulty_rating": "appropriate",
@@ -234,8 +234,8 @@ class TestAssessmentsAPI:
             "/api/v1/assessments/",
             headers=auth_headers,
             json={
-                "activity_id": str(test_activity.id),
-                "student_id": str(test_activity.student_id),
+                "activity_id": test_activity["id"],
+                "student_id": test_activity["student_id"],
                 "completion_status": "completed",
                 "engagement_level": "high",
                 "difficulty_rating": "appropriate",

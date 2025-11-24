@@ -9,7 +9,7 @@ import enum
 from datetime import date
 from typing import Any, Dict, List, TYPE_CHECKING
 
-from sqlalchemy import Date, Integer, String, Text, Table, Column, ForeignKey
+from sqlalchemy import Boolean, Date, Integer, String, Text, Table, Column, ForeignKey
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -99,6 +99,11 @@ class InterventionPlan(BaseModel):
         default=0,
     )
     progress_notes: Mapped[Dict[str, Any] | None] = mapped_column(PortableJSON, nullable=True)
+    needs_review: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+    )
 
     # Materiais e recursos
     required_materials: Mapped[List[str] | None] = mapped_column(PortableJSON, nullable=True)
@@ -141,3 +146,50 @@ class InterventionPlan(BaseModel):
         from datetime import date as dt_date
 
         return self.end_date < dt_date.today() and self.status not in [PlanStatus.COMPLETED, PlanStatus.CANCELLED]
+
+    def calculate_needs_review(self) -> bool:
+        """
+        Calcula se o plano precisa de revisão baseado na frequência configurada.
+
+        Lógica:
+        - Se nunca foi revisado (last_reviewed_at is None), sempre precisa revisão
+        - Se foi revisado, verifica se passou o período da frequência configurada
+
+        Returns:
+            bool: True se precisa revisão, False caso contrário
+        """
+        from datetime import date as dt_date, timedelta
+
+        # Planos não ativos não precisam revisão
+        if self.status != PlanStatus.ACTIVE:
+            return False
+
+        # Se nunca foi revisado, precisa revisão
+        if self.last_reviewed_at is None:
+            return True
+
+        # Calcula dias desde última revisão
+        days_since_review = (dt_date.today() - self.last_reviewed_at).days
+
+        # Define limites por frequência
+        frequency_days = {
+            ReviewFrequency.DAILY: 1,
+            ReviewFrequency.WEEKLY: 7,
+            ReviewFrequency.BIWEEKLY: 14,
+            ReviewFrequency.MONTHLY: 30,
+            ReviewFrequency.QUARTERLY: 90,
+        }
+
+        threshold = frequency_days.get(self.review_frequency, 7)  # Default: weekly
+
+        return days_since_review >= threshold
+
+    def update_needs_review(self) -> bool:
+        """
+        Atualiza o campo needs_review com valor calculado.
+
+        Returns:
+            bool: Valor atualizado de needs_review
+        """
+        self.needs_review = self.calculate_needs_review()
+        return self.needs_review

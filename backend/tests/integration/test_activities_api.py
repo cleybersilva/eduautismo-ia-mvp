@@ -12,7 +12,7 @@ class TestActivitiesAPI:
             "/api/v1/activities/generate",
             headers=auth_headers,
             json={
-                "student_id": str(test_student.id),
+                "student_id": test_student["id"],
                 "activity_type": "cognitive",
                 "difficulty": "easy",
                 "duration_minutes": 30,
@@ -22,7 +22,7 @@ class TestActivitiesAPI:
 
         assert response.status_code == 201
         data = response.json()
-        assert data["student_id"] == str(test_student.id)
+        assert data["student_id"] == test_student["id"]
         assert data["activity_type"] == "cognitive"
         assert data["difficulty"] == "easy"
         assert data["duration_minutes"] == 30
@@ -40,7 +40,7 @@ class TestActivitiesAPI:
         response = client.post(
             "/api/v1/activities/generate",
             json={
-                "student_id": str(test_student.id),
+                "student_id": test_student["id"],
                 "activity_type": "academic",
                 "difficulty": "medium",
                 "duration_minutes": 45,
@@ -69,7 +69,7 @@ class TestActivitiesAPI:
             "/api/v1/activities/generate",
             headers=auth_headers,
             json={
-                "student_id": str(test_student.id),
+                "student_id": test_student["id"],
                 "activity_type": "motor",
                 "difficulty": "medium",
                 "duration_minutes": 200,  # Over maximum
@@ -87,7 +87,7 @@ class TestActivitiesAPI:
                 "/api/v1/activities/generate",
                 headers=auth_headers,
                 json={
-                    "student_id": str(test_student.id),
+                    "student_id": test_student["id"],
                     "activity_type": activity_type,
                     "difficulty": "easy",
                     "duration_minutes": 30,

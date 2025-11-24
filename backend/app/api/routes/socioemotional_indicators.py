@@ -11,7 +11,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.api.dependencies.auth import get_current_user
+from app.api.dependencies.auth import get_current_user, get_professional_id
 from app.core.database import get_db
 from app.core.exceptions import NotFoundException, ValidationException
 from app.schemas.socioemotional_indicator import (
@@ -36,6 +36,7 @@ def create_indicator(
     indicator: SocialEmotionalIndicatorCreate,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Cria novo indicador socioemocional.
@@ -77,7 +78,7 @@ def create_indicator(
     """
     try:
         service = SocialEmotionalIndicatorService(db)
-        professional_id = UUID(current_user["user_id"])
+        professional_id = professional_id_param if professional_id_param is not None else UUID(current_user["user_id"])
         return service.create(indicator, professional_id)
     except NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -88,6 +89,7 @@ def create_bulk_indicators(
     bulk_data: BulkIndicatorCreate,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Cria múltiplos indicadores de uma vez.
@@ -126,7 +128,7 @@ def create_bulk_indicators(
     - Erros individuais são retornados na lista de erros
     """
     service = SocialEmotionalIndicatorService(db)
-    professional_id = UUID(current_user["user_id"])
+    professional_id = professional_id_param if professional_id_param is not None else UUID(current_user["user_id"])
     return service.create_bulk(bulk_data, professional_id)
 
 
@@ -161,6 +163,7 @@ def update_indicator(
     indicator_update: SocialEmotionalIndicatorUpdate,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Atualiza indicador socioemocional.
@@ -176,7 +179,7 @@ def update_indicator(
     """
     try:
         service = SocialEmotionalIndicatorService(db)
-        professional_id = UUID(current_user["user_id"])
+        professional_id = professional_id_param if professional_id_param is not None else UUID(current_user["user_id"])
         return service.update(indicator_id, indicator_update, professional_id)
     except NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -189,6 +192,7 @@ def delete_indicator(
     indicator_id: UUID,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
 ):
     """
     Remove indicador.
@@ -201,7 +205,7 @@ def delete_indicator(
     """
     try:
         service = SocialEmotionalIndicatorService(db)
-        professional_id = UUID(current_user["user_id"])
+        professional_id = professional_id_param if professional_id_param is not None else UUID(current_user["user_id"])
         service.delete(indicator_id, professional_id)
     except NotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
