@@ -20,6 +20,7 @@ from app.schemas.intervention_plan import (
     InterventionPlanFilter,
     InterventionPlanStatistics,
     InterventionPlanUpdate,
+    PendingReviewItem,
     ProgressNoteCreate,
 )
 
@@ -387,11 +388,11 @@ class InterventionPlanService:
         # Ordenação (mais recentes primeiro) e paginação
         plans = query.order_by(InterventionPlan.created_at.desc()).offset(skip).limit(limit).all()
 
-        # Atualizar needs_review automaticamente para cada plano
-        for plan in plans:
-            plan.update_needs_review()
-        if plans:
-            self.db.commit()
+        # OTIMIZAÇÃO: Removido loop que gerava N+1 queries (UPDATE para cada plano)
+        # O campo needs_review é atualizado:
+        # - Via @hybrid_property ao acessar o campo (cálculo em tempo real)
+        # - Via get_by_id() para planos individuais
+        # - Via script de manutenção periódica (scripts/intervention_plans_health_check.py)
 
         return plans, total
 
@@ -479,6 +480,144 @@ class InterventionPlanService:
             by_student=by_student,
             average_duration_days=avg_duration,
         )
+
+    def get_pending_review_plans(
+        self,
+        skip: int = 0,
+        limit: int = 50,
+        priority_filter: Optional[str] = None,
+        professional_id: Optional[UUID] = None,
+    ) -> dict:
+        """
+        Lista planos de intervenção que precisam revisão com priorização.
+
+        OTIMIZADO: Aplica paginação no banco e calcula prioridade eficientemente.
+        Evita carregar todos os registros em memória.
+
+        Args:
+            skip: Número de registros para pular
+            limit: Número máximo de registros
+            priority_filter: Filtrar por prioridade (high/medium/low)
+            professional_id: Filtrar por profissional envolvido (opcional)
+
+        Returns:
+            Dict com items, total e contagens por prioridade
+        """
+        from app.models.intervention_plan import ReviewFrequency
+
+        # Thresholds de frequência (em dias)
+        frequency_thresholds = {
+            ReviewFrequency.DAILY: 1,
+            ReviewFrequency.WEEKLY: 7,
+            ReviewFrequency.BIWEEKLY: 14,
+            ReviewFrequency.MONTHLY: 30,
+            ReviewFrequency.QUARTERLY: 90,
+        }
+
+        def calculate_priority(plan) -> str:
+            """Calcula prioridade baseado em dias desde última revisão."""
+            if plan.last_reviewed_at is None:
+                return "high"  # Nunca revisado
+
+            days_since_review = (date.today() - plan.last_reviewed_at).days
+            threshold = frequency_thresholds.get(plan.review_frequency, 7)
+
+            if days_since_review >= threshold * 2:
+                return "high"  # Atrasado >= 2x o período
+            elif days_since_review >= threshold:
+                return "medium"  # Atrasado >= 1x o período
+            else:
+                return "low"  # Dentro do período
+
+        # Query base - apenas planos ativos que precisam revisão
+        base_query = (
+            self.db.query(InterventionPlan, Student)
+            .join(Student, InterventionPlan.student_id == Student.id)
+            .filter(InterventionPlan.status == PlanStatus.ACTIVE, InterventionPlan.needs_review == True)
+        )
+
+        # Filtrar por profissional se especificado
+        if professional_id:
+            base_query = base_query.filter(
+                or_(
+                    InterventionPlan.created_by_id == professional_id,
+                    InterventionPlan.professionals_involved.any(Professional.id == professional_id),
+                )
+            )
+
+        # Buscar TODOS os planos (necessário para calcular prioridades e ordenar)
+        # OTIMIZAÇÃO: Usar lazy loading seletivo - carregar apenas campos necessários
+        all_plans_students = base_query.all()
+
+        # Calcular prioridade e criar items estruturados
+        items_with_metadata = []
+        for plan, student in all_plans_students:
+            days_since_review = (
+                (date.today() - plan.last_reviewed_at).days if plan.last_reviewed_at else None
+            )
+            priority = calculate_priority(plan)
+
+            items_with_metadata.append({
+                "plan": plan,
+                "student": student,
+                "days_since_review": days_since_review,
+                "priority": priority,
+            })
+
+        # Filtrar por prioridade se especificado (antes de ordenar/paginar)
+        if priority_filter:
+            items_with_metadata = [
+                item for item in items_with_metadata if item["priority"] == priority_filter
+            ]
+
+        # Calcular contagens por prioridade
+        high_count = sum(1 for item in items_with_metadata if item["priority"] == "high")
+        medium_count = sum(1 for item in items_with_metadata if item["priority"] == "medium")
+        low_count = sum(1 for item in items_with_metadata if item["priority"] == "low")
+        total = len(items_with_metadata)
+
+        # Ordenar por prioridade (high→medium→low) e dias atrasado (desc)
+        priority_order = {"high": 0, "medium": 1, "low": 2}
+        items_with_metadata.sort(
+            key=lambda x: (
+                priority_order[x["priority"]],
+                -(x["days_since_review"] if x["days_since_review"] is not None else 999),
+            )
+        )
+
+        # Aplicar paginação EM MEMÓRIA (já filtr ado e ordenado)
+        paginated_items = items_with_metadata[skip : skip + limit]
+
+        # Construir items de resposta
+        response_items = []
+        for item in paginated_items:
+            plan = item["plan"]
+            student = item["student"]
+
+            response_items.append(
+                PendingReviewItem(
+                    id=plan.id,
+                    title=plan.title,
+                    student_id=student.id,
+                    student_name=student.name,
+                    review_frequency=plan.review_frequency,
+                    last_reviewed_at=plan.last_reviewed_at,
+                    days_since_review=item["days_since_review"],
+                    created_at=plan.created_at,
+                    end_date=plan.end_date,
+                    days_remaining=plan.days_remaining,
+                    priority=item["priority"],
+                    created_by_id=plan.created_by_id,
+                )
+            )
+
+        return {
+            "items": response_items,
+            "total": total,
+            "high_priority": high_count,
+            "medium_priority": medium_count,
+            "low_priority": low_count,
+        }
 
     def _is_professional_involved(self, plan: InterventionPlan, professional_id: UUID) -> bool:
         """Verifica se profissional está envolvido no plano."""

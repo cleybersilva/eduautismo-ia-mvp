@@ -4,6 +4,7 @@ Intervention Plan API endpoints - Gestão de planos de intervenção multiprofis
 Endpoints para criação e gerenciamento colaborativo de planos de intervenção.
 """
 
+import logging
 from typing import Optional
 from uuid import UUID
 
@@ -13,6 +14,7 @@ from sqlalchemy.orm import Session
 from app.api.dependencies.auth import get_current_user, get_professional_id
 from app.core.database import get_db
 from app.core.exceptions import ForbiddenException, NotFoundException, ValidationException
+from app.models.intervention_plan import PlanStatus
 from app.schemas.intervention_plan import (
     AddProfessionalRequest,
     InterventionPlanCreate,
@@ -21,11 +23,13 @@ from app.schemas.intervention_plan import (
     InterventionPlanResponse,
     InterventionPlanStatistics,
     InterventionPlanUpdate,
+    PendingReviewListResponse,
     ProgressNoteCreate,
     StatusChangeRequest,
 )
 from app.services.intervention_plan_service import InterventionPlanService
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/intervention-plans", tags=["intervention-plans"])
 
 
@@ -246,8 +250,6 @@ def change_plan_status(
     - 403: Profissional não está envolvido
     """
     try:
-        from app.models.intervention_plan import PlanStatus
-
         service = InterventionPlanService(db)
         professional_id = professional_id_param if professional_id_param is not None else UUID(current_user["user_id"])
         return service.change_status(plan_id, PlanStatus(status_request.status), professional_id)
@@ -465,3 +467,76 @@ def get_statistics(
     """
     service = InterventionPlanService(db)
     return service.get_statistics()
+
+
+@router.get("/pending-review", response_model=PendingReviewListResponse)
+def get_pending_review_plans(
+    skip: int = Query(0, ge=0, description="Número de registros para pular"),
+    limit: int = Query(50, ge=1, le=200, description="Número máximo de registros"),
+    priority: Optional[str] = Query(None, pattern="^(high|medium|low)$", description="Filtrar por prioridade"),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+    professional_id_param: Optional[UUID] = Depends(get_professional_id),
+):
+    """
+    Lista planos de intervenção que precisam revisão.
+
+    **Permissões**: Requer autenticação.
+
+    **Query Parameters**:
+    - `skip`: Paginação - registros para pular (padrão: 0)
+    - `limit`: Paginação - máximo de registros (padrão: 50, máx: 200)
+    - `priority`: Filtrar por prioridade (high/medium/low)
+
+    **Retorna**:
+    - Lista de planos que precisam revisão
+    - Total de planos
+    - Contagem por prioridade
+
+    **Prioridade**:
+    - **HIGH**: Atrasado há mais de 2x o período da frequência
+    - **MEDIUM**: Atrasado há mais de 1x o período da frequência
+    - **LOW**: No período ou recém passou
+
+    **Útil para**:
+    - Dashboard de revisões pendentes
+    - Alertas e notificações
+    - Priorização de trabalho
+    - Gestão de tempo
+
+    **Exemplo**:
+    ```
+    GET /intervention-plans/pending-review?priority=high&limit=10
+    ```
+    """
+    logger.info(
+        "Fetching pending review plans",
+        extra={
+            "user_id": current_user.get("user_id"),
+            "professional_id": str(professional_id_param) if professional_id_param else None,
+            "priority_filter": priority,
+            "skip": skip,
+            "limit": limit,
+        },
+    )
+
+    service = InterventionPlanService(db)
+    result = service.get_pending_review_plans(
+        skip=skip,
+        limit=limit,
+        priority_filter=priority,
+        professional_id=professional_id_param,
+    )
+
+    logger.info(
+        "Pending review plans fetched successfully",
+        extra={
+            "total": result["total"],
+            "high_priority": result["high_priority"],
+            "medium_priority": result["medium_priority"],
+            "low_priority": result["low_priority"],
+            "returned_items": len(result["items"]),
+        },
+    )
+
+    return result

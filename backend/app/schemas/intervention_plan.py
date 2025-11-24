@@ -5,7 +5,7 @@ Schemas de validação e serialização para planos de intervenção multiprofis
 """
 
 from datetime import date, datetime
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field, field_serializer
@@ -218,6 +218,36 @@ class InterventionPlanFilter(BaseModel):
 # ============================================================================
 # ACTION SCHEMAS
 # ============================================================================
+
+
+class PendingReviewItem(BaseModel):
+    """Schema para item na lista de revisões pendentes."""
+
+    id: UUID
+    title: str
+    student_id: UUID
+    student_name: str
+    review_frequency: ReviewFrequency
+    last_reviewed_at: Optional[date]
+    days_since_review: Optional[int]
+    created_at: datetime
+    end_date: date
+    days_remaining: int
+    priority: Literal["high", "medium", "low"] = Field(..., description="Prioridade da revisão")
+    created_by_id: UUID
+
+    class Config:
+        from_attributes = True
+
+
+class PendingReviewListResponse(BaseModel):
+    """Response schema para lista de planos que precisam revisão."""
+
+    items: list[PendingReviewItem]
+    total: int
+    high_priority: int
+    medium_priority: int
+    low_priority: int
 
 
 class StatusChangeRequest(BaseModel):
