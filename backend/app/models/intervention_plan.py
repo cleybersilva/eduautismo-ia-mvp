@@ -17,8 +17,9 @@ from app.db.base import Base, BaseModel
 from app.db.types import GUID, PortableJSON
 
 if TYPE_CHECKING:
-    from app.models.student import Student
+    from app.models.notification import Notification
     from app.models.professional import Professional
+    from app.models.student import Student
 
 
 class PlanStatus(str, enum.Enum):
@@ -120,6 +121,12 @@ class InterventionPlan(BaseModel):
         secondary=intervention_plan_professionals,
         backref="intervention_plans",
         lazy="selectin",
+    )
+    notifications: Mapped[List["Notification"]] = relationship(
+        "Notification",
+        back_populates="intervention_plan",
+        cascade="all, delete-orphan",
+        lazy="select",
     )
 
     def __repr__(self):
