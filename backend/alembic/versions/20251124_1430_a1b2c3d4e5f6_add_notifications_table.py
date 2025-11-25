@@ -8,6 +8,7 @@ Create Date: 2025-11-24 14:30:00.000000
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
+import uuid
 
 # revision identifiers, used by Alembic.
 revision = 'a1b2c3d4e5f6'
@@ -27,19 +28,31 @@ def upgrade() -> None:
     - Expiração automática
     - Relacionamento com planos e usuários
     """
+    # Detectar se é PostgreSQL ou SQLite
+    bind = op.get_bind()
+    is_postgresql = bind.dialect.name == 'postgresql'
+
+    # Usar UUID nativo para PostgreSQL, String para SQLite
+    if is_postgresql:
+        uuid_type = postgresql.UUID(as_uuid=True)
+        id_default = sa.text('gen_random_uuid()')
+    else:
+        uuid_type = sa.String(36)
+        id_default = None  # SQLite não suporta server_default para UUID
+
     op.create_table(
         'notifications',
-        sa.Column('id', postgresql.UUID(as_uuid=True), server_default=sa.text('gen_random_uuid()'), nullable=False),
-        sa.Column('user_id', postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column('id', uuid_type, primary_key=True, nullable=False, default=uuid.uuid4 if not is_postgresql else None, server_default=id_default if is_postgresql else None),
+        sa.Column('user_id', uuid_type, nullable=False),
         sa.Column('type', sa.String(length=50), nullable=False),
         sa.Column('priority', sa.String(length=20), nullable=False),
         sa.Column('title', sa.String(length=255), nullable=False),
         sa.Column('message', sa.Text(), nullable=False),
-        sa.Column('intervention_plan_id', postgresql.UUID(as_uuid=True), nullable=True),
+        sa.Column('intervention_plan_id', uuid_type, nullable=True),
         sa.Column('is_read', sa.Boolean(), nullable=False, server_default='false'),
         sa.Column('read_at', sa.DateTime(timezone=True), nullable=True),
         sa.Column('action_url', sa.String(length=500), nullable=True),
-        sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+        sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()') if is_postgresql else sa.text("(datetime('now'))"), nullable=False),
         sa.Column('expires_at', sa.DateTime(timezone=True), nullable=True),
         sa.PrimaryKeyConstraint('id'),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
