@@ -11,7 +11,7 @@ Data: 2025-11-24
 
 from datetime import datetime
 from enum import Enum
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import Boolean, Column, DateTime, Enum as SQLEnum, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
@@ -52,7 +52,7 @@ class Notification(Base):
 
     __tablename__ = "notifications"
 
-    id = Column(GUID, primary_key=True, default=func.uuid_generate_v4())
+    id = Column(GUID, primary_key=True, default=uuid4)
 
     # Destinatário
     user_id = Column(
