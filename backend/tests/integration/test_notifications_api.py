@@ -129,7 +129,8 @@ class TestNotificationsAPI:
         """Testa que requer autenticação."""
         response = client.get("/api/v1/notifications")
 
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        # HTTPBearer returns 403 when no credentials are provided
+        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_get_unread_count_success(self, client, auth_headers):
         """Testa contagem de não lidas."""
@@ -161,7 +162,7 @@ class TestNotificationsAPI:
         assert "by_priority" in data
         assert "urgent_count" in data
 
-    def test_mark_as_read_success(self, client, auth_headers, db_session):
+    def test_mark_as_read_success(self, client, auth_headers, db_session, test_user):
         """Testa marcar notificação como lida."""
         from app.services.notification_service import NotificationService
         from app.schemas.notification import NotificationCreate
@@ -170,7 +171,7 @@ class TestNotificationsAPI:
         service = NotificationService(db_session)
         notification = service.create_notification(
             NotificationCreate(
-                user_id=uuid4(),
+                user_id=test_user.id,
                 type=NotificationType.SYSTEM,
                 priority=NotificationPriority.LOW,
                 title="Test",
@@ -217,7 +218,7 @@ class TestNotificationsAPI:
         assert "message" in data
         assert isinstance(data["updated_count"], int)
 
-    def test_delete_notification_success(self, client, auth_headers, db_session):
+    def test_delete_notification_success(self, client, auth_headers, db_session, test_user):
         """Testa exclusão de notificação."""
         from app.services.notification_service import NotificationService
         from app.schemas.notification import NotificationCreate
@@ -226,7 +227,7 @@ class TestNotificationsAPI:
         service = NotificationService(db_session)
         notification = service.create_notification(
             NotificationCreate(
-                user_id=uuid4(),
+                user_id=test_user.id,
                 type=NotificationType.SYSTEM,
                 priority=NotificationPriority.LOW,
                 title="To Delete",

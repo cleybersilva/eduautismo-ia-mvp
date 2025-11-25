@@ -22,7 +22,7 @@ from app.services.export_service import ExportService
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/v1/export", tags=["export"])
+router = APIRouter(prefix="/export", tags=["export"])
 
 
 @router.get("/pending-review/summary", response_model=dict, status_code=status.HTTP_200_OK)

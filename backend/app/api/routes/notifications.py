@@ -28,7 +28,7 @@ from app.services.notification_service import NotificationService
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/v1/notifications", tags=["notifications"])
+router = APIRouter(prefix="/notifications", tags=["notifications"])
 
 
 @router.get("/", response_model=NotificationListResponse, status_code=status.HTTP_200_OK)
