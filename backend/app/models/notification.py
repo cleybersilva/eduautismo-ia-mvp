@@ -14,11 +14,11 @@ from enum import Enum
 from uuid import UUID
 
 from sqlalchemy import Boolean, Column, DateTime, Enum as SQLEnum, ForeignKey, String, Text
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.db.base import Base
+from app.db.types import GUID
 
 
 class NotificationType(str, Enum):
@@ -52,11 +52,11 @@ class Notification(Base):
 
     __tablename__ = "notifications"
 
-    id = Column(PGUUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
+    id = Column(GUID, primary_key=True, default=func.uuid_generate_v4())
 
     # Destinatário
     user_id = Column(
-        PGUUID(as_uuid=True),
+        GUID,
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
@@ -82,7 +82,7 @@ class Notification(Base):
 
     # Relacionamento com plano (opcional)
     intervention_plan_id = Column(
-        PGUUID(as_uuid=True),
+        GUID,
         ForeignKey("intervention_plans.id", ondelete="CASCADE"),
         nullable=True,
         index=True,
