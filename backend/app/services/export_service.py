@@ -123,7 +123,7 @@ class ExportService:
         output = io.StringIO()
 
         # Determinar colunas
-        first_row = self._get_plan_row_data(plans[0], include_student=include_student)
+        first_row = self._get_plan_row_data(plans[0]["plan"], include_student=include_student)
         fieldnames = list(first_row.keys())
 
         # Adicionar coluna de prioridade
@@ -201,7 +201,7 @@ class ExportService:
         header_font = Font(bold=True, color="FFFFFF")
 
         # Determinar colunas
-        first_row = self._get_plan_row_data(plans[0], include_student=include_student)
+        first_row = self._get_plan_row_data(plans[0]["plan"], include_student=include_student)
         headers = ["Prioridade"] + list(first_row.keys())
 
         # Escrever cabeçalhos
