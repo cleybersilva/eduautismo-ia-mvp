@@ -2,10 +2,11 @@
 
 Este arquivo fornece orientações para o Claude Code (claude.ai/code) ao trabalhar com código neste repositório.
 
-> **Versão**: 1.1.1
-> **Última Atualização**: 2025-11-15
+> **Versão**: 2.0.0
+> **Última Atualização**: 2025-12-01
 > **Autor**: Cleyber Silva
 > **Projeto**: TCC MBA IA & Big Data - USP
+> **Posicionamento**: Plataforma Multidisciplinar Inteligente de Apoio Pedagógico
 
 ---
 
@@ -79,6 +80,47 @@ app/config.py           # Config LEGADO (deprecated)
 ```python
 app/main.py             # App completo com todas as rotas
 app/main_simple.py      # App mínimo para testes
+```
+
+**5. Enums Multidisciplinares (MVP 3.0)**
+```python
+# CRÍTICO: Estes enums são fundamentais para a plataforma multidisciplinar
+
+# app/utils/constants.py (ou backend/app/utils/constants.py)
+
+class Subject(str, enum.Enum):
+    """25 disciplinas do currículo brasileiro"""
+    MATEMATICA = "matematica"
+    PORTUGUES = "portugues"
+    CIENCIAS = "ciencias"
+    HISTORIA = "historia"
+    GEOGRAFIA = "geografia"
+    ARTE = "arte"
+    EDUCACAO_FISICA = "educacao_fisica"
+    INGLES = "ingles"
+    # ... e mais 17 disciplinas (ver MVP_3.0_MIGRATION_PLAN.md)
+
+class GradeLevel(str, enum.Enum):
+    """18 níveis escolares (Infantil ao EJA)"""
+    INFANTIL_MATERNAL = "infantil_maternal"
+    INFANTIL_1 = "infantil_1"
+    INFANTIL_2 = "infantil_2"
+    FUNDAMENTAL_1_1ANO = "fundamental_1_1ano"
+    # ... até EJA_MEDIO_3 (ver MVP_3.0_MIGRATION_PLAN.md)
+
+class ActivityType(str, enum.Enum):
+    """Tipos de atividades pedagógicas"""
+    EXERCICIO = "exercicio"
+    JOGO_EDUCATIVO = "jogo_educativo"
+    PROJETO = "projeto"
+    LEITURA = "leitura"
+    ARTE_MANUAL = "arte_manual"
+    # ... 10 tipos no total
+
+# Uso nos Models:
+# activity.subject: Subject
+# activity.grade_level: GradeLevel
+# activity.bncc_competencies: List[str]  # Códigos BNCC
 ```
 
 ### 📝 Tarefas Comuns de Desenvolvimento
@@ -159,77 +201,97 @@ uvicorn app.main:app --reload
 
 ### 2.1 Contexto
 
-**EduAutismo IA** é uma plataforma de apoio pedagógico para professores da rede pública que trabalham com alunos do Transtorno do Espectro Autista (TEA).
+**EduAutismo IA** é uma **Plataforma Multidisciplinar Inteligente de Apoio Pedagógico** para professores de escolas públicas e privadas, especializada em alunos com Transtorno do Espectro Autista (TEA).
 
-**Objetivo Principal**: Automatizar criação de atividades pedagógicas personalizadas usando IA (GPT-4) baseadas em perfis cognitivos e sensoriais individuais.
+**Objetivo Principal**: Empoderar professores na criação de atividades pedagógicas personalizadas usando IA (GPT-4o) baseadas em perfis cognitivos e sensoriais individuais, com suporte para **25 disciplinas** e **18 níveis escolares**.
 
-### 1.2 Stakeholders
+**Framework AIPE** (AI-Powered Inclusive Pedagogy Empowerment):
+- **Human-in-the-Loop**: IA recomenda, professor decide
+- **Multidisciplinar**: 25 matérias do currículo brasileiro
+- **Alinhamento BNCC**: Competências da Base Nacional Comum Curricular
+- **Personalização**: Baseada em perfis cognitivos, sensoriais e interesses
 
-- **Usuários Primários**: Professores de escolas públicas
-- **Beneficiários**: Alunos com TEA (6-18 anos)
+### 2.2 Stakeholders
+
+- **Usuários Primários**: Professores de escolas públicas e privadas
+- **Beneficiários**: Alunos com TEA (Infantil a Ensino Médio)
+- **Parceiros**: Secretarias de Educação, Redes Privadas, Universidades
 - **Instituição**: ICMC - USP
 - **Contexto**: TCC de MBA em IA e Big Data
 
-### 1.3 Requisitos Funcionais Core
+### 2.3 Requisitos Funcionais Core
 ```yaml
 RF01_Gestão_Alunos:
-  Descrição: CRUD completo de alunos com perfis
+  Descrição: CRUD completo de alunos com perfis cognitivos e sensoriais
   Prioridade: ALTA
-  Status: MVP
-  
+  Status: MVP v2.0
+
 RF02_Avaliações_Comportamentais:
   Descrição: Aplicação de instrumentos CARS, AQ, SPM
   Prioridade: ALTA
-  Status: MVP
-  
-RF03_Geração_Atividades_IA:
-  Descrição: Gerar atividades personalizadas via GPT-4
+  Status: MVP v2.0
+
+RF03_Geração_Atividades_Multidisciplinares:
+  Descrição: Gerar atividades em 25 disciplinas via GPT-4o com BNCC
   Prioridade: CRÍTICA
-  Status: MVP
-  
+  Status: MVP v3.0 (em desenvolvimento)
+
 RF04_Classificação_ML:
   Descrição: Predizer perfil comportamental com ML
   Prioridade: MÉDIA
-  Status: MVP
-  
+  Status: MVP v2.0
+
 RF05_Sistema_Recomendação:
-  Descrição: Recomendar atividades baseado em histórico
+  Descrição: Recomendar atividades baseado em histórico e perfil
   Prioridade: MÉDIA
-  Status: MVP
-  
+  Status: MVP v2.0
+
 RF06_Dashboards_Relatórios:
-  Descrição: Visualizar evolução e gerar relatórios
+  Descrição: Visualizar evolução e gerar relatórios PDF/Excel
   Prioridade: MÉDIA
-  Status: MVP
+  Status: MVP v2.0
+
+RF07_Filtros_Avançados:
+  Descrição: Buscar atividades por disciplina, série, BNCC
+  Prioridade: MÉDIA
+  Status: MVP v3.0 (em desenvolvimento)
+
+RF08_Cache_Performance:
+  Descrição: Cache Redis para otimização de performance
+  Prioridade: ALTA
+  Status: MVP v2.0
 ```
 
-### 1.4 Requisitos Não Funcionais
+### 2.4 Requisitos Não Funcionais
 ```yaml
 RNF01_Performance:
-  - API: Latência P95 < 2s
-  - Geração de atividade: < 30s
-  - ML inference: < 500ms
-  
+  - API: Latência P95 < 500ms (v2.0: 90-95% redução)
+  - Geração de atividade: < 10s (v2.0: otimizado)
+  - ML inference: < 100ms (v2.0: cache)
+  - Cache hit rate: > 80%
+
 RNF02_Escalabilidade:
-  - Suportar 1.000-5.000 alunos ativos
-  - 100 requisições/minuto
-  - Auto-scaling 2-10 tasks
-  
+  - Suportar 50.000-100.000 alunos ativos (v3.0)
+  - 1.000+ requisições/minuto (v2.0)
+  - Auto-scaling 2-20 tasks
+
 RNF03_Segurança:
-  - LGPD compliant
-  - Criptografia at rest e in transit
-  - Anonimização de dados
-  - JWT authentication
-  
+  - LGPD compliant (anonimização)
+  - Criptografia at rest e in transit (AWS KMS)
+  - JWT authentication + refresh tokens
+  - Rate limiting e DDoS protection
+
 RNF04_Disponibilidade:
-  - SLA: 99.5% uptime
-  - RTO: 4 horas
-  - RPO: 1 hora
-  
+  - SLA: 99.9% uptime
+  - RTO: 2 horas
+  - RPO: 30 minutos
+  - Multi-AZ deployment
+
 RNF05_Manutenibilidade:
-  - Cobertura testes: >80%
-  - Documentação completa
-  - Código seguindo PEP 8
+  - Cobertura testes: >85%
+  - Documentação completa e atualizada
+  - Código seguindo PEP 8 + Black + MyPy
+  - CI/CD automatizado
 ```
 
 ---
@@ -319,14 +381,24 @@ CACHE = {
 # Stack IA/ML
 NLP = {
     "provider": "OpenAI",
-    "model": "GPT-4",
-    "use_cases": ["Geração de atividades", "Adaptação de conteúdo"]
+    "model": "GPT-4o (v3.0) / GPT-4 (v2.0)",
+    "use_cases": [
+        "Geração de atividades multidisciplinares",
+        "Prompts contextualizados por disciplina",
+        "Alinhamento com BNCC",
+        "Adaptação de conteúdo",
+        "Personalização TEA"
+    ]
 }
 
 ML_FRAMEWORK = {
     "library": "scikit-learn 1.3+",
-    "models": ["RandomForest", "GradientBoosting"],
-    "use_cases": ["Classificação comportamental", "Predição de risco"]
+    "models": ["RandomForest", "GradientBoosting", "XGBoost"],
+    "use_cases": [
+        "Classificação comportamental",
+        "Predição de risco",
+        "Sistema de recomendação"
+    ]
 }
 
 DATA_PROCESSING = [
@@ -343,7 +415,44 @@ CI_CD = "GitHub Actions"
 MONITORING = "Datadog (APM, Logs, Metrics)"
 ```
 
-### 2.3 Diagrama de Componentes (Estrutura Real)
+### 3.3 Modelo de Negócio (v2.0)
+
+**Posicionamento**: B2G (Government) + B2B (Private Schools) + B2B2C (Universities)
+
+```yaml
+Canais_de_Receita:
+  B2G_Governo:
+    Descrição: Licenças para secretarias de educação municipais/estaduais
+    Pricing: R$ 5-15 por aluno/ano
+    Target: 180.000 escolas públicas
+    Potencial: R$ 30-40M ARR (5 anos)
+
+  B2B_Escolas_Privadas:
+    Descrição: SaaS para redes privadas especializadas em inclusão
+    Pricing: R$ 20-50 por aluno/ano
+    Target: 40.000 escolas privadas
+    Potencial: R$ 10-15M ARR (5 anos)
+
+  B2B2C_Universidades:
+    Descrição: Parcerias para certificação de professores
+    Pricing: R$ 200-500 por certificação
+    Target: 500 universidades + cursos online
+    Potencial: R$ 5-8M ARR (5 anos)
+
+Proposta_de_Valor:
+  - "Economize 5-10 horas/semana na preparação de atividades"
+  - "Atividades personalizadas baseadas em evidências científicas"
+  - "Alinhamento automático com BNCC"
+  - "Suporte para 25 disciplinas e 18 níveis escolares"
+
+Diferencial_Competitivo:
+  - Foco em empoderar professores (não substituir)
+  - Framework AIPE (Human-in-the-Loop)
+  - Especialização em TEA + multidisciplinar
+  - Dados anonimizados + LGPD compliant
+```
+
+### 3.4 Diagrama de Componentes (Estrutura Real)
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    backend/app/                              │
@@ -1224,41 +1333,53 @@ class ActivityResponse(BaseModel):
         orm_mode = True
 ```
 
-**Passo 2: Criar/Atualizar Model**
+**Passo 2: Criar/Atualizar Model (v3.0 Multidisciplinar)**
 ```python
-# src/models/database/activity.py
+# backend/app/models/activity.py
 
-from sqlalchemy import Column, String, Integer, Text, Boolean, DateTime, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String, Integer, Text, Boolean, DateTime, ForeignKey, Enum as SQLEnum
+from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.sql import func
 import uuid
 
-from src.models.database.base import Base
+from app.db.base import Base
+from app.utils.constants import Subject, GradeLevel, ActivityType
 
 class Activity(Base):
-    """Activity database model"""
-    
+    """
+    Activity database model - v3.0 Multidisciplinar
+
+    Suporta 25 disciplinas e 18 níveis escolares
+    """
+
     __tablename__ = "activities"
-    
+
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     student_id = Column(UUID(as_uuid=True), ForeignKey("students.id"), nullable=False)
-    
-    subject = Column(String(100), nullable=False, index=True)
+
+    # Campos v1.0 (mantidos para compatibilidade)
+    subject = Column(String(100), nullable=True, index=True)  # DEPRECATED: use subject_v3
     topic = Column(String(200), nullable=False)
     title = Column(String(500), nullable=False)
     content = Column(Text, nullable=False)
-    
+
+    # Campos v3.0 - Multidisciplinar
+    subject_v3 = Column(SQLEnum(Subject), nullable=True, index=True)
+    grade_level = Column(SQLEnum(GradeLevel), nullable=True, index=True)
+    activity_type = Column(SQLEnum(ActivityType), nullable=True)
+    bncc_competencies = Column(ARRAY(String), nullable=True)  # ['EF01MA01', 'EF01MA02']
+
     difficulty = Column(Integer, nullable=False)
     duration_minutes = Column(Integer, nullable=False)
     ai_generated = Column(Boolean, default=True)
-    
+
     # Metadata
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     created_by = Column(String(255), nullable=False)
-    
+
     def __repr__(self):
-        return f"<Activity(id={self.id}, subject={self.subject}, topic={self.topic})>"
+        return f"<Activity(id={self.id}, subject={self.subject_v3 or self.subject}, grade={self.grade_level})>"
 ```
 
 **Passo 3: Implementar Service**
@@ -2498,7 +2619,7 @@ Negócio:
 Quando ajudar no desenvolvimento, sempre:
 
 - [ ] Ler este CLAUDE.md completamente antes de começar
-- [ ] Seguir estrutura de código definida
+- [ ] Seguir estrutura de código definida (`backend/app/` NÃO `src/`)
 - [ ] Usar type hints em todo código Python
 - [ ] Adicionar docstrings (Google style)
 - [ ] Implementar error handling adequado
@@ -2506,20 +2627,54 @@ Quando ajudar no desenvolvimento, sempre:
 - [ ] Escrever testes (unitários e integração)
 - [ ] Seguir padrões de nomenclatura
 - [ ] Validar com Black, Flake8, MyPy
-- [ ] Verificar coverage >80%
+- [ ] Verificar coverage >85%
 - [ ] Documentar decisões importantes
 - [ ] Atualizar documentação quando necessário
 - [ ] Considerar LGPD e segurança
 - [ ] Testar localmente antes de commit
 - [ ] Criar PR com descrição clara
+- [ ] **NOVO v3.0**: Usar enums `Subject`, `GradeLevel`, `ActivityType`
+- [ ] **NOVO v3.0**: Incluir códigos BNCC quando aplicável
+- [ ] **NOVO v3.0**: Garantir backwards compatibility (campos nullable)
 
 ---
 
-**Versão**: 1.1.1
-**Última Atualização**: 2025-11-15
+## 📚 Referências de Documentação
+
+Para informações detalhadas sobre implementação:
+
+- **MVP 3.0 Migration Plan**: `backend/MVP_3.0_MIGRATION_PLAN.md`
+  - Sprints 1-8: Implementação completa da plataforma multidisciplinar
+  - Enums: Subject (25 disciplinas), GradeLevel (18 níveis), ActivityType (10 tipos)
+  - NLP Service: Prompts contextualizados por disciplina
+  - API Endpoints: Filtros avançados e busca por BNCC
+
+- **Strategic Vision**: `backend/STRATEGIC_VISION_MULTIDISCIPLINARY_PLATFORM.md`
+  - Framework AIPE
+  - Modelo de negócio B2G + B2B + B2B2C
+  - Roadmap v1.0 até v5.0
+
+- **PR Enhanced Features**: `backend/PR_ENHANCED_FEATURES_DESCRIPTION.md`
+  - Performance v2.0 (90-95% latência reduzida)
+  - Cache Redis
+  - Notificações em tempo real
+  - Export PDF/Excel
+
+---
+
+**Versão**: 2.0.0
+**Última Atualização**: 2025-12-01
 **Mantenedor**: Cleyber Silva
 **Contato**: cleyber.silva@live.com
+**Status**: MVP v2.0 em produção | MVP v3.0 em desenvolvimento
 
 ---
+
+## 🚀 Transformação para Plataforma Multidisciplinar
+
+**v1.0 → v2.0 (2024)**: Otimizações de performance, cache, relatórios
+**v2.0 → v3.0 (2025)**: Transformação multidisciplinar com 25 disciplinas e BNCC
+
+Esta documentação reflete a **nova visão da plataforma** como uma solução abrangente para educação inclusiva, mantendo o foco em TEA mas expandindo para todas as disciplinas do currículo brasileiro.
 
 *Este documento deve ser mantido atualizado conforme o projeto evolui.*
