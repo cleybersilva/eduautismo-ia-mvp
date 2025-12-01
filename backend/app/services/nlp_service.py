@@ -32,6 +32,11 @@ from app.utils.constants import (
     TEMPERATURE_PRECISE,
     ActivityType,
     DifficultyLevel,
+    GradeLevel,
+    PedagogicalActivityType,
+    Subject,
+    get_grade_level_display_name,
+    get_subject_display_name,
 )
 from app.utils.logger import get_logger, log_openai_request
 
@@ -328,6 +333,109 @@ class NLPService:
             logger.error(f"Unexpected error generating recommendations: {e}")
             raise OpenAIError(message="Erro inesperado ao gerar recomendações", original_error=e)
 
+    async def generate_multidisciplinary_activity(
+        self,
+        student_profile: Dict[str, Any],
+        subject: Subject,
+        grade_level: GradeLevel,
+        activity_type: ActivityType,
+        pedagogical_type: Optional[PedagogicalActivityType] = None,
+        difficulty: DifficultyLevel = DifficultyLevel.MEDIUM,
+        duration_minutes: int = 30,
+        theme: Optional[str] = None,
+        bncc_competencies: Optional[List[str]] = None,
+    ) -> GeneratedActivity:
+        """
+        Generate multidisciplinary activity with subject-specific context (MVP 3.0).
+
+        Args:
+            student_profile: Student information
+            subject: Educational subject/discipline
+            grade_level: Brazilian education grade level
+            activity_type: Type of activity (skill domain)
+            pedagogical_type: Pedagogical format (optional)
+            difficulty: Difficulty level
+            duration_minutes: Target duration
+            theme: Optional theme/topic
+            bncc_competencies: Optional BNCC codes to align with
+
+        Returns:
+            GeneratedActivity with subject-specific content
+
+        Raises:
+            OpenAIError: If generation fails
+        """
+        try:
+            start_time = time.time()
+
+            # Get subject-specific system prompt
+            system_prompt = self._get_subject_system_prompt(subject)
+
+            # Build multidisciplinary prompt
+            prompt = self._build_multidisciplinary_prompt(
+                student_profile=student_profile,
+                subject=subject,
+                grade_level=grade_level,
+                activity_type=activity_type,
+                pedagogical_type=pedagogical_type,
+                difficulty=difficulty,
+                duration_minutes=duration_minutes,
+                theme=theme,
+                bncc_competencies=bncc_competencies,
+            )
+
+            logger.debug(
+                f"Generating multidisciplinary activity: subject={subject.value}, "
+                f"grade={grade_level.value}, type={pedagogical_type.value if pedagogical_type else 'N/A'}"
+            )
+
+            # Call OpenAI API with subject-specific context
+            response = await self.client.chat.completions.create(
+                model=self.default_model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=TEMPERATURE_CREATIVE,
+                max_tokens=MAX_TOKENS_ACTIVITY_GENERATION,
+                response_format={"type": "json_object"},
+            )
+
+            # Extract and parse response
+            content = response.choices[0].message.content
+            activity_data = json.loads(content)
+
+            # Log metrics
+            duration_ms = (time.time() - start_time) * 1000
+            log_openai_request(
+                logger=logger,
+                model=self.default_model,
+                prompt_tokens=response.usage.prompt_tokens,
+                completion_tokens=response.usage.completion_tokens,
+                duration_ms=duration_ms,
+            )
+
+            # Validate and return structured output
+            activity = GeneratedActivity(**activity_data)
+            logger.info(
+                f"Multidisciplinary activity generated: {activity.title} "
+                f"({subject.value}, {grade_level.value})"
+            )
+
+            return activity
+
+        except OpenAIAPIError as e:
+            logger.error(f"OpenAI API error: {e}")
+            raise OpenAIError(message="Falha ao gerar atividade multidisciplinar", original_error=e)
+
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse OpenAI response: {e}")
+            raise OpenAIError(message="Resposta inválida da IA")
+
+        except Exception as e:
+            logger.error(f"Unexpected error generating multidisciplinary activity: {e}")
+            raise OpenAIError(message="Erro inesperado ao gerar atividade", original_error=e)
+
     # ========================================================================
     # Helper Methods - Prompt Building
     # ========================================================================
@@ -464,6 +572,147 @@ Retorne as recomendações no seguinte formato JSON:
 }
 
 Gere 3-5 recomendações práticas e acionáveis, priorizando as mais relevantes.
+"""
+        return prompt
+
+    def _get_subject_system_prompt(self, subject: Subject) -> str:
+        """
+        Get subject-specific system prompt for contextualized generation.
+
+        Args:
+            subject: Educational subject
+
+        Returns:
+            System prompt tailored to the subject
+        """
+        base_prompt = """Você é um especialista em educação especial e Transtorno do Espectro Autista (TEA),
+com profundo conhecimento em pedagogia inclusiva e adaptações curriculares."""
+
+        subject_contexts = {
+            Subject.MATEMATICA: """
+Especialização: Matemática para alunos com TEA
+- Use estratégias visuais e concretas (manipuláveis, blocos, desenhos)
+- Divida problemas complexos em passos menores
+- Incorpore interesses especiais em problemas matemáticos
+- Evite linguagem ambígua; seja literal e preciso
+- Use rotinas previsíveis na resolução de problemas""",
+            Subject.PORTUGUES: """
+Especialização: Português/Língua Portuguesa para alunos com TEA
+- Trabalhe compreensão literal antes de inferências
+- Use apoios visuais para gramática e estrutura textual
+- Considere dificuldades pragmáticas da linguagem
+- Adapte textos mantendo informações essenciais
+- Foque em comunicação funcional""",
+            Subject.LITERATURA: """
+Especialização: Literatura para alunos com TEA
+- Escolha textos com estrutura clara e previsível
+- Trabalhe compreensão literal antes de metáforas
+- Use organizadores gráficos para enredo e personagens
+- Conecte histórias a experiências concretas
+- Considere sensibilidades sensoriais ao escolher textos""",
+            Subject.CIENCIAS: """
+Especialização: Ciências para alunos com TEA
+- Enfatize observação e experimentação prática
+- Use classificação e categorização (pontos fortes TEA)
+- Aproveite interesses especiais (dinossauros, planetas, etc.)
+- Forneça procedimentos passo-a-passo para experimentos
+- Use diagramas e imagens reais""",
+            Subject.HISTORIA: """
+Especialização: História para alunos com TEA
+- Use linhas do tempo visuais e cronológicas
+- Conecte eventos históricos a experiências pessoais
+- Foque em fatos concretos antes de interpretações
+- Use mapas, imagens e fontes primárias
+- Organize informações em categorias claras""",
+            Subject.GEOGRAFIA: """
+Especialização: Geografia para alunos com TEA
+- Use mapas visuais e recursos espaciais
+- Aproveite pensamento sistemático para padrões geográficos
+- Conecte conceitos abstratos a exemplos concretos
+- Use imagens de satélite e fotografias reais
+- Organize por categorias (clima, relevo, etc.)""",
+            # Adicione mais disciplinas conforme necessário
+        }
+
+        specific_context = subject_contexts.get(
+            subject,
+            f"\nEspecialização: {get_subject_display_name(subject)} para alunos com TEA\n"
+            "- Adapte o conteúdo considerando as características do TEA\n"
+            "- Use estratégias visuais e estruturadas\n"
+            "- Conecte com interesses do aluno\n",
+        )
+
+        return base_prompt + specific_context
+
+    def _build_multidisciplinary_prompt(
+        self,
+        student_profile: Dict[str, Any],
+        subject: Subject,
+        grade_level: GradeLevel,
+        activity_type: ActivityType,
+        pedagogical_type: Optional[PedagogicalActivityType],
+        difficulty: DifficultyLevel,
+        duration_minutes: int,
+        theme: Optional[str],
+        bncc_competencies: Optional[List[str]],
+    ) -> str:
+        """Build prompt for multidisciplinary activity generation."""
+        subject_name = get_subject_display_name(subject)
+        grade_name = get_grade_level_display_name(grade_level)
+
+        prompt = f"""Gere uma atividade pedagógica de {subject_name} personalizada para aluno com TEA:
+
+PERFIL DO ALUNO:
+- Nome: {student_profile.get('name', 'Aluno')}
+- Idade: {student_profile.get('age', 'não especificada')} anos
+- Série/Nível: {grade_name}
+- Diagnóstico: {student_profile.get('diagnosis', 'TEA')}
+- Interesses: {', '.join(student_profile.get('interests', ['não especificados']))}
+- Pontos fortes: {', '.join(student_profile.get('strengths', ['a identificar']))}
+- Desafios: {', '.join(student_profile.get('challenges', ['a identificar']))}
+
+REQUISITOS DA ATIVIDADE:
+- Disciplina: {subject_name}
+- Série/Nível: {grade_name}
+- Tipo de domínio: {activity_type.value}
+"""
+        if pedagogical_type:
+            prompt += f"- Formato pedagógico: {pedagogical_type.value}\n"
+
+        prompt += f"""- Nível de dificuldade: {difficulty.value}
+- Duração estimada: {duration_minutes} minutos
+"""
+        if theme:
+            prompt += f"- Tema específico: {theme}\n"
+
+        if bncc_competencies:
+            prompt += f"""
+ALINHAMENTO BNCC:
+Alinhe a atividade com as seguintes competências da Base Nacional Comum Curricular:
+{', '.join(bncc_competencies)}
+"""
+
+        prompt += """
+Retorne a atividade no seguinte formato JSON:
+{
+    "title": "Título da atividade",
+    "description": "Descrição detalhada do conteúdo e objetivo",
+    "objectives": ["Objetivo 1", "Objetivo 2", ...],
+    "materials": ["Material 1", "Material 2", ...],
+    "instructions": ["Passo 1", "Passo 2", ...],
+    "duration_minutes": 30,
+    "adaptations": ["Adaptação específica para TEA 1", "Adaptação 2", ...],
+    "visual_supports": ["Suporte visual 1", "Suporte visual 2", ...],
+    "success_criteria": ["Critério observável 1", "Critério 2", ...]
+}
+
+IMPORTANTE:
+- Conteúdo deve ser apropriado para a série/nível especificado
+- Incorpore estratégias específicas para TEA
+- Use interesses do aluno quando possível
+- Inclua adaptações considerando desafios sensoriais e cognitivos
+- Critérios de sucesso devem ser observáveis e mensuráveis
+- Se houver códigos BNCC, garanta alinhamento com as competências
 """
         return prompt
 
