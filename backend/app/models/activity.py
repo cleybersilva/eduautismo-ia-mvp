@@ -13,7 +13,13 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import BaseModel
 from app.db.types import GUID, PortableJSON, StringArray
-from app.utils.constants import ActivityType, DifficultyLevel
+from app.utils.constants import (
+    ActivityType,
+    DifficultyLevel,
+    GradeLevel,
+    PedagogicalActivityType,
+    Subject,
+)
 
 if TYPE_CHECKING:
     from app.models.assessment import Assessment
@@ -61,6 +67,40 @@ class Activity(BaseModel):
     theme: Mapped[str | None] = mapped_column(String(255), nullable=True)
     tags: Mapped[List[str] | None] = mapped_column(StringArray, nullable=True, index=True)
 
+    # ===================================================================
+    # MVP 3.0 - Multidisciplinary Platform Fields
+    # ===================================================================
+    # All fields are nullable for backwards compatibility
+
+    # Subject and Grade Level
+    subject: Mapped[Subject | None] = mapped_column(
+        SQLEnum(Subject, name="subject"),
+        nullable=True,
+        index=True,
+        comment="Educational subject/discipline (v3.0)",
+    )
+
+    grade_level: Mapped[GradeLevel | None] = mapped_column(
+        SQLEnum(GradeLevel, name="grade_level"),
+        nullable=True,
+        index=True,
+        comment="Brazilian education grade level (v3.0)",
+    )
+
+    # Pedagogical Activity Type
+    pedagogical_type: Mapped[PedagogicalActivityType | None] = mapped_column(
+        SQLEnum(PedagogicalActivityType, name="pedagogical_activity_type"),
+        nullable=True,
+        comment="Type of pedagogical activity format (v3.0)",
+    )
+
+    # BNCC (Base Nacional Comum Curricular) Alignment
+    bncc_competencies: Mapped[List[str] | None] = mapped_column(
+        StringArray,
+        nullable=True,
+        comment="BNCC competency codes (e.g., ['EF01MA01', 'EF01MA02']) (v3.0)",
+    )
+
     # Generation Metadata
     generated_by_ai: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     generation_metadata: Mapped[Dict[str, Any] | None] = mapped_column(
@@ -92,8 +132,12 @@ class Activity(BaseModel):
         return f"<Activity(id={self.id}, title={self.title}, type={self.activity_type})>"
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary for AI processing."""
-        return {
+        """
+        Convert to dictionary for AI processing.
+
+        Includes both v1.0 and v3.0 fields for compatibility.
+        """
+        data = {
             "title": self.title,
             "description": self.description,
             "type": self.activity_type.value,
@@ -104,3 +148,15 @@ class Activity(BaseModel):
             "instructions": self.instructions,
             "theme": self.theme,
         }
+
+        # Add v3.0 fields if present
+        if self.subject:
+            data["subject"] = self.subject.value
+        if self.grade_level:
+            data["grade_level"] = self.grade_level.value
+        if self.pedagogical_type:
+            data["pedagogical_type"] = self.pedagogical_type.value
+        if self.bncc_competencies:
+            data["bncc_competencies"] = self.bncc_competencies
+
+        return data
