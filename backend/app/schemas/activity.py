@@ -10,14 +10,22 @@ from uuid import UUID
 from pydantic import Field, field_validator
 
 from app.schemas.common import BaseResponseSchema, BaseSchema
-from app.utils.constants import MAX_ACTIVITY_DURATION, MIN_ACTIVITY_DURATION, ActivityType, DifficultyLevel
+from app.utils.constants import (
+    MAX_ACTIVITY_DURATION,
+    MIN_ACTIVITY_DURATION,
+    ActivityType,
+    DifficultyLevel,
+    GradeLevel,
+    PedagogicalActivityType,
+    Subject,
+)
 
 
 class ActivityGenerate(BaseSchema):
     """Schema for generating activity with AI."""
 
     student_id: UUID = Field(..., description="Student ID for personalization")
-    activity_type: ActivityType = Field(..., description="Type of activity")
+    activity_type: ActivityType = Field(..., description="Type of activity (skill domain)")
     difficulty: DifficultyLevel = Field(..., description="Difficulty level")
     duration_minutes: int = Field(
         ..., ge=MIN_ACTIVITY_DURATION, le=MAX_ACTIVITY_DURATION, description="Duration in minutes"
@@ -29,6 +37,30 @@ class ActivityGenerate(BaseSchema):
         examples=["dinossauros", "sistema solar", "cores"],
     )
 
+    # ===================================================================
+    # MVP 3.0 - Multidisciplinary Fields (Optional)
+    # ===================================================================
+    subject: Optional[Subject] = Field(
+        default=None,
+        description="Educational subject/discipline (v3.0)",
+        examples=[Subject.MATEMATICA, Subject.PORTUGUES],
+    )
+    grade_level: Optional[GradeLevel] = Field(
+        default=None,
+        description="Brazilian education grade level (v3.0)",
+        examples=[GradeLevel.FUNDAMENTAL_1_3ANO, GradeLevel.MEDIO_1ANO],
+    )
+    pedagogical_type: Optional[PedagogicalActivityType] = Field(
+        default=None,
+        description="Type of pedagogical activity format (v3.0)",
+        examples=[PedagogicalActivityType.EXERCICIO, PedagogicalActivityType.JOGO_EDUCATIVO],
+    )
+    bncc_competencies: Optional[List[str]] = Field(
+        default=None,
+        description="BNCC competency codes (v3.0)",
+        examples=[["EF03MA01", "EF03MA02"]],
+    )
+
 
 class ActivityCreate(BaseSchema):
     """Schema for creating activity manually."""
@@ -36,7 +68,7 @@ class ActivityCreate(BaseSchema):
     student_id: UUID = Field(..., description="Student ID")
     title: str = Field(..., min_length=3, max_length=500, description="Activity title")
     description: str = Field(..., min_length=10, description="Activity description")
-    activity_type: ActivityType = Field(default=ActivityType.COGNITIVE, description="Activity type")
+    activity_type: ActivityType = Field(default=ActivityType.COGNITIVE, description="Activity type (skill domain)")
     difficulty: DifficultyLevel = Field(default=DifficultyLevel.EASY, description="Difficulty level")
     duration_minutes: int = Field(
         default=30, ge=MIN_ACTIVITY_DURATION, le=MAX_ACTIVITY_DURATION, description="Duration in minutes"
@@ -49,6 +81,12 @@ class ActivityCreate(BaseSchema):
     success_criteria: Optional[List[str]] = Field(default=None, description="Success criteria")
     theme: Optional[str] = Field(default=None, max_length=255, description="Theme")
     tags: Optional[List[str]] = Field(default=None, description="Tags")
+
+    # MVP 3.0 - Multidisciplinary Fields
+    subject: Optional[Subject] = Field(default=None, description="Subject/discipline (v3.0)")
+    grade_level: Optional[GradeLevel] = Field(default=None, description="Grade level (v3.0)")
+    pedagogical_type: Optional[PedagogicalActivityType] = Field(default=None, description="Pedagogical format (v3.0)")
+    bncc_competencies: Optional[List[str]] = Field(default=None, description="BNCC codes (v3.0)")
 
     @field_validator("objectives", "materials", "instructions", mode="before")
     @classmethod
@@ -84,6 +122,12 @@ class ActivityUpdate(BaseSchema):
     tags: Optional[List[str]] = Field(default=None)
     is_published: Optional[bool] = Field(default=None)
 
+    # MVP 3.0 - Multidisciplinary Fields
+    subject: Optional[Subject] = Field(default=None, description="Subject/discipline (v3.0)")
+    grade_level: Optional[GradeLevel] = Field(default=None, description="Grade level (v3.0)")
+    pedagogical_type: Optional[PedagogicalActivityType] = Field(default=None, description="Pedagogical format (v3.0)")
+    bncc_competencies: Optional[List[str]] = Field(default=None, description="BNCC codes (v3.0)")
+
 
 class ActivityResponse(BaseResponseSchema):
     """Schema for activity response."""
@@ -108,6 +152,12 @@ class ActivityResponse(BaseResponseSchema):
     student_id: UUID
     created_by_id: Optional[UUID] = None
 
+    # MVP 3.0 - Multidisciplinary Fields
+    subject: Optional[Subject] = None
+    grade_level: Optional[GradeLevel] = None
+    pedagogical_type: Optional[PedagogicalActivityType] = None
+    bncc_competencies: Optional[List[str]] = None
+
 
 class ActivityListResponse(BaseResponseSchema):
     """Schema for activity in list."""
@@ -120,12 +170,29 @@ class ActivityListResponse(BaseResponseSchema):
     generated_by_ai: bool
     student_id: UUID
 
+    # MVP 3.0 - Multidisciplinary Fields (for quick filtering)
+    subject: Optional[Subject] = None
+    grade_level: Optional[GradeLevel] = None
+    pedagogical_type: Optional[PedagogicalActivityType] = None
+
 
 class ActivityFilterParams(BaseSchema):
     """Query parameters for filtering activities."""
 
-    activity_type: Optional[ActivityType] = Field(default=None, description="Filter by type")
+    # V1.0 Filters
+    activity_type: Optional[ActivityType] = Field(default=None, description="Filter by type (skill domain)")
     difficulty: Optional[DifficultyLevel] = Field(default=None, description="Filter by difficulty")
     theme: Optional[str] = Field(default=None, description="Filter by theme")
     generated_by_ai: Optional[bool] = Field(default=None, description="Filter AI-generated")
     student_id: Optional[UUID] = Field(default=None, description="Filter by student")
+
+    # MVP 3.0 - Multidisciplinary Filters
+    subject: Optional[Subject] = Field(default=None, description="Filter by subject/discipline (v3.0)")
+    grade_level: Optional[GradeLevel] = Field(default=None, description="Filter by grade level (v3.0)")
+    pedagogical_type: Optional[PedagogicalActivityType] = Field(
+        default=None, description="Filter by pedagogical format (v3.0)"
+    )
+    has_bncc: Optional[bool] = Field(default=None, description="Filter activities with BNCC codes (v3.0)")
+    bncc_code: Optional[str] = Field(
+        default=None, description="Filter by specific BNCC code (e.g., 'EF03MA01') (v3.0)"
+    )
