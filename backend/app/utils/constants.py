@@ -39,6 +39,114 @@ class ActivityType(str, Enum):
 
 
 # ============================================================================
+# MVP 3.0 - Multidisciplinary Platform Enums
+# ============================================================================
+
+
+class Subject(str, Enum):
+    """
+    Educational subjects/disciplines (25 total).
+
+    Supports the complete Brazilian curriculum across all education levels.
+    """
+
+    # Core subjects
+    MATEMATICA = "matematica"
+    PORTUGUES = "portugues"
+    LITERATURA = "literatura"
+    REDACAO = "redacao"
+    CIENCIAS = "ciencias"
+    HISTORIA = "historia"
+    GEOGRAFIA = "geografia"
+
+    # Arts and Physical Education
+    ARTE = "arte"
+    EDUCACAO_FISICA = "educacao_fisica"
+    MUSICA = "musica"
+
+    # Languages
+    INGLES = "ingles"
+    ESPANHOL = "espanhol"
+
+    # High School subjects
+    BIOLOGIA = "biologia"
+    FISICA = "fisica"
+    QUIMICA = "quimica"
+    FILOSOFIA = "filosofia"
+    SOCIOLOGIA = "sociologia"
+
+    # Specialized subjects
+    INFORMATICA = "informatica"
+    ARTES_VISUAIS = "artes_visuais"
+    TEATRO = "teatro"
+    DANCA = "danca"
+
+    # Vocational/Technical
+    EDUCACAO_PROFISSIONAL = "educacao_profissional"
+    EMPREENDEDORISMO = "empreendedorismo"
+
+    # Life skills
+    EDUCACAO_FINANCEIRA = "educacao_financeira"
+    EDUCACAO_AMBIENTAL = "educacao_ambiental"
+
+
+class GradeLevel(str, Enum):
+    """
+    Brazilian education grade levels (18 total).
+
+    From early childhood education to adult education (EJA).
+    """
+
+    # Educação Infantil (Early Childhood)
+    INFANTIL_MATERNAL = "infantil_maternal"  # 2-3 years
+    INFANTIL_1 = "infantil_1"  # 4 years
+    INFANTIL_2 = "infantil_2"  # 5 years
+
+    # Ensino Fundamental I (Elementary - Years 1-5)
+    FUNDAMENTAL_1_1ANO = "fundamental_1_1ano"  # 6 years
+    FUNDAMENTAL_1_2ANO = "fundamental_1_2ano"  # 7 years
+    FUNDAMENTAL_1_3ANO = "fundamental_1_3ano"  # 8 years
+    FUNDAMENTAL_1_4ANO = "fundamental_1_4ano"  # 9 years
+    FUNDAMENTAL_1_5ANO = "fundamental_1_5ano"  # 10 years
+
+    # Ensino Fundamental II (Middle School - Years 6-9)
+    FUNDAMENTAL_2_6ANO = "fundamental_2_6ano"  # 11 years
+    FUNDAMENTAL_2_7ANO = "fundamental_2_7ano"  # 12 years
+    FUNDAMENTAL_2_8ANO = "fundamental_2_8ano"  # 13 years
+    FUNDAMENTAL_2_9ANO = "fundamental_2_9ano"  # 14 years
+
+    # Ensino Médio (High School)
+    MEDIO_1ANO = "medio_1ano"  # 15 years
+    MEDIO_2ANO = "medio_2ano"  # 16 years
+    MEDIO_3ANO = "medio_3ano"  # 17 years
+
+    # EJA (Adult Education)
+    EJA_FUNDAMENTAL = "eja_fundamental"
+    EJA_MEDIO_1 = "eja_medio_1"
+    EJA_MEDIO_3 = "eja_medio_3"
+
+
+class PedagogicalActivityType(str, Enum):
+    """
+    Types of pedagogical activities for multidisciplinary platform.
+
+    Different from ActivityType (which focuses on skill domains),
+    this enum focuses on pedagogical formats.
+    """
+
+    EXERCICIO = "exercicio"  # Written exercises
+    JOGO_EDUCATIVO = "jogo_educativo"  # Educational games
+    PROJETO = "projeto"  # Project-based learning
+    LEITURA = "leitura"  # Reading activities
+    ARTE_MANUAL = "arte_manual"  # Arts and crafts
+    EXPERIMENTO = "experimento"  # Science experiments
+    DEBATE = "debate"  # Discussion/debate
+    PESQUISA = "pesquisa"  # Research activities
+    APRESENTACAO = "apresentacao"  # Presentations
+    AVALIACAO = "avaliacao"  # Assessments/tests
+
+
+# ============================================================================
 # Difficulty Levels
 # ============================================================================
 
@@ -406,3 +514,194 @@ def get_engagement_levels() -> List[str]:
 def get_completion_statuses() -> List[str]:
     """Get list of all completion statuses."""
     return [status.value for status in CompletionStatus]
+
+
+# ============================================================================
+# MVP 3.0 - Helper Functions for Multidisciplinary Enums
+# ============================================================================
+
+
+def get_subjects() -> List[str]:
+    """Get list of all subjects/disciplines."""
+    return [subject.value for subject in Subject]
+
+
+def get_grade_levels() -> List[str]:
+    """Get list of all grade levels."""
+    return [grade.value for grade in GradeLevel]
+
+
+def get_pedagogical_activity_types() -> List[str]:
+    """Get list of all pedagogical activity types."""
+    return [activity.value for activity in PedagogicalActivityType]
+
+
+def get_subject_display_name(subject: Subject) -> str:
+    """
+    Get human-readable display name for a subject.
+
+    Args:
+        subject: Subject enum value
+
+    Returns:
+        Display name in Portuguese
+    """
+    display_names = {
+        Subject.MATEMATICA: "Matemática",
+        Subject.PORTUGUES: "Português",
+        Subject.LITERATURA: "Literatura",
+        Subject.REDACAO: "Redação",
+        Subject.CIENCIAS: "Ciências",
+        Subject.HISTORIA: "História",
+        Subject.GEOGRAFIA: "Geografia",
+        Subject.ARTE: "Arte",
+        Subject.EDUCACAO_FISICA: "Educação Física",
+        Subject.MUSICA: "Música",
+        Subject.INGLES: "Inglês",
+        Subject.ESPANHOL: "Espanhol",
+        Subject.BIOLOGIA: "Biologia",
+        Subject.FISICA: "Física",
+        Subject.QUIMICA: "Química",
+        Subject.FILOSOFIA: "Filosofia",
+        Subject.SOCIOLOGIA: "Sociologia",
+        Subject.INFORMATICA: "Informática",
+        Subject.ARTES_VISUAIS: "Artes Visuais",
+        Subject.TEATRO: "Teatro",
+        Subject.DANCA: "Dança",
+        Subject.EDUCACAO_PROFISSIONAL: "Educação Profissional",
+        Subject.EMPREENDEDORISMO: "Empreendedorismo",
+        Subject.EDUCACAO_FINANCEIRA: "Educação Financeira",
+        Subject.EDUCACAO_AMBIENTAL: "Educação Ambiental",
+    }
+    return display_names.get(subject, subject.value)
+
+
+def get_grade_level_display_name(grade: GradeLevel) -> str:
+    """
+    Get human-readable display name for a grade level.
+
+    Args:
+        grade: GradeLevel enum value
+
+    Returns:
+        Display name in Portuguese
+    """
+    display_names = {
+        GradeLevel.INFANTIL_MATERNAL: "Infantil - Maternal",
+        GradeLevel.INFANTIL_1: "Infantil I",
+        GradeLevel.INFANTIL_2: "Infantil II",
+        GradeLevel.FUNDAMENTAL_1_1ANO: "1º Ano - Fundamental I",
+        GradeLevel.FUNDAMENTAL_1_2ANO: "2º Ano - Fundamental I",
+        GradeLevel.FUNDAMENTAL_1_3ANO: "3º Ano - Fundamental I",
+        GradeLevel.FUNDAMENTAL_1_4ANO: "4º Ano - Fundamental I",
+        GradeLevel.FUNDAMENTAL_1_5ANO: "5º Ano - Fundamental I",
+        GradeLevel.FUNDAMENTAL_2_6ANO: "6º Ano - Fundamental II",
+        GradeLevel.FUNDAMENTAL_2_7ANO: "7º Ano - Fundamental II",
+        GradeLevel.FUNDAMENTAL_2_8ANO: "8º Ano - Fundamental II",
+        GradeLevel.FUNDAMENTAL_2_9ANO: "9º Ano - Fundamental II",
+        GradeLevel.MEDIO_1ANO: "1ª Série - Ensino Médio",
+        GradeLevel.MEDIO_2ANO: "2ª Série - Ensino Médio",
+        GradeLevel.MEDIO_3ANO: "3ª Série - Ensino Médio",
+        GradeLevel.EJA_FUNDAMENTAL: "EJA - Fundamental",
+        GradeLevel.EJA_MEDIO_1: "EJA - Médio I",
+        GradeLevel.EJA_MEDIO_3: "EJA - Médio III",
+    }
+    return display_names.get(grade, grade.value)
+
+
+def get_subjects_by_grade_level(grade: GradeLevel) -> List[Subject]:
+    """
+    Get appropriate subjects for a given grade level.
+
+    Args:
+        grade: GradeLevel enum value
+
+    Returns:
+        List of Subject enums appropriate for the grade level
+    """
+    # Core subjects for all levels
+    core_subjects = [
+        Subject.PORTUGUES,
+        Subject.MATEMATICA,
+    ]
+
+    # Infantil (Early Childhood)
+    if grade in [GradeLevel.INFANTIL_MATERNAL, GradeLevel.INFANTIL_1, GradeLevel.INFANTIL_2]:
+        return [
+            Subject.PORTUGUES,
+            Subject.MATEMATICA,
+            Subject.ARTE,
+            Subject.MUSICA,
+            Subject.EDUCACAO_FISICA,
+        ]
+
+    # Fundamental I (Elementary Years 1-5)
+    elif grade in [
+        GradeLevel.FUNDAMENTAL_1_1ANO,
+        GradeLevel.FUNDAMENTAL_1_2ANO,
+        GradeLevel.FUNDAMENTAL_1_3ANO,
+        GradeLevel.FUNDAMENTAL_1_4ANO,
+        GradeLevel.FUNDAMENTAL_1_5ANO,
+    ]:
+        return core_subjects + [
+            Subject.LITERATURA,
+            Subject.REDACAO,
+            Subject.CIENCIAS,
+            Subject.HISTORIA,
+            Subject.GEOGRAFIA,
+            Subject.ARTE,
+            Subject.EDUCACAO_FISICA,
+            Subject.INGLES,
+        ]
+
+    # Fundamental II (Middle School Years 6-9)
+    elif grade in [
+        GradeLevel.FUNDAMENTAL_2_6ANO,
+        GradeLevel.FUNDAMENTAL_2_7ANO,
+        GradeLevel.FUNDAMENTAL_2_8ANO,
+        GradeLevel.FUNDAMENTAL_2_9ANO,
+    ]:
+        return core_subjects + [
+            Subject.LITERATURA,
+            Subject.REDACAO,
+            Subject.CIENCIAS,
+            Subject.HISTORIA,
+            Subject.GEOGRAFIA,
+            Subject.ARTE,
+            Subject.EDUCACAO_FISICA,
+            Subject.INGLES,
+            Subject.INFORMATICA,
+        ]
+
+    # Ensino Médio (High School)
+    elif grade in [GradeLevel.MEDIO_1ANO, GradeLevel.MEDIO_2ANO, GradeLevel.MEDIO_3ANO]:
+        return core_subjects + [
+            Subject.LITERATURA,
+            Subject.REDACAO,
+            Subject.BIOLOGIA,
+            Subject.FISICA,
+            Subject.QUIMICA,
+            Subject.HISTORIA,
+            Subject.GEOGRAFIA,
+            Subject.FILOSOFIA,
+            Subject.SOCIOLOGIA,
+            Subject.ARTE,
+            Subject.EDUCACAO_FISICA,
+            Subject.INGLES,
+            Subject.INFORMATICA,
+            Subject.EDUCACAO_FINANCEIRA,
+        ]
+
+    # EJA (Adult Education)
+    elif grade in [GradeLevel.EJA_FUNDAMENTAL, GradeLevel.EJA_MEDIO_1, GradeLevel.EJA_MEDIO_3]:
+        return core_subjects + [
+            Subject.CIENCIAS,
+            Subject.HISTORIA,
+            Subject.GEOGRAFIA,
+            Subject.EDUCACAO_FINANCEIRA,
+            Subject.EMPREENDEDORISMO,
+            Subject.INFORMATICA,
+        ]
+
+    # Default: return all subjects
+    return list(Subject)
