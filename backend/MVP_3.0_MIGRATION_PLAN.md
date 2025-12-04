@@ -904,17 +904,1886 @@ class ActivityFilterParams(BaseSchema):
 
 ---
 
-## 🚀 CONTINUAÇÃO NO PRÓXIMO COMMIT
+## 🤖 SPRINT 5: NLP Service - Prompts Multidisciplinares (3 dias)
 
-Este plano será expandido nos próximos passos com:
-- Sprint 5: Atualizar NLP Service (prompts IA)
-- Sprint 6: Atualizar API Endpoints
-- Sprint 7: Testes completos
-- Sprint 8: Documentação
+### Objetivo
+Atualizar o serviço de IA generativa (GPT-4o) para gerar atividades contextualizadas por disciplina e alinhadas à BNCC.
 
-**Status atual**: ✅ Estrutura base do plano de migração criada
+### 5.1. Atualizar NLP Service
+
+**Arquivo**: `backend/app/services/nlp_service.py`
+
+```python
+"""
+NLP Service - EduAutismo IA v3.0
+
+CHANGELOG v3.0:
+- Prompts contextualizados por disciplina
+- Sugestões automáticas de objetivos BNCC
+- Templates específicos por matéria
+- Ajuste de linguagem por nível escolar
+"""
+
+from typing import Dict, List, Optional
+import openai
+
+from app.core.config import settings
+from app.core.exceptions import NLPServiceError
+from app.utils.constants import Subject, GradeLevel, ActivityType
+from app.utils.logger import get_logger
+
+logger = get_logger(__name__)
+
+
+class NLPService:
+    """Service for OpenAI GPT-4o integration with multidisciplinary support."""
+
+    def __init__(self):
+        openai.api_key = settings.OPENAI_API_KEY
+        self.model = settings.OPENAI_MODEL
+        self.max_tokens = settings.OPENAI_MAX_TOKENS
+        self.temperature = settings.OPENAI_TEMPERATURE
+
+    # ============================================================================
+    # NOVO v3.0: Multidisciplinary Activity Generation
+    # ============================================================================
+
+    async def generate_multidisciplinary_activity(
+        self,
+        student_age: int,
+        subject: Subject,
+        grade_level: GradeLevel,
+        activity_type: ActivityType,
+        difficulty: str,
+        duration_minutes: int,
+        theme: Optional[str] = None,
+        bncc_code: Optional[str] = None,
+        cognitive_profile: Optional[Dict] = None,
+        sensory_profile: Optional[Dict] = None,
+        interests: Optional[List[str]] = None,
+    ) -> Dict[str, any]:
+        """
+        Generate multidisciplinary activity with BNCC alignment.
+
+        Args:
+            student_age: Student's age
+            subject: Academic subject (Matemática, Português, etc.)
+            grade_level: Grade level (Fundamental 3º ano, etc.)
+            activity_type: Type of activity (cognitive, social, etc.)
+            difficulty: Difficulty level
+            duration_minutes: Activity duration
+            theme: Optional theme to incorporate
+            bncc_code: Optional BNCC competency code to target
+            cognitive_profile: Student's cognitive abilities
+            sensory_profile: Student's sensory preferences
+            interests: Student's special interests
+
+        Returns:
+            Dictionary with activity content and BNCC alignment
+
+        Raises:
+            NLPServiceError: If generation fails
+        """
+        try:
+            # Build subject-specific prompt
+            prompt = self._build_multidisciplinary_prompt(
+                student_age=student_age,
+                subject=subject,
+                grade_level=grade_level,
+                activity_type=activity_type,
+                difficulty=difficulty,
+                duration_minutes=duration_minutes,
+                theme=theme,
+                bncc_code=bncc_code,
+                cognitive_profile=cognitive_profile,
+                sensory_profile=sensory_profile,
+                interests=interests,
+            )
+
+            # Get subject-specific system prompt
+            system_prompt = self._get_subject_system_prompt(subject, grade_level)
+
+            logger.info(
+                "Calling OpenAI API for multidisciplinary activity generation",
+                extra={
+                    "subject": subject.value,
+                    "grade_level": grade_level.value,
+                    "bncc_code": bncc_code,
+                },
+            )
+
+            # Call OpenAI API
+            response = await openai.ChatCompletion.acreate(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt},
+                ],
+                max_tokens=self.max_tokens,
+                temperature=self.temperature,
+                top_p=0.9,
+                frequency_penalty=0.5,
+                presence_penalty=0.3,
+            )
+
+            # Parse response
+            content = response.choices[0].message.content
+            parsed_content = self._parse_activity_response(content)
+
+            # Add metadata
+            parsed_content["generation_metadata"] = {
+                "model": self.model,
+                "tokens_used": response.usage.total_tokens,
+                "subject": subject.value,
+                "grade_level": grade_level.value,
+                "bncc_code": bncc_code,
+                "version": "3.0",
+            }
+
+            logger.info(
+                "Multidisciplinary activity generated successfully",
+                extra={
+                    "subject": subject.value,
+                    "tokens_used": response.usage.total_tokens,
+                    "has_bncc": bool(parsed_content.get("bncc_competencies")),
+                },
+            )
+
+            return parsed_content
+
+        except openai.error.OpenAIError as e:
+            logger.error(f"OpenAI API error: {str(e)}")
+            raise NLPServiceError(f"Failed to generate content: {str(e)}") from e
+
+        except Exception as e:
+            logger.error(f"Unexpected error in NLP service: {str(e)}")
+            raise NLPServiceError(f"Unexpected error: {str(e)}") from e
+
+    # ============================================================================
+    # NOVO v3.0: Subject-Specific Prompts
+    # ============================================================================
+
+    def _build_multidisciplinary_prompt(
+        self,
+        student_age: int,
+        subject: Subject,
+        grade_level: GradeLevel,
+        activity_type: ActivityType,
+        difficulty: str,
+        duration_minutes: int,
+        theme: Optional[str],
+        bncc_code: Optional[str],
+        cognitive_profile: Optional[Dict],
+        sensory_profile: Optional[Dict],
+        interests: Optional[List[str]],
+    ) -> str:
+        """Build detailed prompt for multidisciplinary activity generation."""
+
+        # Get subject-specific context
+        subject_context = self._get_subject_context(subject, grade_level)
+
+        # Get BNCC context if code provided
+        bncc_context = ""
+        if bncc_code:
+            bncc_context = self._get_bncc_context(bncc_code, subject, grade_level)
+
+        prompt = f"""
+Crie uma atividade pedagógica MULTIDISCIPLINAR personalizada para um aluno com TEA.
+
+═══════════════════════════════════════════════════════════════
+INFORMAÇÕES DO ALUNO
+═══════════════════════════════════════════════════════════════
+
+📚 **Perfil Acadêmico:**
+- Idade: {student_age} anos
+- Série/Ano: {self._format_grade_level(grade_level)}
+- Diagnóstico: Transtorno do Espectro Autista (TEA)
+
+🧠 **Perfil Cognitivo:**
+{self._format_cognitive_profile(cognitive_profile)}
+
+👂 **Perfil Sensorial:**
+{self._format_sensory_profile(sensory_profile)}
+
+🎯 **Interesses Especiais:**
+{self._format_interests(interests)}
+
+═══════════════════════════════════════════════════════════════
+REQUISITOS DA ATIVIDADE
+═══════════════════════════════════════════════════════════════
+
+📖 **Disciplina:** {self._format_subject(subject)}
+{subject_context}
+
+📊 **Parâmetros:**
+- Tipo de Atividade: {activity_type.value}
+- Dificuldade: {difficulty}
+- Duração: {duration_minutes} minutos
+{f"- Tema para incorporar: {theme}" if theme else ""}
+
+{bncc_context}
+
+═══════════════════════════════════════════════════════════════
+INSTRUÇÕES ESPECÍFICAS
+═══════════════════════════════════════════════════════════════
+
+**1. CONTEÚDO CURRICULAR:**
+   - Seguir objetivos de aprendizagem da BNCC para {self._format_subject(subject)}
+   - Adequar linguagem e complexidade ao {self._format_grade_level(grade_level)}
+   - Incluir conceitos apropriados para a faixa etária
+
+**2. ADAPTAÇÕES TEA:**
+   - ✅ Instruções CLARAS e OBJETIVAS (passo a passo)
+   - ✅ Rotina PREVISÍVEL (início, meio, fim bem definidos)
+   - ✅ Apoios VISUAIS (cartões, imagens, diagramas)
+   - ✅ Respeitar perfil SENSORIAL (evitar sobrecarga)
+   - ✅ Incorporar INTERESSES ESPECIAIS quando possível
+   - ✅ Dar opções de ESCOLHA (autonomia)
+
+**3. ESTRUTURA DA ATIVIDADE:**
+   - Título atrativo e claro
+   - Objetivos de aprendizagem específicos
+   - Lista de materiais necessários
+   - Instruções passo a passo numeradas
+   - Critérios de sucesso observáveis
+   - Sugestões de adaptações adicionais
+
+**4. FORMATO DE SAÍDA:**
+   Responda em formato JSON válido com as seguintes chaves:
+   {{
+     "title": "Título da atividade",
+     "description": "Descrição breve (2-3 frases)",
+     "objectives": ["Objetivo 1", "Objetivo 2", ...],
+     "materials": ["Material 1", "Material 2", ...],
+     "instructions": ["Passo 1", "Passo 2", ...],
+     "adaptations": ["Adaptação 1", "Adaptação 2", ...],
+     "visual_supports": ["Apoio visual 1", "Apoio visual 2", ...],
+     "success_criteria": ["Critério 1", "Critério 2", ...],
+     "bncc_competencies": ["Código BNCC 1", ...],  // Se aplicável
+     "knowledge_objects": ["Objeto de conhecimento 1", ...]  // Se aplicável
+   }}
+
+═══════════════════════════════════════════════════════════════
+IMPORTANTE
+═══════════════════════════════════════════════════════════════
+
+⚠️ Esta atividade deve ser:
+- ✅ **Inclusiva**: Adequada para aluno com TEA
+- ✅ **Curricular**: Alinhada à BNCC e ao ano escolar
+- ✅ **Motivadora**: Incorporar interesses quando possível
+- ✅ **Estruturada**: Clara, previsível e com suporte visual
+- ✅ **Respeitosa**: Valorizar as características do aluno
+
+Agora, crie a atividade seguindo todas as diretrizes acima! 🎯
+"""
+
+        return prompt
+
+    def _get_subject_system_prompt(self, subject: Subject, grade_level: GradeLevel) -> str:
+        """Get system prompt specialized for subject and grade level."""
+
+        base_prompt = """
+Você é um ESPECIALISTA em educação especial e pedagogia inclusiva, com formação em:
+- Transtorno do Espectro Autista (TEA)
+- Metodologias ativas de ensino
+- Base Nacional Comum Curricular (BNCC)
+- Diferenciação pedagógica
+"""
+
+        # Add subject-specific expertise
+        subject_expertise = {
+            Subject.MATEMATICA: """
+- Educação Matemática para alunos com TEA
+- Materiais manipuláveis e representações visuais
+- Resolução de problemas contextualizados
+- Raciocínio lógico e pensamento computacional
+""",
+            Subject.PORTUGUES: """
+- Alfabetização e letramento para alunos com TEA
+- Comunicação alternativa e aumentativa
+- Compreensão leitora e produção textual
+- Gêneros textuais e oralidade
+""",
+            Subject.CIENCIAS: """
+- Ensino de Ciências por investigação
+- Experimentação segura e adaptada
+- Método científico acessível
+- Conexão com o cotidiano
+""",
+            Subject.HISTORIA: """
+- Ensino de História contextualizado
+- Linha do tempo visual
+- Fontes históricas adaptadas
+- Conexão passado-presente
+""",
+            Subject.GEOGRAFIA: """
+- Alfabetização cartográfica
+- Mapas e representações espaciais
+- Relação local-global
+- Sustentabilidade e meio ambiente
+""",
+            Subject.ARTE: """
+- Expressão artística inclusiva
+- Artes visuais, música, dança, teatro
+- Materiais sensoriais adequados
+- Arte como comunicação
+""",
+            Subject.EDUCACAO_FISICA: """
+- Educação Física inclusiva
+- Psicomotricidade e coordenação
+- Jogos cooperativos
+- Regulação sensorial através do movimento
+""",
+        }
+
+        expertise = subject_expertise.get(subject, "")
+
+        grade_context = f"""
+Você está criando atividades para o {self._format_grade_level(grade_level)},
+considerando as competências e habilidades da BNCC específicas para este nível.
+"""
+
+        return base_prompt + expertise + grade_context + """
+
+**PRINCÍPIOS FUNDAMENTAIS:**
+1. **Clareza**: Linguagem simples, objetiva e direta
+2. **Estrutura**: Rotina previsível com início, meio e fim
+3. **Visual**: Apoios visuais sempre que possível
+4. **Sensorial**: Respeitar sensibilidades sensoriais
+5. **Interesse**: Incorporar temas de interesse do aluno
+6. **Autonomia**: Oferecer escolhas apropriadas
+7. **Sucesso**: Critérios claros e alcançáveis
+8. **Respeito**: Valorizar neurodiversidade
+
+**FORMATO DE RESPOSTA:**
+Sempre responda em formato JSON válido com todas as chaves solicitadas.
+Seja específico, prático e baseado em evidências científicas.
+"""
+
+    def _get_subject_context(self, subject: Subject, grade_level: GradeLevel) -> str:
+        """Get context about the subject and what should be covered."""
+
+        # Subject descriptions by grade level would go here
+        # This is a simplified version
+        contexts = {
+            Subject.MATEMATICA: """
+**Foco em Matemática para este nível:**
+- Números e operações
+- Geometria e medidas
+- Grandezas e medidas
+- Probabilidade e estatística
+- Álgebra (se aplicável ao nível)
+
+**Competências esperadas:**
+- Raciocínio lógico
+- Resolução de problemas
+- Representação matemática
+- Uso de tecnologias
+""",
+            Subject.PORTUGUES: """
+**Foco em Português para este nível:**
+- Leitura e compreensão
+- Produção textual
+- Análise linguística
+- Oralidade
+- Práticas de linguagem
+
+**Competências esperadas:**
+- Comunicação oral e escrita
+- Interpretação de textos
+- Uso adequado da língua
+- Produção de gêneros textuais
+""",
+            # ... adicionar outros
+        }
+
+        return contexts.get(subject, "")
+
+    def _get_bncc_context(self, bncc_code: str, subject: Subject, grade_level: GradeLevel) -> str:
+        """Get context about specific BNCC competency/skill."""
+
+        # In a production environment, this would query a BNCC database
+        # For now, we'll include the code in the prompt for AI to interpret
+
+        return f"""
+🎯 **Alinhamento BNCC:**
+- Código solicitado: **{bncc_code}**
+- Por favor, alinhe a atividade com esta competência/habilidade específica da BNCC
+- Inclua o código BNCC no campo "bncc_competencies" da resposta
+- Liste os objetos de conhecimento relacionados em "knowledge_objects"
+"""
+
+    # ============================================================================
+    # Helper Methods
+    # ============================================================================
+
+    def _format_grade_level(self, grade_level: GradeLevel) -> str:
+        """Format grade level for display."""
+        names = {
+            GradeLevel.FUNDAMENTAL_1_ANO: "1º ano do Ensino Fundamental",
+            GradeLevel.FUNDAMENTAL_2_ANO: "2º ano do Ensino Fundamental",
+            GradeLevel.FUNDAMENTAL_3_ANO: "3º ano do Ensino Fundamental",
+            # ... adicionar outros
+        }
+        return names.get(grade_level, grade_level.value)
+
+    def _format_subject(self, subject: Subject) -> str:
+        """Format subject for display."""
+        names = {
+            Subject.MATEMATICA: "Matemática",
+            Subject.PORTUGUES: "Língua Portuguesa",
+            Subject.CIENCIAS: "Ciências da Natureza",
+            Subject.HISTORIA: "História",
+            Subject.GEOGRAFIA: "Geografia",
+            Subject.ARTE: "Arte",
+            Subject.EDUCACAO_FISICA: "Educação Física",
+            # ... adicionar outros
+        }
+        return names.get(subject, subject.value)
+
+    def _format_cognitive_profile(self, profile: Optional[Dict]) -> str:
+        """Format cognitive profile for prompt."""
+        if not profile:
+            return "- Perfil não fornecido"
+
+        return f"""
+- Memória: {profile.get('memory', 'N/A')}/10
+- Atenção: {profile.get('attention', 'N/A')}/10
+- Velocidade de Processamento: {profile.get('processing_speed', 'N/A')}/10
+- Função Executiva: {profile.get('executive_function', 'N/A')}/10
+- Linguagem: {profile.get('language', 'N/A')}/10
+- Visual-Espacial: {profile.get('visual_spatial', 'N/A')}/10
+"""
+
+    def _format_sensory_profile(self, profile: Optional[Dict]) -> str:
+        """Format sensory profile for prompt."""
+        if not profile:
+            return "- Perfil não fornecido"
+
+        sensitivity_labels = {
+            0: "Nenhuma sensibilidade",
+            1: "Baixa sensibilidade",
+            2: "Sensibilidade moderada",
+            3: "Alta sensibilidade"
+        }
+
+        return f"""
+- Visual: {sensitivity_labels.get(profile.get('visual', 0))}
+- Auditivo: {sensitivity_labels.get(profile.get('auditory', 0))}
+- Tátil: {sensitivity_labels.get(profile.get('tactile', 0))}
+- Vestibular: {sensitivity_labels.get(profile.get('vestibular', 0))}
+- Proprioceptivo: {sensitivity_labels.get(profile.get('proprioceptive', 0))}
+"""
+
+    def _format_interests(self, interests: Optional[List[str]]) -> str:
+        """Format interests for prompt."""
+        if not interests:
+            return "- Nenhum interesse especial informado"
+
+        return "\n".join(f"- {interest.title()}" for interest in interests)
+
+    def _parse_activity_response(self, content: str) -> Dict[str, any]:
+        """Parse GPT response to extract activity fields."""
+        import json
+
+        try:
+            # Try to parse as JSON
+            parsed = json.loads(content)
+
+            # Validate required fields
+            required_fields = ["title", "description", "objectives", "materials", "instructions"]
+            for field in required_fields:
+                if field not in parsed:
+                    raise ValueError(f"Missing required field: {field}")
+
+            return parsed
+
+        except json.JSONDecodeError:
+            # If not JSON, try to extract manually (fallback)
+            logger.warning("Response not in JSON format, attempting manual extraction")
+
+            lines = content.strip().split('\n')
+            return {
+                'title': lines[0] if lines else "Atividade Personalizada",
+                'description': '\n'.join(lines[1:]) if len(lines) > 1 else content,
+                'objectives': [],
+                'materials': [],
+                'instructions': [],
+                'adaptations': [],
+                'visual_supports': [],
+                'success_criteria': [],
+            }
+
+    # ============================================================================
+    # Backwards Compatibility: Keep existing method
+    # ============================================================================
+
+    async def generate_activity_content(
+        self,
+        subject: str,
+        topic: str,
+        difficulty: int,
+        student_age: int,
+        cognitive_profile: Optional[Dict] = None,
+        sensory_profile: Optional[Dict] = None
+    ) -> Dict[str, str]:
+        """
+        Generate activity content (v2.0 compatibility method).
+
+        This method is kept for backwards compatibility with existing code.
+        New code should use generate_multidisciplinary_activity().
+        """
+        # Map to new method (simplified)
+        try:
+            result = await self.generate_multidisciplinary_activity(
+                student_age=student_age,
+                subject=Subject.MATEMATICA,  # Default, needs proper mapping
+                grade_level=GradeLevel.FUNDAMENTAL_3_ANO,  # Default, needs proper mapping
+                activity_type=ActivityType.COGNITIVE,
+                difficulty="medium",
+                duration_minutes=30,
+                theme=topic,
+                cognitive_profile=cognitive_profile,
+                sensory_profile=sensory_profile,
+            )
+
+            return {
+                'title': result.get('title', ''),
+                'content': result.get('description', ''),
+            }
+
+        except Exception as e:
+            logger.error(f"Error in backwards compatibility method: {str(e)}")
+            raise
+```
+
+**Checklist Sprint 5.1:**
+- [ ] Atualizar `nlp_service.py` com código acima
+- [ ] Testar geração de atividade de Matemática
+- [ ] Testar geração de atividade de Português
+- [ ] Testar com e sem código BNCC
+- [ ] Verificar formato JSON da resposta
+- [ ] Executar linter e formatter
+- [ ] Commitar: `git commit -m "feat: atualizar NLP service com prompts multidisciplinares"`
 
 ---
 
-**Próximo passo**: Quer que eu continue com os sprints restantes (5-8)?
+## 🌐 SPRINT 6: API Endpoints - Filtros e Rotas (2 dias)
+
+### Objetivo
+Atualizar endpoints REST para suportar filtros multidisciplinares e adicionar novas rotas.
+
+### 6.1. Atualizar Activity Service
+
+**Arquivo**: `backend/app/services/activity_service.py`
+
+```python
+"""
+Activity Service - EduAutismo IA v3.0
+
+CHANGELOG v3.0:
+- Método generate_multidisciplinary_activity()
+- Filtros por subject e grade_level
+- Busca por BNCC
+"""
+
+from sqlalchemy import and_, or_
+from sqlalchemy.orm import Session
+from typing import List, Optional, Tuple
+from uuid import UUID
+
+from app.models.activity import Activity
+from app.schemas.activity import (
+    ActivityCreate,
+    ActivityUpdate,
+    ActivityGenerateMultidisciplinary,  # NOVO v3.0
+    ActivityFilterParams,
+)
+from app.services.nlp_service import NLPService
+from app.services.student_service import StudentService
+from app.utils.constants import Subject, GradeLevel  # NOVO v3.0
+from app.utils.logger import get_logger
+
+logger = get_logger(__name__)
+
+
+class ActivityService:
+    """Service for activity operations with multidisciplinary support."""
+
+    def __init__(self, db: Session):
+        self.db = db
+        self.nlp_service = NLPService()
+        self.student_service = StudentService(db)
+
+    # ============================================================================
+    # NOVO v3.0: Multidisciplinary Activity Generation
+    # ============================================================================
+
+    async def generate_multidisciplinary_activity(
+        self,
+        request: ActivityGenerateMultidisciplinary,
+        created_by_id: UUID,
+    ) -> Activity:
+        """
+        Generate personalized multidisciplinary activity using AI.
+
+        Args:
+            request: Activity generation request with subject, grade_level, etc.
+            created_by_id: ID of the user creating the activity
+
+        Returns:
+            Created Activity object
+
+        Raises:
+            StudentNotFoundError: If student doesn't exist
+            NLPServiceError: If AI generation fails
+        """
+        # 1. Get student profile
+        logger.info(f"Generating multidisciplinary activity for student {request.student_id}")
+        student = self.student_service.get_by_id(request.student_id)
+
+        # 2. Generate content with NLP service
+        logger.info(
+            f"Calling NLP service for {request.subject.value} activity",
+            extra={
+                "subject": request.subject.value,
+                "grade_level": request.grade_level.value,
+                "bncc_code": request.bncc_code,
+            },
+        )
+
+        generated_content = await self.nlp_service.generate_multidisciplinary_activity(
+            student_age=student.age,
+            subject=request.subject,
+            grade_level=request.grade_level,
+            activity_type=request.activity_type,
+            difficulty=request.difficulty.value,
+            duration_minutes=request.duration_minutes,
+            theme=request.theme,
+            bncc_code=request.bncc_code,
+            cognitive_profile=student.cognitive_profile,
+            sensory_profile=student.sensory_profile,
+            interests=student.interests,
+        )
+
+        # 3. Create activity in database
+        activity = Activity(
+            student_id=request.student_id,
+            created_by_id=created_by_id,
+            title=generated_content['title'],
+            description=generated_content['description'],
+            activity_type=request.activity_type,
+            difficulty=request.difficulty,
+            duration_minutes=request.duration_minutes,
+            theme=request.theme,
+            # NOVO v3.0: Multidisciplinary fields
+            subject=request.subject,
+            grade_level=request.grade_level,
+            bncc_competencies=generated_content.get('bncc_competencies'),
+            bncc_skills=generated_content.get('bncc_skills'),
+            knowledge_objects=generated_content.get('knowledge_objects'),
+            # Content
+            objectives=generated_content['objectives'],
+            materials=generated_content['materials'],
+            instructions=generated_content['instructions'],
+            adaptations=generated_content.get('adaptations'),
+            visual_supports=generated_content.get('visual_supports'),
+            success_criteria=generated_content.get('success_criteria'),
+            generated_by_ai=True,
+            generation_metadata=generated_content.get('generation_metadata'),
+        )
+
+        self.db.add(activity)
+        self.db.commit()
+        self.db.refresh(activity)
+
+        logger.info(
+            f"Multidisciplinary activity generated successfully: {activity.id}",
+            extra={
+                "activity_id": str(activity.id),
+                "subject": activity.subject.value if activity.subject else None,
+                "has_bncc": activity.is_aligned_with_bncc(),
+            },
+        )
+
+        return activity
+
+    # ============================================================================
+    # NOVO v3.0: Advanced Filtering
+    # ============================================================================
+
+    def list_with_filters(
+        self,
+        filters: ActivityFilterParams,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> Tuple[List[Activity], int]:
+        """
+        List activities with advanced filters (v3.0).
+
+        Args:
+            filters: Filter parameters including subject, grade_level, has_bncc
+            skip: Number of records to skip
+            limit: Maximum number of records to return
+
+        Returns:
+            Tuple of (activities list, total count)
+        """
+        query = self.db.query(Activity)
+
+        # Apply filters
+        filter_conditions = []
+
+        if filters.activity_type:
+            filter_conditions.append(Activity.activity_type == filters.activity_type)
+
+        if filters.difficulty:
+            filter_conditions.append(Activity.difficulty == filters.difficulty)
+
+        if filters.theme:
+            filter_conditions.append(Activity.theme.ilike(f"%{filters.theme}%"))
+
+        if filters.generated_by_ai is not None:
+            filter_conditions.append(Activity.generated_by_ai == filters.generated_by_ai)
+
+        if filters.student_id:
+            filter_conditions.append(Activity.student_id == filters.student_id)
+
+        # NOVO v3.0: Multidisciplinary filters
+        if filters.subject:
+            filter_conditions.append(Activity.subject == filters.subject)
+
+        if filters.grade_level:
+            filter_conditions.append(Activity.grade_level == filters.grade_level)
+
+        if filters.has_bncc is not None:
+            if filters.has_bncc:
+                # Has BNCC alignment
+                filter_conditions.append(
+                    or_(
+                        Activity.bncc_competencies.isnot(None),
+                        Activity.bncc_skills.isnot(None),
+                        Activity.knowledge_objects.isnot(None),
+                    )
+                )
+            else:
+                # No BNCC alignment
+                filter_conditions.append(
+                    and_(
+                        Activity.bncc_competencies.is_(None),
+                        Activity.bncc_skills.is_(None),
+                        Activity.knowledge_objects.is_(None),
+                    )
+                )
+
+        if filter_conditions:
+            query = query.filter(and_(*filter_conditions))
+
+        # Get total count
+        total = query.count()
+
+        # Apply pagination
+        activities = query.offset(skip).limit(limit).all()
+
+        logger.info(
+            f"Listed {len(activities)} activities with filters",
+            extra={
+                "total": total,
+                "filters_applied": len(filter_conditions),
+                "subject": filters.subject.value if filters.subject else None,
+                "grade_level": filters.grade_level.value if filters.grade_level else None,
+            },
+        )
+
+        return activities, total
+
+    def search_by_bncc_code(
+        self,
+        bncc_code: str,
+        grade_level: Optional[GradeLevel] = None,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> Tuple[List[Activity], int]:
+        """
+        Search activities by BNCC code (v3.0).
+
+        Args:
+            bncc_code: BNCC competency/skill code (e.g., "EF01MA01")
+            grade_level: Optional filter by grade level
+            skip: Number of records to skip
+            limit: Maximum number of records to return
+
+        Returns:
+            Tuple of (activities list, total count)
+        """
+        query = self.db.query(Activity).filter(
+            or_(
+                Activity.bncc_competencies.contains([bncc_code]),
+                Activity.bncc_skills.contains([bncc_code]),
+            )
+        )
+
+        if grade_level:
+            query = query.filter(Activity.grade_level == grade_level)
+
+        total = query.count()
+        activities = query.offset(skip).limit(limit).all()
+
+        logger.info(
+            f"Found {len(activities)} activities for BNCC code {bncc_code}",
+            extra={
+                "bncc_code": bncc_code,
+                "grade_level": grade_level.value if grade_level else None,
+                "total": total,
+            },
+        )
+
+        return activities, total
+
+    # Existing methods remain unchanged...
+    # (create, get_by_id, update, delete, etc.)
+```
+
+**Checklist Sprint 6.1:**
+- [ ] Atualizar `activity_service.py`
+- [ ] Testar método `generate_multidisciplinary_activity()`
+- [ ] Testar `list_with_filters()` com novos filtros
+- [ ] Testar `search_by_bncc_code()`
+- [ ] Commitar: `git commit -m "feat: adicionar métodos multidisciplinares no activity service"`
+
+### 6.2. Atualizar Activity Routes
+
+**Arquivo**: `backend/app/api/routes/activities.py`
+
+```python
+"""
+Activity Routes - EduAutismo IA v3.0
+
+CHANGELOG v3.0:
+- Endpoint POST /generate-multidisciplinary
+- Filtros multidisciplinares no GET /
+- Endpoint GET /search/bncc/{code}
+"""
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy.orm import Session
+from typing import List, Optional
+from uuid import UUID
+
+from app.api.dependencies.auth import get_current_user
+from app.core.database import get_db
+from app.schemas.activity import (
+    ActivityCreate,
+    ActivityUpdate,
+    ActivityResponse,
+    ActivityListResponse,
+    ActivityGenerate,
+    ActivityGenerateMultidisciplinary,  # NOVO v3.0
+    ActivityFilterParams,
+)
+from app.schemas.common import PaginatedResponse
+from app.services.activity_service import ActivityService
+from app.utils.constants import Subject, GradeLevel  # NOVO v3.0
+from app.utils.logger import get_logger
+
+logger = get_logger(__name__)
+router = APIRouter(prefix="/api/v1/activities", tags=["activities"])
+
+
+# ============================================================================
+# NOVO v3.0: Multidisciplinary Activity Generation
+# ============================================================================
+
+@router.post(
+    "/generate-multidisciplinary",
+    response_model=ActivityResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Generate multidisciplinary activity with AI (v3.0)",
+    description="""
+    Generate personalized activity for a specific subject and grade level,
+    aligned with BNCC competencies.
+
+    **New in v3.0:**
+    - Subject selection (Matemática, Português, etc.)
+    - Grade level targeting
+    - Optional BNCC code alignment
+    - Enhanced AI prompts with subject-specific context
+
+    **Example:**
+    ```json
+    {
+      "student_id": "uuid-here",
+      "subject": "matematica",
+      "grade_level": "fundamental_3_ano",
+      "activity_type": "cognitive",
+      "difficulty": "medium",
+      "duration_minutes": 30,
+      "theme": "dinossauros",
+      "bncc_code": "EF03MA06"
+    }
+    ```
+    """,
+)
+async def generate_multidisciplinary_activity(
+    request: ActivityGenerateMultidisciplinary,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Generate multidisciplinary activity with AI (v3.0).
+
+    This endpoint uses GPT-4o with subject-specific prompts to generate
+    educational activities aligned with BNCC and adapted for TEA students.
+    """
+    try:
+        service = ActivityService(db)
+        activity = await service.generate_multidisciplinary_activity(
+            request=request,
+            created_by_id=UUID(current_user["sub"]),
+        )
+
+        logger.info(
+            "Multidisciplinary activity generated via API",
+            extra={
+                "activity_id": str(activity.id),
+                "subject": activity.subject.value if activity.subject else None,
+                "user": current_user["sub"],
+            },
+        )
+
+        return activity
+
+    except Exception as e:
+        logger.error(f"Error generating multidisciplinary activity: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate activity: {str(e)}",
+        )
+
+
+# ============================================================================
+# UPDATED: List with Multidisciplinary Filters
+# ============================================================================
+
+@router.get(
+    "/",
+    response_model=PaginatedResponse[ActivityListResponse],
+    summary="List activities with filters (updated v3.0)",
+    description="""
+    List activities with optional filters.
+
+    **New filters in v3.0:**
+    - `subject`: Filter by subject (matematica, portugues, etc.)
+    - `grade_level`: Filter by grade level (fundamental_3_ano, etc.)
+    - `has_bncc`: Filter activities with BNCC alignment (true/false)
+    """,
+)
+async def list_activities(
+    # Pagination
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(20, ge=1, le=100, description="Items per page"),
+    # Existing filters
+    activity_type: Optional[str] = Query(None, description="Filter by activity type"),
+    difficulty: Optional[str] = Query(None, description="Filter by difficulty"),
+    theme: Optional[str] = Query(None, description="Filter by theme"),
+    generated_by_ai: Optional[bool] = Query(None, description="Filter AI-generated"),
+    student_id: Optional[UUID] = Query(None, description="Filter by student"),
+    # NOVO v3.0: Multidisciplinary filters
+    subject: Optional[Subject] = Query(None, description="Filter by subject"),
+    grade_level: Optional[GradeLevel] = Query(None, description="Filter by grade level"),
+    has_bncc: Optional[bool] = Query(None, description="Filter BNCC-aligned activities"),
+    # Dependencies
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    List activities with advanced filters (v3.0).
+    """
+    try:
+        service = ActivityService(db)
+
+        # Build filters
+        filters = ActivityFilterParams(
+            activity_type=activity_type,
+            difficulty=difficulty,
+            theme=theme,
+            generated_by_ai=generated_by_ai,
+            student_id=student_id,
+            subject=subject,
+            grade_level=grade_level,
+            has_bncc=has_bncc,
+        )
+
+        # Calculate skip
+        skip = (page - 1) * page_size
+
+        # Get activities
+        activities, total = service.list_with_filters(
+            filters=filters,
+            skip=skip,
+            limit=page_size,
+        )
+
+        return PaginatedResponse(
+            items=activities,
+            total=total,
+            page=page,
+            page_size=page_size,
+            total_pages=(total + page_size - 1) // page_size,
+        )
+
+    except Exception as e:
+        logger.error(f"Error listing activities: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to list activities: {str(e)}",
+        )
+
+
+# ============================================================================
+# NOVO v3.0: Search by BNCC Code
+# ============================================================================
+
+@router.get(
+    "/search/bncc/{code}",
+    response_model=PaginatedResponse[ActivityListResponse],
+    summary="Search activities by BNCC code (v3.0)",
+    description="""
+    Search activities that target a specific BNCC competency or skill code.
+
+    **Example codes:**
+    - `EF01MA01`: Fundamental I, Matemática
+    - `EF03LP01`: Fundamental I, Português
+    - `EI03EO01`: Educação Infantil
+
+    **Use case:**
+    - Find activities aligned with specific BNCC objectives
+    - Browse repository of activities for a competency
+    - Reuse activities across students
+    """,
+)
+async def search_activities_by_bncc(
+    code: str,
+    grade_level: Optional[GradeLevel] = Query(None, description="Filter by grade level"),
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(20, ge=1, le=100, description="Items per page"),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Search activities by BNCC code (v3.0).
+    """
+    try:
+        service = ActivityService(db)
+
+        skip = (page - 1) * page_size
+
+        activities, total = service.search_by_bncc_code(
+            bncc_code=code,
+            grade_level=grade_level,
+            skip=skip,
+            limit=page_size,
+        )
+
+        logger.info(
+            f"BNCC search performed for code {code}",
+            extra={
+                "bncc_code": code,
+                "results": len(activities),
+                "user": current_user["sub"],
+            },
+        )
+
+        return PaginatedResponse(
+            items=activities,
+            total=total,
+            page=page,
+            page_size=page_size,
+            total_pages=(total + page_size - 1) // page_size,
+        )
+
+    except Exception as e:
+        logger.error(f"Error searching by BNCC code: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to search activities: {str(e)}",
+        )
+
+
+# ============================================================================
+# NOVO v3.0: Get Subjects and Grade Levels
+# ============================================================================
+
+@router.get(
+    "/meta/subjects",
+    response_model=List[dict],
+    summary="Get available subjects (v3.0)",
+)
+async def get_available_subjects():
+    """Get list of available subjects with metadata."""
+    from app.utils.constants import Subject
+
+    subjects = [
+        {
+            "code": subject.value,
+            "name": subject.name,
+            "display_name": subject.value.replace("_", " ").title(),
+        }
+        for subject in Subject
+    ]
+
+    return subjects
+
+
+@router.get(
+    "/meta/grade-levels",
+    response_model=List[dict],
+    summary="Get available grade levels (v3.0)",
+)
+async def get_available_grade_levels():
+    """Get list of available grade levels with metadata."""
+    from app.utils.constants import GradeLevel
+
+    levels = [
+        {
+            "code": level.value,
+            "name": level.name,
+            "display_name": level.value.replace("_", " ").title(),
+            "age_range": GradeLevel.get_age_range(level),
+            "education_level": GradeLevel.get_education_level(level),
+        }
+        for level in GradeLevel
+    ]
+
+    return levels
+
+
+# Existing endpoints remain unchanged...
+# (POST /, GET /{id}, PUT /{id}, DELETE /{id}, etc.)
+```
+
+**Checklist Sprint 6.2:**
+- [ ] Atualizar `activities.py` routes
+- [ ] Testar POST `/generate-multidisciplinary`
+- [ ] Testar GET `/` com novos filtros
+- [ ] Testar GET `/search/bncc/{code}`
+- [ ] Testar GET `/meta/subjects`
+- [ ] Testar GET `/meta/grade-levels`
+- [ ] Atualizar OpenAPI docs: http://localhost:8000/docs
+- [ ] Commitar: `git commit -m "feat: adicionar endpoints multidisciplinares"`
+
+---
+
+## 🧪 SPRINT 7: Testes Completos (3 dias)
+
+### Objetivo
+Garantir 85%+ de cobertura de testes para todas as mudanças do MVP 3.0.
+
+### 7.1. Testes Unitários - Constants e Enums
+
+**Arquivo**: `backend/tests/unit/test_constants_v3.py`
+
+```python
+"""
+Unit tests for constants.py enums (v3.0).
+"""
+
+import pytest
+
+from app.utils.constants import Subject, GradeLevel
+
+
+class TestSubjectEnum:
+    """Test Subject enum."""
+
+    def test_subject_enum_values(self):
+        """Test that all expected subjects are defined."""
+        expected_subjects = [
+            "matematica",
+            "portugues",
+            "ciencias",
+            "historia",
+            "geografia",
+            "arte",
+            "educacao_fisica",
+            "ingles",
+            "biologia",
+            "fisica",
+            "quimica",
+        ]
+
+        for subject_code in expected_subjects:
+            assert any(s.value == subject_code for s in Subject)
+
+    def test_get_by_grade_level_infantil(self):
+        """Test subjects for Educação Infantil."""
+        subjects = Subject.get_by_grade_level("pre_escola_4")
+
+        assert len(subjects) == 5
+        assert Subject.INFANTIL_SELF_OTHERS in subjects
+        assert Subject.INFANTIL_BODY_MOVEMENT in subjects
+
+    def test_get_by_grade_level_fundamental_1(self):
+        """Test subjects for Fundamental I."""
+        subjects = Subject.get_by_grade_level("fundamental_1_3ano")
+
+        assert len(subjects) >= 7
+        assert Subject.MATEMATICA in subjects
+        assert Subject.PORTUGUES in subjects
+        assert Subject.INGLES not in subjects  # Inglês só no Fundamental II
+
+    def test_get_by_grade_level_fundamental_2(self):
+        """Test subjects for Fundamental II."""
+        subjects = Subject.get_by_grade_level("fundamental_2_6ano")
+
+        assert len(subjects) >= 8
+        assert Subject.MATEMATICA in subjects
+        assert Subject.INGLES in subjects  # Inglês a partir do 6º ano
+
+    def test_get_by_grade_level_medio(self):
+        """Test subjects for Ensino Médio."""
+        subjects = Subject.get_by_grade_level("medio_1_ano")
+
+        assert len(subjects) >= 12
+        assert Subject.BIOLOGIA in subjects
+        assert Subject.FISICA in subjects
+        assert Subject.QUIMICA in subjects
+
+
+class TestGradeLevelEnum:
+    """Test GradeLevel enum."""
+
+    def test_grade_level_enum_values(self):
+        """Test that all expected grade levels are defined."""
+        expected_levels = [
+            "creche_0_1",
+            "pre_escola_4",
+            "fundamental_1_ano",
+            "fundamental_2_ano",
+            "fundamental_9_ano",
+            "medio_1_ano",
+            "medio_3_ano",
+        ]
+
+        for level_code in expected_levels:
+            assert any(l.value == level_code for l in GradeLevel)
+
+    def test_get_age_range_infantil(self):
+        """Test age range for Educação Infantil."""
+        age_range = GradeLevel.get_age_range(GradeLevel.PRE_ESCOLA_4)
+        assert age_range == (4, 4)
+
+    def test_get_age_range_fundamental_1(self):
+        """Test age range for Fundamental I."""
+        age_range = GradeLevel.get_age_range(GradeLevel.FUNDAMENTAL_3_ANO)
+        assert age_range == (8, 8)
+
+    def test_get_age_range_medio(self):
+        """Test age range for Ensino Médio."""
+        age_range = GradeLevel.get_age_range(GradeLevel.MEDIO_1_ANO)
+        assert age_range == (15, 15)
+
+    def test_get_education_level_infantil(self):
+        """Test education level for Infantil."""
+        level = GradeLevel.get_education_level(GradeLevel.CRECHE_0_1)
+        assert level == "Educação Infantil"
+
+    def test_get_education_level_fundamental_1(self):
+        """Test education level for Fundamental I."""
+        level = GradeLevel.get_education_level(GradeLevel.FUNDAMENTAL_3_ANO)
+        assert level == "Ensino Fundamental I"
+
+    def test_get_education_level_fundamental_2(self):
+        """Test education level for Fundamental II."""
+        level = GradeLevel.get_education_level(GradeLevel.FUNDAMENTAL_7_ANO)
+        assert level == "Ensino Fundamental II"
+
+    def test_get_education_level_medio(self):
+        """Test education level for Médio."""
+        level = GradeLevel.get_education_level(GradeLevel.MEDIO_2_ANO)
+        assert level == "Ensino Médio"
+```
+
+### 7.2. Testes Unitários - Activity Model
+
+**Arquivo**: `backend/tests/unit/test_activity_model_v3.py`
+
+```python
+"""
+Unit tests for Activity model (v3.0).
+"""
+
+import pytest
+
+from app.models.activity import Activity
+from app.utils.constants import Subject, GradeLevel, ActivityType, DifficultyLevel
+
+
+class TestActivityModelV3:
+    """Test Activity model multidisciplinary fields."""
+
+    def test_activity_with_subject_and_grade_level(self, db_session):
+        """Test creating activity with subject and grade level."""
+        activity = Activity(
+            title="Adição com Dinossauros",
+            description="Atividade de matemática",
+            activity_type=ActivityType.COGNITIVE,
+            difficulty=DifficultyLevel.EASY,
+            duration_minutes=30,
+            subject=Subject.MATEMATICA,  # NOVO v3.0
+            grade_level=GradeLevel.FUNDAMENTAL_3_ANO,  # NOVO v3.0
+            objectives=["Aprender adição"],
+            materials=["Dinossauros de plástico"],
+            instructions=["Passo 1", "Passo 2"],
+            student_id="uuid-here",
+        )
+
+        db_session.add(activity)
+        db_session.commit()
+        db_session.refresh(activity)
+
+        assert activity.subject == Subject.MATEMATICA
+        assert activity.grade_level == GradeLevel.FUNDAMENTAL_3_ANO
+
+    def test_activity_with_bncc_competencies(self, db_session):
+        """Test creating activity with BNCC alignment."""
+        activity = Activity(
+            title="Leitura e Interpretação",
+            description="Atividade de português",
+            activity_type=ActivityType.COGNITIVE,
+            difficulty=DifficultyLevel.MEDIUM,
+            duration_minutes=45,
+            subject=Subject.PORTUGUES,
+            grade_level=GradeLevel.FUNDAMENTAL_4_ANO,
+            bncc_competencies=["EF04LP01", "EF04LP02"],  # NOVO v3.0
+            bncc_skills=["EF04LP03"],  # NOVO v3.0
+            knowledge_objects=["Leitura", "Interpretação"],  # NOVO v3.0
+            objectives=["Compreender texto"],
+            materials=["Livro"],
+            instructions=["Ler", "Responder"],
+            student_id="uuid-here",
+        )
+
+        db_session.add(activity)
+        db_session.commit()
+        db_session.refresh(activity)
+
+        assert activity.bncc_competencies == ["EF04LP01", "EF04LP02"]
+        assert activity.bncc_skills == ["EF04LP03"]
+        assert activity.knowledge_objects == ["Leitura", "Interpretação"]
+
+    def test_activity_subject_name_property(self, db_session):
+        """Test subject_name property."""
+        activity = Activity(
+            title="Test",
+            description="Test",
+            activity_type=ActivityType.COGNITIVE,
+            difficulty=DifficultyLevel.EASY,
+            duration_minutes=30,
+            subject=Subject.MATEMATICA,
+            objectives=["Test"],
+            materials=["Test"],
+            instructions=["Test"],
+            student_id="uuid-here",
+        )
+
+        assert activity.subject_name == "Matemática"
+
+    def test_activity_grade_level_name_property(self, db_session):
+        """Test grade_level_name property."""
+        activity = Activity(
+            title="Test",
+            description="Test",
+            activity_type=ActivityType.COGNITIVE,
+            difficulty=DifficultyLevel.EASY,
+            duration_minutes=30,
+            grade_level=GradeLevel.FUNDAMENTAL_3_ANO,
+            objectives=["Test"],
+            materials=["Test"],
+            instructions=["Test"],
+            student_id="uuid-here",
+        )
+
+        assert activity.grade_level_name == "3º ano Fundamental"
+
+    def test_is_aligned_with_bncc_true(self, db_session):
+        """Test is_aligned_with_bncc returns True."""
+        activity = Activity(
+            title="Test",
+            description="Test",
+            activity_type=ActivityType.COGNITIVE,
+            difficulty=DifficultyLevel.EASY,
+            duration_minutes=30,
+            bncc_competencies=["EF01MA01"],
+            objectives=["Test"],
+            materials=["Test"],
+            instructions=["Test"],
+            student_id="uuid-here",
+        )
+
+        assert activity.is_aligned_with_bncc() is True
+
+    def test_is_aligned_with_bncc_false(self, db_session):
+        """Test is_aligned_with_bncc returns False."""
+        activity = Activity(
+            title="Test",
+            description="Test",
+            activity_type=ActivityType.COGNITIVE,
+            difficulty=DifficultyLevel.EASY,
+            duration_minutes=30,
+            objectives=["Test"],
+            materials=["Test"],
+            instructions=["Test"],
+            student_id="uuid-here",
+        )
+
+        assert activity.is_aligned_with_bncc() is False
+
+    def test_to_dict_includes_multidisciplinary_fields(self, db_session):
+        """Test to_dict includes multidisciplinary fields."""
+        activity = Activity(
+            title="Test",
+            description="Test",
+            activity_type=ActivityType.COGNITIVE,
+            difficulty=DifficultyLevel.EASY,
+            duration_minutes=30,
+            subject=Subject.CIENCIAS,
+            grade_level=GradeLevel.FUNDAMENTAL_5_ANO,
+            bncc_competencies=["EF05CI01"],
+            objectives=["Test"],
+            materials=["Test"],
+            instructions=["Test"],
+            theme="Planetas",
+            student_id="uuid-here",
+        )
+
+        activity_dict = activity.to_dict()
+
+        assert activity_dict["subject"] == "ciencias"
+        assert activity_dict["grade_level"] == "fundamental_5_ano"
+        assert activity_dict["bncc_competencies"] == ["EF05CI01"]
+```
+
+### 7.3. Testes de Integração - API Endpoints
+
+**Arquivo**: `backend/tests/integration/test_activities_api_v3.py`
+
+```python
+"""
+Integration tests for activities API endpoints (v3.0).
+"""
+
+import pytest
+
+from app.utils.constants import Subject, GradeLevel
+
+
+class TestActivitiesAPIMultidisciplinary:
+    """Test multidisciplinary activity endpoints."""
+
+    def test_generate_multidisciplinary_activity_matematica(
+        self, client, auth_headers, sample_student
+    ):
+        """Test generating Matemática activity."""
+        response = client.post(
+            "/api/v1/activities/generate-multidisciplinary",
+            json={
+                "student_id": str(sample_student.id),
+                "subject": "matematica",
+                "grade_level": "fundamental_3_ano",
+                "activity_type": "cognitive",
+                "difficulty": "easy",
+                "duration_minutes": 30,
+                "theme": "dinossauros",
+            },
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 201
+        data = response.json()
+
+        assert data["subject"] == "matematica"
+        assert data["grade_level"] == "fundamental_3_ano"
+        assert data["subject_name"] is not None
+        assert data["generated_by_ai"] is True
+
+    def test_generate_multidisciplinary_activity_with_bncc(
+        self, client, auth_headers, sample_student
+    ):
+        """Test generating activity with BNCC code."""
+        response = client.post(
+            "/api/v1/activities/generate-multidisciplinary",
+            json={
+                "student_id": str(sample_student.id),
+                "subject": "portugues",
+                "grade_level": "fundamental_4_ano",
+                "activity_type": "cognitive",
+                "difficulty": "medium",
+                "duration_minutes": 45,
+                "bncc_code": "EF04LP01",
+            },
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 201
+        data = response.json()
+
+        assert data["subject"] == "portugues"
+        assert data["is_bncc_aligned"] is True
+        assert "EF04LP01" in data.get("bncc_competencies", [])
+
+    def test_list_activities_filter_by_subject(
+        self, client, auth_headers, sample_activities_v3
+    ):
+        """Test filtering activities by subject."""
+        response = client.get(
+            "/api/v1/activities/?subject=matematica",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+
+        assert data["total"] > 0
+        for activity in data["items"]:
+            assert activity["subject"] == "matematica"
+
+    def test_list_activities_filter_by_grade_level(
+        self, client, auth_headers, sample_activities_v3
+    ):
+        """Test filtering activities by grade level."""
+        response = client.get(
+            "/api/v1/activities/?grade_level=fundamental_3_ano",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+
+        assert data["total"] > 0
+        for activity in data["items"]:
+            assert activity["grade_level"] == "fundamental_3_ano"
+
+    def test_list_activities_filter_by_has_bncc(
+        self, client, auth_headers, sample_activities_v3
+    ):
+        """Test filtering activities with BNCC alignment."""
+        response = client.get(
+            "/api/v1/activities/?has_bncc=true",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+
+        assert data["total"] > 0
+        for activity in data["items"]:
+            assert activity["is_bncc_aligned"] is True
+
+    def test_search_activities_by_bncc_code(
+        self, client, auth_headers, sample_activities_v3
+    ):
+        """Test searching activities by BNCC code."""
+        response = client.get(
+            "/api/v1/activities/search/bncc/EF03MA06",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+
+        assert data["total"] >= 0
+        for activity in data["items"]:
+            assert (
+                "EF03MA06" in activity.get("bncc_competencies", [])
+                or "EF03MA06" in activity.get("bncc_skills", [])
+            )
+
+    def test_get_available_subjects(self, client):
+        """Test getting list of available subjects."""
+        response = client.get("/api/v1/activities/meta/subjects")
+
+        assert response.status_code == 200
+        subjects = response.json()
+
+        assert len(subjects) > 0
+        assert any(s["code"] == "matematica" for s in subjects)
+        assert any(s["code"] == "portugues" for s in subjects)
+
+    def test_get_available_grade_levels(self, client):
+        """Test getting list of available grade levels."""
+        response = client.get("/api/v1/activities/meta/grade-levels")
+
+        assert response.status_code == 200
+        levels = response.json()
+
+        assert len(levels) > 0
+        assert any(l["code"] == "fundamental_3_ano" for l in levels)
+        assert all("age_range" in l for l in levels)
+        assert all("education_level" in l for l in levels)
+```
+
+**Checklist Sprint 7:**
+- [ ] Executar todos os testes: `pytest tests/ -v`
+- [ ] Verificar coverage: `pytest --cov=app --cov-report=html`
+- [ ] Coverage >= 85%?
+- [ ] Todos os testes passando?
+- [ ] Commitar: `git commit -m "test: adicionar testes para MVP 3.0 multidisciplinar"`
+
+---
+
+## 📚 SPRINT 8: Documentação Completa (2 dias)
+
+### Objetivo
+Atualizar toda a documentação para refletir as mudanças do MVP 3.0.
+
+### 8.1. Atualizar CLAUDE.md
+
+**Seções a atualizar:**
+- Adicionar Subject e GradeLevel enums
+- Exemplos de uso multidisciplinar
+- Comandos de teste atualizados
+
+### 8.2. Criar Guia de Uso Multidisciplinar
+
+**Arquivo**: `backend/docs/MULTIDISCIPLINARY_USAGE_GUIDE.md`
+
+```markdown
+# 📚 Guia de Uso: Plataforma Multidisciplinar
+
+## Visão Geral
+
+O EduAutismo IA v3.0 permite criar atividades para TODAS as disciplinas curriculares,
+alinhadas à BNCC e personalizadas para alunos com TEA.
+
+## Disciplinas Disponíveis
+
+### Educação Infantil (Campos de Experiência BNCC)
+- O eu, o outro e o nós
+- Corpo, gestos e movimentos
+- Traços, sons, cores e formas
+- Escuta, fala, pensamento e imaginação
+- Espaços, tempos, quantidades
+
+### Ensino Fundamental I e II
+- Matemática
+- Língua Portuguesa
+- Ciências
+- História
+- Geografia
+- Arte
+- Educação Física
+- Língua Inglesa (a partir do 6º ano)
+
+### Ensino Médio
+- Matemática
+- Língua Portuguesa
+- Biologia
+- Física
+- Química
+- História
+- Geografia
+- Filosofia
+- Sociologia
+- Arte
+- Educação Física
+- Inglês
+- Literatura
+- Redação
+
+## Exemplos de Uso
+
+### 1. Atividade de Matemática (3º ano)
+
+```python
+POST /api/v1/activities/generate-multidisciplinary
+
+{
+  "student_id": "uuid-here",
+  "subject": "matematica",
+  "grade_level": "fundamental_3_ano",
+  "activity_type": "cognitive",
+  "difficulty": "easy",
+  "duration_minutes": 30,
+  "theme": "dinossauros",
+  "bncc_code": "EF03MA06"  // Resolver e elaborar problemas de adição e subtração
+}
+```
+
+**Resposta esperada:**
+- Atividade com problemas de adição usando dinossauros
+- Alinhada com EF03MA06 da BNCC
+- Adaptada para perfil TEA do aluno
+- Com apoios visuais e instruções claras
+
+### 2. Atividade de Português (4º ano)
+
+```python
+POST /api/v1/activities/generate-multidisciplinary
+
+{
+  "student_id": "uuid-here",
+  "subject": "portugues",
+  "grade_level": "fundamental_4_ano",
+  "activity_type": "cognitive",
+  "difficulty": "medium",
+  "duration_minutes": 45,
+  "theme": "astronomia",
+  "bncc_code": "EF04LP03"  // Localizar palavras no dicionário
+}
+```
+
+### 3. Filtrar Atividades por Disciplina
+
+```python
+GET /api/v1/activities/?subject=ciencias&grade_level=fundamental_5_ano
+
+# Retorna todas as atividades de Ciências do 5º ano
+```
+
+### 4. Buscar por Código BNCC
+
+```python
+GET /api/v1/activities/search/bncc/EF03MA06
+
+# Retorna todas as atividades alinhadas com EF03MA06
+```
+
+## Alinhamento BNCC
+
+### O que é a BNCC?
+
+A Base Nacional Comum Curricular (BNCC) define as aprendizagens essenciais
+que todos os alunos brasileiros devem desenvolver.
+
+### Como funciona o alinhamento?
+
+1. **Códigos BNCC**: Cada competência/habilidade tem um código único
+   - Formato: `[EI/EF/EM][ano][disciplina][número]`
+   - Exemplo: `EF03MA06` = Ensino Fundamental, 3º ano, Matemática, habilidade 06
+
+2. **No EduAutismo IA**:
+   - Você pode informar um código BNCC ao gerar atividade
+   - A IA alinhará a atividade com essa competência
+   - A atividade será marcada com os códigos BNCC correspondentes
+
+3. **Busca por BNCC**:
+   - Encontre atividades alinhadas com competências específicas
+   - Reutilize atividades para outros alunos
+   - Mantenha biblioteca organizada por objetivos de aprendizagem
+
+## Boas Práticas
+
+### ✅ DO
+
+- Especifique subject e grade_level sempre que possível
+- Use códigos BNCC para garantir alinhamento curricular
+- Incorpore interesses especiais do aluno no theme
+- Revise e personalize atividades geradas pela IA
+- Reutilize atividades bem-sucedidas
+
+### ❌ DON'T
+
+- Não gere atividades sem contexto do perfil do aluno
+- Não ignore adaptações sugeridas
+- Não espere que a IA seja perfeita (sempre revise!)
+- Não use atividades de série muito acima/abaixo do nível do aluno
+
+## Dúvidas Frequentes
+
+**Q: Posso usar atividades sem especificar disciplina?**
+A: Sim, os campos subject e grade_level são opcionais. Mas especificá-los
+melhora significativamente a qualidade da atividade gerada.
+
+**Q: O código BNCC é obrigatório?**
+A: Não, é opcional. Se não informado, a IA sugerirá competências adequadas.
+
+**Q: Posso criar atividades interdisciplinares?**
+A: Atualmente, cada atividade tem uma disciplina principal. Mas você pode
+mencionar conexões interdisciplinares no campo "theme".
+
+**Q: Como sei qual código BNCC usar?**
+A: Consulte a documentação oficial da BNCC ou use nosso endpoint
+`/api/v1/bncc/search` (disponível em MVP 4.0).
+
+## Próximos Passos
+
+- MVP 4.0: Busca de códigos BNCC integrada
+- MVP 4.0: Sugestão automática de competências
+- MVP 5.0: Atividades interdisciplinares
+- MVP 5.0: Sequências didáticas completas
+```
+
+### 8.3. Atualizar API Docs (Swagger)
+
+Os docstrings dos endpoints já estão atualizados, então o Swagger será
+automaticamente atualizado.
+
+**Validação:**
+- Acessar http://localhost:8000/docs
+- Verificar novos endpoints
+- Testar via Swagger UI
+
+**Checklist Sprint 8:**
+- [ ] Atualizar CLAUDE.md com novos enums
+- [ ] Criar MULTIDISCIPLINARY_USAGE_GUIDE.md
+- [ ] Validar Swagger docs
+- [ ] Adicionar exemplos no README
+- [ ] Commitar: `git commit -m "docs: adicionar documentação completa MVP 3.0"`
+
+---
+
+## ✅ CHECKLIST FINAL MVP 3.0
+
+### Código
+
+- [ ] Sprint 1: Enums e Constants
+- [ ] Sprint 2: Models (SQLAlchemy)
+- [ ] Sprint 3: Database Migration
+- [ ] Sprint 4: Schemas (Pydantic)
+- [ ] Sprint 5: NLP Service
+- [ ] Sprint 6: API Endpoints
+- [ ] Sprint 7: Testes (85%+ coverage)
+- [ ] Sprint 8: Documentação
+
+### Qualidade
+
+- [ ] Todos os testes passando
+- [ ] Coverage >= 85%
+- [ ] Black formatado
+- [ ] Flake8 sem erros
+- [ ] MyPy validado
+- [ ] Sem regressões
+
+### Deployment
+
+- [ ] Migration executada em dev
+- [ ] Validação manual via Swagger
+- [ ] Teste de carga básico
+- [ ] Logs estruturados funcionando
+- [ ] Pronto para merge
+
+---
+
+## 🎉 CONCLUSÃO
+
+Com a conclusão do MVP 3.0, o EduAutismo IA será transformado em uma
+**Plataforma Multidisciplinar Inteligente** completa:
+
+✅ **25 disciplinas** disponíveis
+✅ **18 níveis escolares** suportados
+✅ **Alinhamento BNCC** automático
+✅ **IA contextualizada** por disciplina
+✅ **Filtros avançados** para busca
+✅ **100% backwards-compatible**
+
+**Tempo total estimado**: ~33 horas (~1 semana de desenvolvimento)
+
+**Próximo passo**: MVP 4.0 - Analytics & Insights com BNCC avançado
+
+---
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
 

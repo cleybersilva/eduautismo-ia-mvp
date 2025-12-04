@@ -11,7 +11,7 @@ Tests the new endpoints:
 
 import pytest
 from fastapi import status
-from httpx import AsyncClient
+from fastapi.testclient import TestClient
 
 from app.utils.constants import GradeLevel, PedagogicalActivityType, Subject
 
@@ -19,10 +19,9 @@ from app.utils.constants import GradeLevel, PedagogicalActivityType, Subject
 class TestMetaEndpoints:
     """Test metadata endpoints for subjects and grade levels."""
 
-    @pytest.mark.asyncio
-    async def test_list_subjects(self, async_client: AsyncClient, auth_headers: dict):
+    def test_list_subjects(self, client: TestClient, auth_headers: dict):
         """Test GET /activities/meta/subjects."""
-        response = await async_client.get(
+        response = client.get(
             "/api/v1/activities/meta/subjects",
             headers=auth_headers,
         )
@@ -42,10 +41,9 @@ class TestMetaEndpoints:
         assert "educacao_fisica" in data
         assert data["educacao_fisica"] == "Educação Física"
 
-    @pytest.mark.asyncio
-    async def test_list_grade_levels(self, async_client: AsyncClient, auth_headers: dict):
+    def test_list_grade_levels(self, client: TestClient, auth_headers: dict):
         """Test GET /activities/meta/grade-levels."""
-        response = await async_client.get(
+        response = client.get(
             "/api/v1/activities/meta/grade-levels",
             headers=auth_headers,
         )
@@ -69,12 +67,11 @@ class TestMetaEndpoints:
 class TestAdvancedSearch:
     """Test advanced search endpoint with v3.0 filters."""
 
-    @pytest.mark.asyncio
-    async def test_search_by_subject(self, async_client: AsyncClient, auth_headers: dict, test_student):
+    def test_search_by_subject(self, client: TestClient, auth_headers: dict, test_student):
         """Test filtering by subject."""
         # Create activity with subject
         activity_data = {
-            "student_id": str(test_student.id),
+            "student_id": test_student["id"],
             "title": "Atividade de Matemática",
             "description": "Teste de matemática",
             "activity_type": "cognitive",
@@ -88,7 +85,7 @@ class TestAdvancedSearch:
         }
 
         # Create activity
-        create_response = await async_client.post(
+        create_response = client.post(
             "/api/v1/activities/",
             json=activity_data,
             headers=auth_headers,
@@ -96,7 +93,7 @@ class TestAdvancedSearch:
         assert create_response.status_code == status.HTTP_201_CREATED
 
         # Search by subject
-        response = await async_client.get(
+        response = client.get(
             "/api/v1/activities/search?subject=matematica",
             headers=auth_headers,
         )
@@ -106,12 +103,11 @@ class TestAdvancedSearch:
         assert len(activities) >= 1
         assert all(act["subject"] == "matematica" for act in activities if act.get("subject"))
 
-    @pytest.mark.asyncio
-    async def test_search_by_grade_level(self, async_client: AsyncClient, auth_headers: dict, test_student):
+    def test_search_by_grade_level(self, client: TestClient, auth_headers: dict, test_student):
         """Test filtering by grade level."""
         # Create activity with grade level
         activity_data = {
-            "student_id": str(test_student.id),
+            "student_id": test_student["id"],
             "title": "Atividade 3º Ano",
             "description": "Teste para 3º ano",
             "activity_type": "cognitive",
@@ -125,7 +121,7 @@ class TestAdvancedSearch:
         }
 
         # Create activity
-        create_response = await async_client.post(
+        create_response = client.post(
             "/api/v1/activities/",
             json=activity_data,
             headers=auth_headers,
@@ -133,7 +129,7 @@ class TestAdvancedSearch:
         assert create_response.status_code == status.HTTP_201_CREATED
 
         # Search by grade level
-        response = await async_client.get(
+        response = client.get(
             "/api/v1/activities/search?grade_level=fundamental_1_3ano",
             headers=auth_headers,
         )
@@ -145,12 +141,11 @@ class TestAdvancedSearch:
             act["grade_level"] == "fundamental_1_3ano" for act in activities if act.get("grade_level")
         )
 
-    @pytest.mark.asyncio
-    async def test_search_combined_filters(self, async_client: AsyncClient, auth_headers: dict, test_student):
+    def test_search_combined_filters(self, client: TestClient, auth_headers: dict, test_student):
         """Test search with multiple v3.0 filters combined."""
         # Create activity with multiple v3.0 fields
         activity_data = {
-            "student_id": str(test_student.id),
+            "student_id": test_student["id"],
             "title": "Exercício de Matemática",
             "description": "Exercício para 3º ano",
             "activity_type": "cognitive",
@@ -166,7 +161,7 @@ class TestAdvancedSearch:
         }
 
         # Create activity
-        create_response = await async_client.post(
+        create_response = client.post(
             "/api/v1/activities/",
             json=activity_data,
             headers=auth_headers,
@@ -174,7 +169,7 @@ class TestAdvancedSearch:
         assert create_response.status_code == status.HTTP_201_CREATED
 
         # Search with combined filters
-        response = await async_client.get(
+        response = client.get(
             "/api/v1/activities/search"
             "?subject=matematica"
             "&grade_level=fundamental_1_3ano"
@@ -198,12 +193,11 @@ class TestAdvancedSearch:
             if act.get("bncc_competencies"):
                 assert len(act["bncc_competencies"]) > 0
 
-    @pytest.mark.asyncio
-    async def test_search_has_bncc_filter(self, async_client: AsyncClient, auth_headers: dict, test_student):
+    def test_search_has_bncc_filter(self, client: TestClient, auth_headers: dict, test_student):
         """Test has_bncc filter (true/false)."""
         # Create activity WITH BNCC
         activity_with_bncc = {
-            "student_id": str(test_student.id),
+            "student_id": test_student["id"],
             "title": "Com BNCC",
             "description": "Atividade com códigos BNCC",
             "activity_type": "cognitive",
@@ -217,7 +211,7 @@ class TestAdvancedSearch:
 
         # Create activity WITHOUT BNCC
         activity_without_bncc = {
-            "student_id": str(test_student.id),
+            "student_id": test_student["id"],
             "title": "Sem BNCC",
             "description": "Atividade sem códigos BNCC",
             "activity_type": "cognitive",
@@ -228,11 +222,11 @@ class TestAdvancedSearch:
             "instructions": ["Passo 1"],
         }
 
-        await async_client.post("/api/v1/activities/", json=activity_with_bncc, headers=auth_headers)
-        await async_client.post("/api/v1/activities/", json=activity_without_bncc, headers=auth_headers)
+        client.post("/api/v1/activities/", json=activity_with_bncc, headers=auth_headers)
+        client.post("/api/v1/activities/", json=activity_without_bncc, headers=auth_headers)
 
         # Search for activities WITH BNCC
-        response_with = await async_client.get(
+        response_with = client.get(
             "/api/v1/activities/search?has_bncc=true",
             headers=auth_headers,
         )
@@ -245,7 +239,7 @@ class TestAdvancedSearch:
         )
 
         # Search for activities WITHOUT BNCC
-        response_without = await async_client.get(
+        response_without = client.get(
             "/api/v1/activities/search?has_bncc=false",
             headers=auth_headers,
         )
@@ -255,12 +249,11 @@ class TestAdvancedSearch:
 class TestBNCCSearch:
     """Test BNCC code search endpoint."""
 
-    @pytest.mark.asyncio
-    async def test_search_by_bncc_code(self, async_client: AsyncClient, auth_headers: dict, test_student):
+    def test_search_by_bncc_code(self, client: TestClient, auth_headers: dict, test_student):
         """Test GET /activities/search/bncc/{code}."""
         # Create activities with specific BNCC codes
         activity_data = {
-            "student_id": str(test_student.id),
+            "student_id": test_student["id"],
             "title": "Atividade BNCC EF03MA01",
             "description": "Atividade alinhada com EF03MA01",
             "activity_type": "cognitive",
@@ -275,7 +268,7 @@ class TestBNCCSearch:
         }
 
         # Create activity
-        create_response = await async_client.post(
+        create_response = client.post(
             "/api/v1/activities/",
             json=activity_data,
             headers=auth_headers,
@@ -283,7 +276,7 @@ class TestBNCCSearch:
         assert create_response.status_code == status.HTTP_201_CREATED
 
         # Search by BNCC code
-        response = await async_client.get(
+        response = client.get(
             "/api/v1/activities/search/bncc/EF03MA01",
             headers=auth_headers,
         )
@@ -297,10 +290,9 @@ class TestBNCCSearch:
             assert "bncc_competencies" in act
             assert "EF03MA01" in act["bncc_competencies"]
 
-    @pytest.mark.asyncio
-    async def test_search_by_bncc_code_not_found(self, async_client: AsyncClient, auth_headers: dict):
+    def test_search_by_bncc_code_not_found(self, client: TestClient, auth_headers: dict):
         """Test searching for non-existent BNCC code."""
-        response = await async_client.get(
+        response = client.get(
             "/api/v1/activities/search/bncc/EF99ZZ99",
             headers=auth_headers,
         )
@@ -309,13 +301,12 @@ class TestBNCCSearch:
         activities = response.json()
         assert len(activities) == 0  # No activities with this code
 
-    @pytest.mark.asyncio
-    async def test_search_bncc_pagination(self, async_client: AsyncClient, auth_headers: dict, test_student):
+    def test_search_bncc_pagination(self, client: TestClient, auth_headers: dict, test_student):
         """Test BNCC search with pagination."""
         # Create multiple activities with same BNCC code
         for i in range(5):
             activity_data = {
-                "student_id": str(test_student.id),
+                "student_id": test_student["id"],
                 "title": f"Atividade BNCC {i}",
                 "description": f"Atividade {i}",
                 "activity_type": "cognitive",
@@ -326,10 +317,10 @@ class TestBNCCSearch:
                 "instructions": ["Passo 1"],
                 "bncc_competencies": ["EF03MA06"],
             }
-            await async_client.post("/api/v1/activities/", json=activity_data, headers=auth_headers)
+            client.post("/api/v1/activities/", json=activity_data, headers=auth_headers)
 
         # Test pagination
-        response = await async_client.get(
+        response = client.get(
             "/api/v1/activities/search/bncc/EF03MA06?skip=0&limit=3",
             headers=auth_headers,
         )
@@ -342,20 +333,19 @@ class TestBNCCSearch:
 class TestMultidisciplinaryGeneration:
     """Test multidisciplinary activity generation endpoint."""
 
-    @pytest.mark.asyncio
-    async def test_generate_multidisciplinary_requires_subject(
-        self, async_client: AsyncClient, auth_headers: dict, test_student
+    def test_generate_multidisciplinary_requires_subject(
+        self, client: TestClient, auth_headers: dict, test_student
     ):
         """Test that subject and grade_level are required."""
         # Request without subject and grade_level
         activity_data = {
-            "student_id": str(test_student.id),
+            "student_id": test_student["id"],
             "activity_type": "cognitive",
             "difficulty": "medium",
             "duration_minutes": 30,
         }
 
-        response = await async_client.post(
+        response = client.post(
             "/api/v1/activities/generate-multidisciplinary",
             json=activity_data,
             headers=auth_headers,
@@ -365,9 +355,8 @@ class TestMultidisciplinaryGeneration:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "subject e grade_level são obrigatórios" in response.json()["detail"]
 
-    @pytest.mark.asyncio
-    async def test_generate_multidisciplinary_invalid_student(
-        self, async_client: AsyncClient, auth_headers: dict
+    def test_generate_multidisciplinary_invalid_student(
+        self, client: TestClient, auth_headers: dict
     ):
         """Test generation with non-existent student."""
         activity_data = {
@@ -379,7 +368,7 @@ class TestMultidisciplinaryGeneration:
             "grade_level": "fundamental_1_3ano",
         }
 
-        response = await async_client.post(
+        response = client.post(
             "/api/v1/activities/generate-multidisciplinary",
             json=activity_data,
             headers=auth_headers,
