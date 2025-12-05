@@ -56,14 +56,24 @@ documentdb_enable_pitr         = true
 documentdb_pitr_window         = 7
 
 # ============================================================================
-# Cache Redis (ElastiCache)
+# Cache Redis (ElastiCache) - MVP 3.0
 # ============================================================================
 # Cluster com múltiplos nós e failover automático
 redis_engine_version = "7.0"
 redis_node_type      = "cache.r5.large"
 redis_num_cache_nodes = 3  # 3 nós com failover automático
-redis_automatic_failover_enabled = true
-redis_multi_az_enabled = true
+
+# MVP 3.0 - Security & Encryption (LGPD Compliance)
+redis_at_rest_encryption_enabled = true   # Criptografia at rest (LGPD)
+redis_transit_encryption_enabled = true   # Criptografia in transit (TLS 1.2+)
+redis_auth_token_enabled         = true   # Auth token para segurança
+
+# MVP 3.0 - High Availability
+redis_automatic_failover_enabled = true   # Failover automático
+redis_multi_az_enabled           = true   # Multi-AZ para HA
+
+# MVP 3.0 - Backups
+redis_snapshot_retention_limit = 7  # 7 dias de snapshots (compliance)
 
 # ============================================================================
 # Computação (ECS Fargate)

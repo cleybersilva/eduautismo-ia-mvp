@@ -37,12 +37,24 @@ rds_enable_cloudwatch_logs      = true   # Para debug
 enable_documentdb = false
 
 # ============================================================================
-# Cache Redis (ElastiCache)
+# Cache Redis (ElastiCache) - MVP 3.0
 # ============================================================================
 # Instância pequena para desenvolvimento
 redis_engine_version = "7.0"
 redis_node_type      = "cache.t3.micro"
 redis_num_cache_nodes = 1  # Nó único em dev
+
+# MVP 3.0 - Security & Encryption
+redis_at_rest_encryption_enabled = false  # Desabilitado em dev (custo)
+redis_transit_encryption_enabled = false  # Desabilitado em dev (performance)
+redis_auth_token_enabled         = false  # Desabilitado em dev (simplicidade)
+
+# MVP 3.0 - High Availability
+redis_automatic_failover_enabled = false  # Requer > 1 nó
+redis_multi_az_enabled           = false  # Single AZ em dev
+
+# MVP 3.0 - Backups
+redis_snapshot_retention_limit = 1  # Mínimo de backups em dev
 
 # ============================================================================
 # Computação (ECS Fargate)

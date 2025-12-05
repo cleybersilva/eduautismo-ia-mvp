@@ -30,6 +30,12 @@ variable "rds_instance_class" {
   default     = "db.t3.small"
 }
 
+variable "rds_engine_version" {
+  description = "Versão do PostgreSQL"
+  type        = string
+  default     = "15.4"
+}
+
 # Variáveis de Computação
 variable "ecs_container_insights" {
   description = "Habilitar Container Insights no ECS"
@@ -42,4 +48,68 @@ variable "s3_lifecycle_enabled" {
   description = "Habilitar regras de lifecycle no S3"
   type        = bool
   default     = true
+}
+
+# =================================================================
+# MVP 3.0 - ElastiCache Redis Variables
+# =================================================================
+
+variable "redis_node_type" {
+  description = "Tipo de instância do Redis"
+  type        = string
+  default     = "cache.t3.micro"
+}
+
+variable "redis_num_cache_nodes" {
+  description = "Número de réplicas do Redis"
+  type        = number
+  default     = 1
+}
+
+variable "redis_engine_version" {
+  description = "Versão do Redis"
+  type        = string
+  default     = "7.0"
+}
+
+variable "redis_at_rest_encryption_enabled" {
+  description = "Habilitar criptografia at rest"
+  type        = bool
+  default     = true
+}
+
+variable "redis_transit_encryption_enabled" {
+  description = "Habilitar criptografia in transit"
+  type        = bool
+  default     = true
+}
+
+variable "redis_auth_token_enabled" {
+  description = "Habilitar auth token (senha)"
+  type        = bool
+  default     = true
+}
+
+variable "redis_automatic_failover_enabled" {
+  description = "Habilitar failover automático (requer num_cache_nodes > 1)"
+  type        = bool
+  default     = true
+}
+
+variable "redis_multi_az_enabled" {
+  description = "Habilitar Multi-AZ"
+  type        = bool
+  default     = true
+}
+
+variable "redis_snapshot_retention_limit" {
+  description = "Número de dias para retenção de snapshots"
+  type        = number
+  default     = 5
+}
+
+variable "tags" {
+  description = "Tags adicionais para os recursos"
+  type        = map(string)
+  default     = {}
 }

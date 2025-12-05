@@ -41,12 +41,24 @@ documentdb_num_instances       = 2      # Multi-node cluster
 documentdb_backup_retention    = 14
 
 # ============================================================================
-# Cache Redis (ElastiCache)
+# Cache Redis (ElastiCache) - MVP 3.0
 # ============================================================================
 # Instância média com redundância
 redis_engine_version = "7.0"
 redis_node_type      = "cache.t3.small"
 redis_num_cache_nodes = 2  # 2 nós para redundância
+
+# MVP 3.0 - Security & Encryption
+redis_at_rest_encryption_enabled = true   # Criptografia at rest
+redis_transit_encryption_enabled = true   # Criptografia in transit (TLS)
+redis_auth_token_enabled         = true   # Auth token habilitado
+
+# MVP 3.0 - High Availability
+redis_automatic_failover_enabled = true   # Failover automático
+redis_multi_az_enabled           = true   # Multi-AZ para HA
+
+# MVP 3.0 - Backups
+redis_snapshot_retention_limit = 5  # 5 dias de snapshots
 
 # ============================================================================
 # Computação (ECS Fargate)

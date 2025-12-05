@@ -23,17 +23,41 @@ variable "environment" {
   type        = string
 }
 
+variable "engine_version" {
+  description = "Versão do PostgreSQL"
+  type        = string
+  default     = "15.4"
+}
+
 # Security Group para RDS
 resource "aws_security_group" "rds" {
   name_prefix = "${var.project_name}-${var.environment}-rds-"
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    security_groups = [var.ecs_security_group_id]
+    description = "PostgreSQL from VPC"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.main.cidr_block]
   }
+
+  egress {
+    description = "Allow all outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-rds-sg"
+  }
+}
+
+# Data source para obter CIDR da VPC
+data "aws_vpc" "main" {
+  id = var.vpc_id
 }
 
 # Subnet Group para RDS
@@ -50,7 +74,7 @@ resource "aws_db_subnet_group" "main" {
 resource "aws_db_instance" "main" {
   identifier_prefix    = "${var.project_name}-${var.environment}-"
   engine              = "postgres"
-  engine_version      = "14"
+  engine_version      = var.engine_version
   instance_class      = var.instance_class
   allocated_storage   = 20
   storage_encrypted   = true
