@@ -218,6 +218,175 @@ def create_activity(
     return activity
 
 
+@router.get("/search/bncc/{bncc_code}", response_model=List[ActivityListResponse])
+def search_by_bncc(
+    bncc_code: str,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> List[ActivityListResponse]:
+    """
+    Search activities by BNCC competency code (MVP 3.0).
+
+    Searches for activities that include the specified BNCC code in their
+    bncc_competencies array.
+
+    **Example:** `/search/bncc/EF03MA01`
+
+    **Parameters:**
+    - bncc_code: BNCC competency code (e.g., "EF03MA01")
+    - skip: Pagination offset
+    - limit: Maximum results (1-100)
+
+    **Returns:** List of activities with the specified BNCC code
+    """
+    teacher_id = UUID(current_user["user_id"])
+
+    logger.info(f"Searching activities by BNCC code: {bncc_code}")
+
+    # Query activities with BNCC code
+    # Note: This uses PostgreSQL array contains operator
+    query = db.query(Activity).join(Student).filter(Student.teacher_id == teacher_id)
+
+    # Filter by BNCC code (PostgreSQL array contains)
+    query = query.filter(Activity.bncc_competencies.contains([bncc_code]))
+
+    activities = query.offset(skip).limit(limit).all()
+
+    logger.info(f"Found {len(activities)} activities with BNCC code {bncc_code}")
+
+    return activities
+@router.get("/meta/subjects", response_model=Dict[str, str])
+def list_subjects() -> Dict[str, str]:
+    """
+    List all available subjects/disciplines (MVP 3.0).
+
+    Returns a dictionary mapping subject codes to display names.
+
+    **Example Response:**
+    ```json
+    {
+      "matematica": "Matemática",
+      "portugues": "Português",
+      "ciencias": "Ciências",
+      ...
+    }
+    ```
+
+    **Use case:** Populate subject dropdown in frontend
+    """
+    from app.utils.constants import get_subject_display_name
+
+    subjects = {}
+    for subject_code in get_subjects():
+        try:
+            subject_enum = Subject(subject_code)
+            subjects[subject_code] = get_subject_display_name(subject_enum)
+        except ValueError:
+            subjects[subject_code] = subject_code
+
+    return subjects
+@router.get("/meta/grade-levels", response_model=Dict[str, str])
+def list_grade_levels() -> Dict[str, str]:
+    """
+    List all available grade levels (MVP 3.0).
+
+    Returns a dictionary mapping grade level codes to display names.
+
+    **Example Response:**
+    ```json
+    {
+      "infantil_maternal": "Infantil - Maternal",
+      "fundamental_1_1ano": "1º Ano - Fundamental I",
+      "medio_1ano": "1ª Série - Ensino Médio",
+      ...
+    }
+    ```
+
+    **Use case:** Populate grade level dropdown in frontend
+    """
+    from app.utils.constants import get_grade_level_display_name
+
+    grade_levels = {}
+    for grade_code in get_grade_levels():
+        try:
+            grade_enum = GradeLevel(grade_code)
+            grade_levels[grade_code] = get_grade_level_display_name(grade_enum)
+        except ValueError:
+            grade_levels[grade_code] = grade_code
+
+    return grade_levels
+@router.get("/search", response_model=List[ActivityListResponse])
+def search_activities(
+    subject: Optional[Subject] = Query(None, description="Filter by subject"),
+    grade_level: Optional[GradeLevel] = Query(None, description="Filter by grade level"),
+    pedagogical_type: Optional[PedagogicalActivityType] = Query(None, description="Filter by pedagogical type"),
+    has_bncc: Optional[bool] = Query(None, description="Filter activities with/without BNCC codes"),
+    difficulty: Optional[str] = Query(None, description="Filter by difficulty"),
+    student_id: Optional[UUID] = Query(None, description="Filter by student"),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> List[ActivityListResponse]:
+    """
+    Advanced search with multidisciplinary filters (MVP 3.0).
+
+    **New Filters:**
+    - subject: Filter by educational subject
+    - grade_level: Filter by grade level
+    - pedagogical_type: Filter by activity format
+    - has_bncc: true/false to filter activities with/without BNCC codes
+
+    **Example:**
+    ```
+    GET /search?subject=matematica&grade_level=fundamental_1_3ano&has_bncc=true
+    ```
+
+    **Returns:** Paginated list of activities matching all filters
+    """
+    teacher_id = UUID(current_user["user_id"])
+
+    # Start with base query
+    query = db.query(Activity).join(Student).filter(Student.teacher_id == teacher_id)
+
+    # Apply v3.0 filters
+    if subject:
+        query = query.filter(Activity.subject == subject)
+
+    if grade_level:
+        query = query.filter(Activity.grade_level == grade_level)
+
+    if pedagogical_type:
+        query = query.filter(Activity.pedagogical_type == pedagogical_type)
+
+    if has_bncc is not None:
+        if has_bncc:
+            # Has BNCC codes (array is not null and not empty)
+            query = query.filter(Activity.bncc_competencies.isnot(None))
+        else:
+            # Does not have BNCC codes
+            query = query.filter(
+                or_(Activity.bncc_competencies.is_(None), Activity.bncc_competencies == [])
+            )
+
+    if difficulty:
+        query = query.filter(Activity.difficulty == difficulty)
+
+    if student_id:
+        query = query.filter(Activity.student_id == student_id)
+
+    # Execute query with pagination
+    activities = query.order_by(Activity.created_at.desc()).offset(skip).limit(limit).all()
+
+    logger.info(
+        f"Advanced search: subject={subject}, grade={grade_level}, "
+        f"pedagogical_type={pedagogical_type}, found={len(activities)}"
+    )
+
+    return activities
+
 @router.get("/{activity_id}", response_model=ActivityResponse)
 def get_activity(activity_id: int, db: Session = Depends(get_db)) -> ActivityResponse:
     """
@@ -446,177 +615,9 @@ async def generate_multidisciplinary_activity(
         )
 
 
-@router.get("/search/bncc/{bncc_code}", response_model=List[ActivityListResponse])
-def search_by_bncc(
-    bncc_code: str,
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
-    current_user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db),
-) -> List[ActivityListResponse]:
-    """
-    Search activities by BNCC competency code (MVP 3.0).
-
-    Searches for activities that include the specified BNCC code in their
-    bncc_competencies array.
-
-    **Example:** `/search/bncc/EF03MA01`
-
-    **Parameters:**
-    - bncc_code: BNCC competency code (e.g., "EF03MA01")
-    - skip: Pagination offset
-    - limit: Maximum results (1-100)
-
-    **Returns:** List of activities with the specified BNCC code
-    """
-    teacher_id = UUID(current_user["user_id"])
-
-    logger.info(f"Searching activities by BNCC code: {bncc_code}")
-
-    # Query activities with BNCC code
-    # Note: This uses PostgreSQL array contains operator
-    query = db.query(Activity).join(Student).filter(Student.teacher_id == teacher_id)
-
-    # Filter by BNCC code (PostgreSQL array contains)
-    query = query.filter(Activity.bncc_competencies.contains([bncc_code]))
-
-    activities = query.offset(skip).limit(limit).all()
-
-    logger.info(f"Found {len(activities)} activities with BNCC code {bncc_code}")
-
-    return activities
 
 
-@router.get("/meta/subjects", response_model=Dict[str, str])
-def list_subjects() -> Dict[str, str]:
-    """
-    List all available subjects/disciplines (MVP 3.0).
-
-    Returns a dictionary mapping subject codes to display names.
-
-    **Example Response:**
-    ```json
-    {
-      "matematica": "Matemática",
-      "portugues": "Português",
-      "ciencias": "Ciências",
-      ...
-    }
-    ```
-
-    **Use case:** Populate subject dropdown in frontend
-    """
-    from app.utils.constants import get_subject_display_name
-
-    subjects = {}
-    for subject_code in get_subjects():
-        try:
-            subject_enum = Subject(subject_code)
-            subjects[subject_code] = get_subject_display_name(subject_enum)
-        except ValueError:
-            subjects[subject_code] = subject_code
-
-    return subjects
 
 
-@router.get("/meta/grade-levels", response_model=Dict[str, str])
-def list_grade_levels() -> Dict[str, str]:
-    """
-    List all available grade levels (MVP 3.0).
-
-    Returns a dictionary mapping grade level codes to display names.
-
-    **Example Response:**
-    ```json
-    {
-      "infantil_maternal": "Infantil - Maternal",
-      "fundamental_1_1ano": "1º Ano - Fundamental I",
-      "medio_1ano": "1ª Série - Ensino Médio",
-      ...
-    }
-    ```
-
-    **Use case:** Populate grade level dropdown in frontend
-    """
-    from app.utils.constants import get_grade_level_display_name
-
-    grade_levels = {}
-    for grade_code in get_grade_levels():
-        try:
-            grade_enum = GradeLevel(grade_code)
-            grade_levels[grade_code] = get_grade_level_display_name(grade_enum)
-        except ValueError:
-            grade_levels[grade_code] = grade_code
-
-    return grade_levels
 
 
-@router.get("/search", response_model=List[ActivityListResponse])
-def search_activities(
-    subject: Optional[Subject] = Query(None, description="Filter by subject"),
-    grade_level: Optional[GradeLevel] = Query(None, description="Filter by grade level"),
-    pedagogical_type: Optional[PedagogicalActivityType] = Query(None, description="Filter by pedagogical type"),
-    has_bncc: Optional[bool] = Query(None, description="Filter activities with/without BNCC codes"),
-    difficulty: Optional[str] = Query(None, description="Filter by difficulty"),
-    student_id: Optional[UUID] = Query(None, description="Filter by student"),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
-    current_user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db),
-) -> List[ActivityListResponse]:
-    """
-    Advanced search with multidisciplinary filters (MVP 3.0).
-
-    **New Filters:**
-    - subject: Filter by educational subject
-    - grade_level: Filter by grade level
-    - pedagogical_type: Filter by activity format
-    - has_bncc: true/false to filter activities with/without BNCC codes
-
-    **Example:**
-    ```
-    GET /search?subject=matematica&grade_level=fundamental_1_3ano&has_bncc=true
-    ```
-
-    **Returns:** Paginated list of activities matching all filters
-    """
-    teacher_id = UUID(current_user["user_id"])
-
-    # Start with base query
-    query = db.query(Activity).join(Student).filter(Student.teacher_id == teacher_id)
-
-    # Apply v3.0 filters
-    if subject:
-        query = query.filter(Activity.subject == subject)
-
-    if grade_level:
-        query = query.filter(Activity.grade_level == grade_level)
-
-    if pedagogical_type:
-        query = query.filter(Activity.pedagogical_type == pedagogical_type)
-
-    if has_bncc is not None:
-        if has_bncc:
-            # Has BNCC codes (array is not null and not empty)
-            query = query.filter(Activity.bncc_competencies.isnot(None))
-        else:
-            # Does not have BNCC codes
-            query = query.filter(
-                or_(Activity.bncc_competencies.is_(None), Activity.bncc_competencies == [])
-            )
-
-    if difficulty:
-        query = query.filter(Activity.difficulty == difficulty)
-
-    if student_id:
-        query = query.filter(Activity.student_id == student_id)
-
-    # Execute query with pagination
-    activities = query.order_by(Activity.created_at.desc()).offset(skip).limit(limit).all()
-
-    logger.info(
-        f"Advanced search: subject={subject}, grade={grade_level}, "
-        f"pedagogical_type={pedagogical_type}, found={len(activities)}"
-    )
-
-    return activities

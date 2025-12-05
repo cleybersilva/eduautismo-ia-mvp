@@ -98,6 +98,9 @@ class TestAdvancedSearch:
             headers=auth_headers,
         )
 
+        if response.status_code != status.HTTP_200_OK:
+            print(f"ERROR Response: {response.json()}")
+
         assert response.status_code == status.HTTP_200_OK
         activities = response.json()
         assert len(activities) >= 1
