@@ -1,5 +1,18 @@
 #!/usr/bin/env python3
 """
+
+Executa testes de carga no endpoint /api/v1/intervention-plans/pending-review
+para validar performance antes do deploy em produção.
+
+Uso:
+    python scripts/load_test_pending_review.py --requests 100 --concurrent 10
+    python scripts/load_test_pending_review.py --requests 1000 --concurrent 50 --url https://api-staging.example.com
+
+Requisitos:
+    pip install aiohttp
+
+Autor: Claude Code
+Data: 2025-11-24
 Script de teste de carga para endpoint /pending-review.
 
 Simula múltiplas requisições concorrentes para validar performance.

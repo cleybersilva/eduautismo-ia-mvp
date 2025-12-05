@@ -16,6 +16,7 @@ from app.db.base import BaseModel
 from app.utils.constants import UserRole
 
 if TYPE_CHECKING:
+    from app.models.notification import Notification
     from app.models.student import Student
 
 
@@ -114,6 +115,13 @@ class User(BaseModel):
         back_populates="teacher",
         cascade="all, delete-orphan",
         lazy="selectin",
+    )
+
+    notifications: Mapped[List["Notification"]] = relationship(
+        "Notification",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        lazy="select",
     )
 
     def __repr__(self) -> str:

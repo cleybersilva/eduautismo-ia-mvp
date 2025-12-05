@@ -16,6 +16,7 @@ from fastapi.responses import JSONResponse
 from app.api import api_router
 
 # Import configuration and dependencies
+from app.core.cache import cache_manager
 from app.core.config import settings
 from app.core.database import engine
 from app.db.base import Base  # Use the Base where models are registered
@@ -44,6 +45,14 @@ async def lifespan(app: FastAPI):
     print(f"📍 Environment: {settings.ENVIRONMENT}")
     print(f"🔧 Debug Mode: {settings.DEBUG}")
 
+    # Connect to Redis cache
+    try:
+        await cache_manager.connect()
+        print("✅ Redis cache connected")
+    except Exception as e:
+        print(f"⚠️  Redis cache connection warning: {e}")
+        print("ℹ️  Cache will be disabled")
+
     # Import all models to ensure they're registered with Base
     try:
         from app.models import activity, assessment, student, user  # noqa
@@ -61,6 +70,13 @@ async def lifespan(app: FastAPI):
 
     # Shutdown
     print("🛑 Shutting down EduAutismo IA API")
+
+    # Disconnect from Redis cache
+    try:
+        await cache_manager.disconnect()
+        print("✅ Redis cache disconnected")
+    except Exception as e:
+        print(f"⚠️  Redis cache disconnection warning: {e}")
 
 
 # ============================================================================

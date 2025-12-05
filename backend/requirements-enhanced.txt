@@ -1,0 +1,21 @@
+# Dependências Adicionais - Funcionalidades Avançadas
+# =========================================================
+#
+# Instalar com: pip install -r requirements-enhanced.txt
+#
+# Data: 2025-11-24
+# Versão: 2.0
+
+# Cache Redis
+redis==5.0.1
+redis[hiredis]==5.0.1  # Com suporte hiredis para performance
+
+# Exportação Excel
+openpyxl==3.1.2
+
+# Notificações em tempo real (opcional - para WebSockets)
+# python-socketio==5.10.0
+# python-engineio==4.8.0
+
+# Monitoramento de cache (opcional)
+# redis-om==0.2.1

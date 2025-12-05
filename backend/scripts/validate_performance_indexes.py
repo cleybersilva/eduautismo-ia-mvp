@@ -1,5 +1,27 @@
 #!/usr/bin/env python3
 """
+
+Valida se os índices de performance foram criados corretamente
+no banco de dados após deploy da migration.
+
+Uso:
+    python scripts/validate_performance_indexes.py
+
+Autor: Claude Code
+Data: 2025-11-24
+"""
+
+import sys
+from sqlalchemy import create_engine, inspect, text
+from app.core.config import settings
+
+# Índices esperados
+EXPECTED_INDEXES = {
+    "ix_intervention_plans_status_needs_review": ["status", "needs_review"],
+    "ix_intervention_plans_last_reviewed_at": ["last_reviewed_at"],
+    "ix_intervention_plans_review_frequency": ["review_frequency"],
+    "ix_intervention_plans_created_by_id": ["created_by_id"],
+}
 Script de validação de índices de performance.
 
 Valida se os índices criados pela migration estão presentes e sendo utilizados.
