@@ -246,13 +246,24 @@ def search_by_bncc(
     logger.info(f"Searching activities by BNCC code: {bncc_code}")
 
     # Query activities with BNCC code
-    # Note: This uses PostgreSQL array contains operator
     query = db.query(Activity).join(Student).filter(Student.teacher_id == teacher_id)
 
-    # Filter by BNCC code (PostgreSQL array contains)
-    query = query.filter(Activity.bncc_competencies.contains([bncc_code]))
-
-    activities = query.offset(skip).limit(limit).all()
+    # Filter by BNCC code (works for both PostgreSQL and SQLite)
+    if db.bind.dialect.name == "postgresql":
+        # PostgreSQL: uses native ARRAY contains operator
+        query = query.filter(Activity.bncc_competencies.contains([bncc_code]))
+        activities = query.offset(skip).limit(limit).all()
+    else:
+        # SQLite: Filter in Python since StringArray deserializes JSON to list
+        # We retrieve all activities for the teacher, then filter by BNCC code in memory
+        all_activities = query.offset(skip).limit(100).all()  # Get more to ensure we have enough
+        activities = [
+            act
+            for act in all_activities
+            if act.bncc_competencies and bncc_code in act.bncc_competencies
+        ]
+        # Apply limit after filtering
+        activities = activities[:limit]
 
     logger.info(f"Found {len(activities)} activities with BNCC code {bncc_code}")
 
@@ -504,11 +515,19 @@ async def generate_multidisciplinary_activity(
     **Returns:** Generated activity with subject-specific content
 
     **Raises:**
+    - 400: Missing required fields (subject and grade_level)
     - 404: Student not found
     - 403: Permission denied
     - 500: AI generation failed
     """
     teacher_id = UUID(current_user["user_id"])
+
+    # Validate required fields for multidisciplinary generation
+    if not activity_data.subject or not activity_data.grade_level:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="subject e grade_level são obrigatórios para geração multidisciplinar",
+        )
 
     # Get student
     student = db.query(Student).filter(Student.id == activity_data.student_id).first()

@@ -174,6 +174,7 @@ class ActivityListResponse(BaseResponseSchema):
     subject: Optional[Subject] = None
     grade_level: Optional[GradeLevel] = None
     pedagogical_type: Optional[PedagogicalActivityType] = None
+    bncc_competencies: Optional[List[str]] = None
 
 
 class ActivityFilterParams(BaseSchema):
